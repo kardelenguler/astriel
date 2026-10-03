@@ -1,0 +1,496 @@
+// ---------- Üst bölüm: solda yazı + form, sağda çark ----------
+.hero {
+  position: relative;  // süs bulutları buna göre konumlansın
+  overflow-x: clip;    // bulutlar sayfayı yana taşırmasın
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  align-items: center;
+  gap: 48px;
+  padding: 40px var(--page-padding) 64px;
+}
+
+// ---------- Süs bulutları ----------
+.deco {
+  position: absolute;
+  height: auto;
+  pointer-events: none;  // tıklamaları engellemesin
+  user-select: none;
+}
+
+.deco-right {
+  top: -10px;
+  right: -60px;
+  width: min(560px, 42vw);
+  opacity: 0.5;
+}
+
+.deco-left {
+  bottom: 0;
+  left: -80px;
+  width: min(440px, 34vw);
+  opacity: 0.4;
+}
+
+// Yazı ve çark bulutların önünde dursun
+.hero-text,
+.hero-visual {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-text {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;  // form dar ekranda taşmasın
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(40px, 5vw, 68px);
+  line-height: 1.08;
+  font-weight: 500;
+
+  em {
+    color: var(--color-mauve);
+    font-style: italic;
+  }
+}
+
+.lead {
+  margin: 0;
+  max-width: 460px;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.hero-form {
+  display: block;
+  margin-top: 12px;
+}
+
+// ---------- Sağdaki çark görseli ----------
+.hero-visual {
+  display: grid;
+  place-items: center;
+
+  // Çarkın arkasındaki yumuşak mor ışık
+  &::before {
+    content: '';
+    position: absolute;
+    width: 70%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(139, 111, 181, 0.35), transparent 70%);
+    filter: blur(20px);
+  }
+}
+
+.hero-wheel {
+  position: relative;  // ışığın üstünde dursun
+  width: 100%;
+  max-width: 580px;
+  height: auto;
+  animation: float 7s ease-in-out infinite;
+}
+
+// Yavaşça yukarı aşağı süzülme
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-14px); }
+}
+
+// Hareket azaltma tercihi olan kullanıcılarda animasyon olmasın
+@media (prefers-reduced-motion: reduce) {
+  .hero-wheel {
+    animation: none;
+  }
+}
+
+// ---------- Dar ekran: çark üstte, yazı ve form altta ----------
+@media (max-width: 1000px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .hero-visual {
+    order: -1;
+  }
+
+  .hero-wheel {
+    max-width: 340px;
+  }
+
+  .deco-right {
+    width: 60vw;
+    opacity: 0.3;
+  }
+
+  // Dar ekranda sol bulut formun altında kalıp kalabalık yapmasın
+  .deco-left {
+    display: none;
+  }
+} 
+
+
+// ---------- Özellik kartları ----------
+.features {
+  padding: 40px var(--page-padding) 96px;
+  text-align: center;
+
+  .eyebrow {
+    margin-bottom: 12px;
+  }
+
+  h2 {
+    margin: 0 0 48px;
+    font-size: clamp(30px, 3.4vw, 44px);
+    font-weight: 500;
+  }
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.feature-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 32px 22px;
+  background: rgba(23, 19, 34, 0.6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(10px);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+
+  // Üstüne gelince hafifçe yukarı kalksın ve pembe ışık versin
+  &:hover {
+    transform: translateY(-4px);
+    border-color: rgba(197, 138, 168, 0.5);
+    box-shadow: 0 10px 40px rgba(139, 111, 181, 0.18);
+  }
+
+  svg {
+    width: 52px;
+    height: 52px;
+    fill: none;
+    stroke: var(--color-gold);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 500;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+}
+
+// Orta ekran: 2 sütun, telefon: 1 sütun
+@media (max-width: 1000px) {
+  .feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-card:hover {
+    transform: none;
+  }
+} 
+
+
+// ---------- Nasıl çalışır? ----------
+.how {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  align-items: center;
+  gap: 64px;
+  padding: 40px var(--page-padding) 96px;
+  scroll-margin-top: 24px;  // menüden gelince başlık ekranın tepesine yapışmasın
+}
+
+.how-visual {
+  display: grid;
+  place-items: center;
+
+  img {
+    width: 100%;
+    max-width: 380px;
+    height: auto;
+    filter: drop-shadow(0 20px 50px rgba(139, 111, 181, 0.25));
+  }
+}
+
+.how-text {
+  .eyebrow {
+    margin-bottom: 12px;
+  }
+
+  h2 {
+    margin: 0 0 36px;
+    font-size: clamp(30px, 3.4vw, 44px);
+    font-weight: 500;
+  }
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  h3 {
+    margin: 0 0 6px;
+    font-size: 24px;
+    font-weight: 500;
+  }
+
+  p {
+    margin: 0;
+    max-width: 440px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+}
+
+// Altın çerçeveli adım numarası
+.step-number {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--color-gold);
+  border-radius: 50%;
+  font-family: var(--font-body);
+  font-size: 17px; 
+  color: var(--color-gold);
+  box-shadow: 0 0 18px rgba(201, 164, 108, 0.2);
+}
+
+// Dar ekran: görsel üstte, adımlar altta
+@media (max-width: 1000px) {
+  .how {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .how-visual img {
+    max-width: 260px;
+  }
+} 
+
+
+// ---------- Çağrı bandı ----------
+.cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 24px var(--page-padding) 110px;
+  text-align: center;
+
+  h2 {
+    margin: 8px 0 0;
+    font-size: clamp(34px, 4vw, 54px);
+    font-weight: 500;
+  }
+
+  p {
+    margin: 0;
+    font-size: 17px;
+    color: var(--color-text-muted);
+  }
+}
+
+.cta-art {
+  width: 100%;
+  max-width: 860px;
+  height: auto;
+}
+
+.cta-btn {
+  margin-top: 14px;
+  padding: 16px 34px;
+  background: var(--color-mauve);
+  color: var(--color-bg);
+  border: none;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 0 32px rgba(197, 138, 168, 0.45);
+  }
+}
+
+// Alttaki düğmeyle gelince form ekranın tepesine yapışmasın
+.hero {
+  scroll-margin-top: 16px;
+} 
+
+// ---------- Telefon (600px ve altı): daha kompakt görünüm ----------
+@media (max-width: 600px) {
+  // Üst bölüm
+  .hero {
+    padding: 8px 16px 32px;
+    gap: 10px;
+  }
+
+  .hero-wheel {
+    max-width: 190px;
+  }
+
+  .hero-text {
+    gap: 10px;
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  .lead {
+    font-size: 14px;
+  }
+
+  .hero-form {
+    margin-top: 2px;
+  }
+
+  // Özellik kartları: ikon solda, yazı sağda
+  .features {
+    padding: 20px 16px 44px;
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+  }
+
+  .feature-grid {
+    gap: 10px;
+  }
+
+  .feature-card {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    align-items: start;
+    gap: 2px 14px;
+    padding: 16px;
+    text-align: left;
+
+    svg {
+      grid-row: span 2;  // ikon, başlık ve yazının yanında dursun
+      width: 32px;
+      height: 32px;
+    }
+
+    h3 {
+      font-size: 18px;
+    }
+
+    p {
+      font-size: 12.5px;
+    }
+  }
+
+  // Nasıl çalışır?
+  .how {
+    padding: 20px 16px 44px;
+    gap: 16px;
+  }
+
+  .how-visual img {
+    max-width: 150px;
+  }
+
+  .how-text h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+  }
+
+  .steps {
+    gap: 16px;
+
+    li {
+      gap: 14px;
+    }
+
+    h3 {
+      font-size: 18px;
+    }
+
+    p {
+      font-size: 13px;
+    }
+  }
+
+  .step-number {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+  }
+
+  // Çağrı bandı
+  .cta {
+    padding: 12px 16px 52px;
+
+    h2 {
+      font-size: 26px;
+    }
+
+    p {
+      font-size: 14px;
+    }
+  }
+
+  .cta-btn {
+    padding: 13px 26px;
+    font-size: 14px;
+  }
+} 

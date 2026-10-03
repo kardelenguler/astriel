@@ -1,0 +1,258 @@
+// Navbar stilleri — renkler styles.scss'teki değişkenlerden gelir
+
+.navbar {
+  // 3 sütun: [logo] [bağlantılar] [düğmeler]
+  // Kenar sütunlar eşit genişlikte (1fr) -> ortadaki bağlantılar tam ortada durur
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 32px;
+  padding: 22px var(--page-padding);
+}
+
+// ---------- Logo ----------
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-gold);
+}
+
+.logo-mark {
+  width: 46px;
+  height: auto;
+  filter: drop-shadow(0 0 6px rgba(201, 164, 108, 0.35)); // hafif altın parıltı
+}
+
+.logo-text {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: 0.18em; // büyük harflerde harf arası açılınca daha zarif durur
+  text-transform: uppercase; // "Astriel" -> "ASTRIEL"
+  color: var(--color-text);
+}
+
+// ---------- Orta bağlantılar ----------
+.links {
+  display: flex;
+  gap: 48px;
+  font-size: 14px;
+
+  a {
+    position: relative;
+    padding: 6px 0;
+    white-space: nowrap; // "Ana Sayfa" iki satıra bölünmesin
+    color: var(--color-text);
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--color-mauve);
+    }
+
+    // Aktif sayfa: pembe yazı + altında ince çizgi (tasarımdaki gibi)
+    &.active {
+      color: var(--color-mauve);
+
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -4px;
+        height: 1px;
+        background: var(--color-mauve);
+      }
+    }
+  }
+}
+
+// ---------- Sağ düğmeler ----------
+.actions {
+  display: flex;
+  gap: 14px;
+  justify-self: end; // sağ sütunun en sağına yaslan
+}
+
+.btn {
+  padding: 10px 24px;
+  white-space: nowrap;
+  border-radius: 999px; // tam yuvarlak kenarlar
+  font-size: 14px;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-outline {
+  border: 1px solid #5b5368;
+
+  &:hover {
+    border-color: var(--color-mauve);
+  }
+}
+
+.btn-filled {
+  background: var(--color-mauve);
+  color: var(--color-bg);
+  font-weight: 500;
+
+  &:hover {
+    box-shadow: 0 0 24px rgba(197, 138, 168, 0.38); // hafif pembe parıltı
+  }
+}
+
+// ---------- Orta genişlik ----------
+// Dizüstü + açık geliştirici paneli gibi daha dar ekranlarda boşlukları daralt
+@media (max-width: 1200px) {
+  .navbar {
+    gap: 20px;
+  }
+
+  .links {
+    gap: 24px;
+  }
+
+  .btn {
+    padding: 10px 18px;
+  }
+}
+
+// ---------- Mobil ----------
+// Ekran 900px'ten darsa orta bağlantıları gizle (mobil menü düğmesi sonra eklenecek)
+@media (max-width: 900px) {
+  // 2 sütun: [logo] [düğmeler]
+  .navbar {
+    grid-template-columns: 1fr auto;
+  }
+
+  .links {
+    display: none;
+  }
+} 
+
+
+// Sağdaki kutu: içindekiler dikeyde ortalı dursun
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+// Giriş yapan kullanıcının adı
+.greeting {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+
+  strong {
+    font-weight: 500;
+    color: var(--color-gold);
+  }
+}
+
+// "Çıkış Yap" bir <button>, link gibi görünsün diye tarayıcı stilini sıfırla
+button.btn {
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+} 
+
+
+// ---------- Mobil menü ----------
+// Masaüstünde ☰ düğmesi ve açılır menü görünmez
+.menu-toggle,
+.mobile-menu {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  // Dar ekranda giriş/kayıt düğmeleri menünün içine taşınıyor
+  .actions {
+    display: none;
+  }
+
+  // ☰ düğmesi: üç çizgi
+  .menu-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    justify-self: end;
+    width: 44px;
+    height: 44px;
+    padding: 0 11px;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    cursor: pointer;
+
+    span {
+      display: block;
+      height: 1.5px;
+      background: var(--color-text);
+      border-radius: 2px;
+      transition: transform 0.25s ease, opacity 0.2s ease;
+    }
+
+    // Menü açıkken üç çizgi ✕ işaretine dönüşsün
+    &[aria-expanded='true'] {
+      span:nth-child(1) {
+        transform: translateY(6.5px) rotate(45deg);
+      }
+      span:nth-child(2) {
+        opacity: 0;
+      }
+      span:nth-child(3) {
+        transform: translateY(-6.5px) rotate(-45deg);
+      }
+    }
+  }
+
+  // Açılır menü paneli
+  .mobile-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0 var(--page-padding) 16px;
+    padding: 12px;
+    background: rgba(23, 19, 34, 0.92);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    backdrop-filter: blur(14px);
+
+    > a {
+      padding: 12px 14px;
+      border-radius: 10px;
+      color: var(--color-text);
+      text-decoration: none;
+
+      &:hover {
+        background: rgba(197, 138, 168, 0.1);
+      }
+
+      &.active {
+        color: var(--color-mauve);
+      }
+    }
+  }
+
+  .mobile-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+    padding: 14px 14px 4px;
+    border-top: 1px solid var(--color-border);
+
+    .greeting {
+      width: 100%;
+      margin: 0;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-toggle span {
+    transition: none;
+  }
+} 

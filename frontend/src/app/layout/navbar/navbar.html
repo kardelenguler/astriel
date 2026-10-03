@@ -1,0 +1,62 @@
+<header class="navbar">
+  <!-- Sol: logo -->
+  <a routerLink="/" class="logo" aria-label="Astriel ana sayfa">
+    <img src="astriellogo.png" alt="" width="40" height="37" class="logo-mark" />
+    <span class="logo-text" lang="en">Astriel</span>
+  </a>
+
+  <!-- Orta: sayfa bağlantıları (masaüstü) -->
+  <nav class="links" aria-label="Ana menü">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      Ana Sayfa
+    </a>
+    <a routerLink="/haritalarim" routerLinkActive="active">Haritalarım</a>
+    <a routerLink="/hakkinda" routerLinkActive="active">Hakkında</a>
+  </nav>
+
+  <!-- Sağ: giriş yaptıysa ad + çıkış, yapmadıysa giriş / kayıt (masaüstü) -->
+  <div class="actions">
+    @if (auth.user(); as user) {
+      <span class="greeting">Merhaba, <strong>{{ user.display_name || user.username }}</strong></span>
+      <button type="button" class="btn btn-outline" (click)="logout()">Çıkış Yap</button>
+    } @else {
+      <a routerLink="/giris" class="btn btn-outline">Giriş Yap</a>
+      <a routerLink="/kayit" class="btn btn-filled">Kayıt Ol</a>
+    }
+  </div>
+
+  <!-- Sağ: menü düğmesi (sadece dar ekranda görünür) -->
+  <button
+    type="button"
+    class="menu-toggle"
+    (click)="toggleMenu()"
+    [attr.aria-expanded]="menuOpen()"
+    aria-controls="mobile-menu"
+    [attr.aria-label]="menuOpen() ? 'Menüyü kapat' : 'Menüyü aç'"
+  >
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</header>
+
+<!-- Mobil menü (☰'e basınca açılır) -->
+@if (menuOpen()) {
+  <nav id="mobile-menu" class="mobile-menu" aria-label="Mobil menü">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
+      Ana Sayfa
+    </a>
+    <a routerLink="/haritalarim" routerLinkActive="active" (click)="closeMenu()">Haritalarım</a>
+    <a routerLink="/hakkinda" routerLinkActive="active" (click)="closeMenu()">Hakkında</a>
+
+    <div class="mobile-actions">
+      @if (auth.user(); as user) {
+        <p class="greeting">Merhaba, <strong>{{ user.display_name || user.username }}</strong></p>
+        <button type="button" class="btn btn-outline" (click)="logout()">Çıkış Yap</button>
+      } @else {
+        <a routerLink="/giris" class="btn btn-outline" (click)="closeMenu()">Giriş Yap</a>
+        <a routerLink="/kayit" class="btn btn-filled" (click)="closeMenu()">Kayıt Ol</a>
+      }
+    </div>
+  </nav>
+} 

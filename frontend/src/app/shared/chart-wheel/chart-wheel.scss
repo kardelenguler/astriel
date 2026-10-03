@@ -1,0 +1,151 @@
+:host {
+  display: block;
+}
+
+.wheel {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  overflow: visible;
+  filter: drop-shadow(0 0 22px rgba(201, 164, 108, 0.12));
+}
+
+// ---------- Halkalar ----------
+.band {
+  fill: rgba(201, 164, 108, 0.06); // burç bandı hafif altın tonlu
+}
+
+.inner-bg {
+  fill: rgba(13, 11, 22, 0.75);
+}
+
+.ring {
+  fill: none;
+  stroke: var(--color-gold);
+  stroke-width: 1;
+  opacity: 0.6;
+}
+
+.outer {
+  stroke-width: 1.4;
+  opacity: 0.85;
+}
+
+.aspect-ring {
+  opacity: 0.3;
+}
+
+.deg-tick {
+  stroke: var(--color-gold);
+  stroke-width: 0.8;
+  opacity: 0.4;
+}
+
+// ---------- Burçlar ----------
+.sign-line {
+  stroke: var(--color-gold);
+  stroke-width: 1;
+  opacity: 0.55;
+}
+
+// Sembol yazıları ortak ayarlar
+.sign-glyph,
+.planet-glyph,
+.retro,
+.house-no,
+.axis-label {
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.sign-glyph,
+.planet-glyph,
+.retro {
+  font-family: 'Segoe UI Symbol', 'Noto Sans Symbols 2', 'Apple Symbols', serif;
+}
+
+.sign-glyph {
+  font-size: 21px;
+  fill: var(--color-gold);
+}
+
+// ---------- Evler ----------
+.house-line {
+  stroke: var(--color-text-muted);
+  stroke-width: 0.8;
+  opacity: 0.35;
+
+  // ASC–DSC ve MC–IC eksenleri daha belirgin
+  &.axis {
+    stroke: var(--color-gold);
+    stroke-width: 1.4;
+    opacity: 0.8;
+  }
+}
+
+.house-no {
+  font-size: 11px;
+  fill: var(--color-text-muted);
+  opacity: 0.7;
+}
+
+.axis-label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  fill: var(--color-gold);
+}
+
+// ---------- Açılar ----------
+.aspect {
+  stroke-width: 1.2;
+
+  &.harmonious {
+    stroke: var(--color-gold);
+  }
+
+  &.hard {
+    stroke: var(--color-error);
+  }
+
+  &.minor {
+    stroke: var(--color-text-muted);
+    stroke-dasharray: 3 3;
+  }
+}
+
+// ---------- Gezegenler ----------
+.planet {
+  cursor: default;
+
+  &:hover .planet-glyph {
+    fill: var(--color-mauve);
+  }
+}
+
+.planet-tick {
+  stroke: var(--color-text);
+  stroke-width: 1.2;
+}
+
+.connector {
+  stroke: var(--color-text-muted);
+  stroke-width: 0.7;
+  opacity: 0.6;
+}
+
+.planet-glyph {
+  font-size: 19px;
+  fill: var(--color-text);
+  transition: fill 0.2s ease;
+}
+
+.retro {
+  font-size: 9px;
+  fill: var(--color-mauve);
+}
+
+.center {
+  fill: var(--color-gold);
+} 

@@ -1,0 +1,18 @@
+<section class="detail" aria-live="polite" [attr.aria-label]="interpretation().heading">
+  <button type="button" class="close" (click)="closed.emit()" aria-label="Açıklamayı kapat">✕</button>
+
+  <header class="detail-header">
+    <p class="keywords">{{ interpretation().keywords }}</p>
+    <h3>{{ interpretation().title }}</h3>
+    <p class="position">{{ interpretation().position }}</p>
+  </header>
+
+  <p class="description">{{ interpretation().description }}</p>
+
+  <div class="divider" aria-hidden="true"><span>✦</span></div>
+
+  <h4>{{ interpretation().heading }}</h4>
+  <p class="text">{{ interpretation().text }}</p>
+
+  <p class="note">Astrolojik geleneğe dayanan genel bir açıklamadır.</p>
+</section> 

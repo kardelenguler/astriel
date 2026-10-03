@@ -1,0 +1,189 @@
+<div class="about">
+  <!-- ================= 1. HERO ================= -->
+  <section class="hero">
+    <div class="hero-text">
+      <p class="eyebrow">Hakkında</p>
+      <h1>Gökyüzünü anlamak için,<br />önce <em>doğduğun ana bak.</em></h1>
+      <p class="lead">
+        Astriel, doğduğun anda gökyüzünün nasıl göründüğünü hesaplayan bir doğum haritası
+        uygulamasıdır. Doğum tarihini, saatini ve yerini kullanarak Güneş, Ay ve gezegenlerin
+        konumlarını hesaplar ve ortaya çıkan gökyüzünü sana ait bir harita olarak sunar.
+      </p>
+      <p class="lead soft">
+        Her şey, doğduğun andaki gökyüzünün mümkün olduğunca doğru hesaplanmasıyla başlar.
+      </p>
+    </div>
+
+    <div class="hero-visual" aria-hidden="true">
+      <img src="books-candles.png" alt="" width="474" height="527" />
+    </div>
+  </section>
+
+  <!-- ================= 2. NASIL ÇALIŞIR ================= -->
+  <section class="how" appReveal aria-labelledby="how-title">
+    <p class="eyebrow center"><span lang="en">Astriel</span> nasıl çalışır?</p> 
+    <h2 id="how-title" class="section-title">Bir doğum haritası,<br />doğru bilgilerle başlar.</h2>
+
+    <ol class="timeline">
+      @for (step of steps; track step.no) {
+        <li class="step">
+          <span class="step-icon" aria-hidden="true">
+            @switch (step.icon) {
+              @case ('calendar') {
+                <svg viewBox="0 0 24 24">
+                  <rect x="3.5" y="5" width="17" height="15" rx="2.5" />
+                  <path d="M3.5 10h17M8 3v4M16 3v4" />
+                </svg>
+              }
+              @case ('pin') {
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11Z" />
+                  <circle cx="12" cy="10" r="2.4" />
+                </svg>
+              }
+              @case ('star') {
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 3c.6 4.6 2.4 6.4 7 7-4.6.6-6.4 2.4-7 7-.6-4.6-2.4-6.4-7-7 4.6-.6 6.4-2.4 7-7Z" />
+                </svg>
+              }
+              @case ('chart') {
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="8.5" />
+                  <circle cx="12" cy="12" r="4.5" />
+                  <path d="M12 3.5v4M12 16.5v4M3.5 12h4M16.5 12h4" />
+                </svg>
+              }
+            }
+          </span>
+          <p class="step-no">{{ step.no }} · {{ step.label }}</p>
+          <h3>{{ step.title }}</h3>
+          <p class="step-text">{{ step.text }}</p>
+        </li>
+      }
+    </ol>
+  </section>
+
+  <!-- ================= 3. GÖKYÜZÜNÜN FOTOĞRAFI ================= -->
+  <section class="snapshot" appReveal aria-labelledby="snapshot-title">
+    <div class="snapshot-text">
+      <h2 id="snapshot-title" class="section-title">Gökyüzünün<br /><em>o anki</em> fotoğrafı.</h2>
+      <p>
+        Bir doğum haritası, doğduğun dakikada gökyüzünün bulunduğun yerden nasıl göründüğünü
+        gösterir. Astriel'de her şey bu anın doğru şekilde hesaplanmasıyla başlar.
+      </p>
+    </div>
+
+    <!-- Süs amaçlı çizim (gerçek veriye dayanmaz) -->
+    <svg class="natal" viewBox="0 0 400 400" aria-hidden="true">
+      <circle cx="200" cy="200" r="178" class="ring outer" />
+      <circle cx="200" cy="200" r="140" class="ring" />
+      <circle cx="200" cy="200" r="96" class="ring inner" />
+
+      @for (t of ticks; track $index) {
+        <line [attr.x1]="t.x1" [attr.y1]="t.y1" [attr.x2]="t.x2" [attr.y2]="t.y2" class="tick" />
+      }
+      @for (s of signs; track $index) {
+        <text [attr.x]="s.x" [attr.y]="s.y" class="sign">{{ s.glyph }}</text>
+      }
+      @for (a of aspects; track $index) {
+        <line [attr.x1]="a.x1" [attr.y1]="a.y1" [attr.x2]="a.x2" [attr.y2]="a.y2" class="aspect" />
+      }
+      @for (p of planets; track $index) {
+        <circle [attr.cx]="p.dotX" [attr.cy]="p.dotY" r="3" class="planet-dot" />
+        <text [attr.x]="p.x" [attr.y]="p.y" class="planet">{{ p.glyph }}</text>
+      }
+
+      <circle cx="200" cy="200" r="3" class="center" />
+    </svg>
+  </section>
+
+  <!-- ================= 4. HESAPLAMALAR ================= -->
+  <section class="calc" appReveal aria-labelledby="calc-title">
+    <p class="eyebrow">Hesaplamalar</p>
+    <h2 id="calc-title" class="section-title">Hesaplamalar nasıl yapılıyor?</h2>
+
+    <dl class="calc-list">
+      <div>
+        <dt>Swiss Ephemeris</dt>
+        <dd>
+          Güneş, Ay ve gezegenlerin konumları, gökbilimde de kullanılan Swiss Ephemeris
+          kütüphanesiyle hesaplanır.
+        </dd>
+      </div>
+      <div>
+        <dt>Doğum yerinin saat dilimi</dt>
+        <dd>
+          Doğum yerinin koordinatlarından o yerin saat dilimi bulunur. O tarihte yaz saati
+          uygulanıyorsa bu da hesaba katılır.
+        </dd>
+      </div>
+      <div>
+        <dt>Doğum anı</dt>
+        <dd>
+          Girdiğin yerel saat evrensel saate (UTC) çevrilir ve hesaplamalar bu kesin an üzerinden
+          yapılır. Saatini bilmiyorsan gezegen konumları yine hesaplanır. Yükselen burç ve evler
+          ise doğum saati gerektirdiği için gösterilmez.
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- ================= 5. YAKLAŞIM ================= -->
+  <section class="approach" appReveal>
+    <span class="approach-star" aria-hidden="true">✦</span>
+    <blockquote>
+      <p>Önce gökyüzünü <em>doğru</em> hesaplar,<br />sonra onu sana gösterir.</p>
+    </blockquote>
+    <p class="approach-text">
+      Doğum haritasının temelini oluşturan gezegen ve burç konumlarını mümkün olduğunca doğru
+      hesaplamaya odaklanıyoruz. Astriel'in temeli, bu konumları hesaplamak ve anlaşılır bir
+      şekilde görselleştirmektir.
+    </p>
+  </section>
+
+  <!-- ================= 6. GİZLİLİK ================= -->
+  <section class="privacy" appReveal aria-labelledby="privacy-title">
+    <div class="privacy-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <rect x="5" y="10.5" width="14" height="10" rx="2.5" />
+        <path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" />
+        <path d="M12 14.5v2" />
+      </svg>
+    </div>
+    <div>
+      <h2 id="privacy-title" class="section-title">Bilgilerin <em>sende kalır.</em></h2>
+      <p>
+        Üye olmadan yaptığın hesaplamalar kaydedilmez. Bir haritayı yalnızca hesap açıp kendin
+        kaydettiğinde saklarız ve kaydettiğin haritaları sadece sen görebilirsin.
+      </p>
+      <p>
+        E-posta adresi vermek zorunlu değildir. Doğum yerini ararken yazdığın yer adı, sonuçları
+        bulmak için OpenStreetMap'in arama hizmetine gönderilir.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= 7. KAYNAKLAR ================= -->
+  <section class="sources" appReveal aria-labelledby="sources-title">
+    <h2 id="sources-title">Kaynaklar</h2>
+    <p class="sources-intro">
+      Astriel'in hesaplamaları ve yer araması aşağıdaki kaynaklardan yararlanılarak yapılır.
+    </p>
+    <ul class="source-list">
+      <li>
+        <a href="https://www.astro.com/swisseph/" target="_blank" rel="noopener">Swiss Ephemeris</a>
+        <span>Astrodienst AG tarafından geliştirilen astronomik hesaplama kütüphanesi.</span>
+      </li>
+      <li>
+        <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">
+          © OpenStreetMap katkıcıları
+        </a>
+        <span>Doğum yeri araması için kullanılan açık harita verileri (ODbL lisansı).</span>
+      </li>
+    </ul>
+  </section>
+
+  <div class="cta" appReveal>
+    <a routerLink="/" class="cta-btn">Haritanı oluştur</a>
+  </div>
+</div> 

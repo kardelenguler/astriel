@@ -1,0 +1,270 @@
+// Doğum formu — tasarımdaki cam efektli (glassmorphism) kart
+
+.birth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px;
+  background: rgba(23, 19, 34, 0.72);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  backdrop-filter: blur(14px); // arkasındakini bulanıklaştırır: "cam" hissi
+}
+
+// 3 alan yan yana: [tarih] [saat] [yer: kalan genişlik]
+.fields {
+  display: grid;
+  grid-template-columns: 170px 150px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+label {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+// ---------- Kutu: ikon + input ----------
+.input-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 46px;
+  padding: 0 12px;
+  background: var(--color-input);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.2s ease, opacity 0.2s ease;
+
+  // İçindeki input odaklanınca kutunun kenarı pembe olsun
+  &:focus-within {
+    border-color: var(--color-mauve);
+  }
+
+  // İçindeki input hatalıysa (Angular'ın otomatik eklediği sınıflar) kenar kırmızı olsun
+  &:has(input.ng-invalid.ng-touched) {
+    border-color: var(--color-error);
+  }
+
+  // "Saatimi bilmiyorum" seçilince saat kutusu soluklaşsın
+  &:has(input:disabled) {
+    opacity: 0.4;
+  }
+
+  svg {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: var(--color-gold);
+    stroke-width: 1.6;
+  }
+
+  input {
+    width: 100%;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    outline: none; // odak göstergesi kutunun kenarında (focus-within)
+    font-size: 15px;
+    color-scheme: dark; // tarih/saat seçicileri koyu temada açılsın
+
+    &::placeholder {
+      color: #6f6880;
+    }
+
+    // Chrome'un kendi takvim/saat simgesini gizle; seçiciyi soldaki
+    // altın simge düğmesi açar (böylece kutuya tıklayıp elle de yazılabilir)
+    &::-webkit-calendar-picker-indicator {
+      display: none;
+    }
+  }
+}
+
+// Tarih/saat kutularındaki simge: tıklanınca seçiciyi açan düğme
+.picker-btn {
+  display: flex;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+// ---------- Doğum yeri: kutu + arama düğmesi ----------
+.place-row {
+  display: flex;
+  gap: 8px;
+
+  .input-box {
+    flex-grow: 1;
+  }
+}
+
+.search-btn {
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  background: var(--color-mauve);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-bg);
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: progress; // arama sürerken fare imleci "bekle" görünsün
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+  }
+}
+
+// ---------- Seçildi işareti (yer kutusunun sağında) ----------
+.input-box svg.check {
+  stroke: var(--color-mauve);
+  stroke-width: 2.2;
+}
+
+// ---------- Arama sonuç listesi ----------
+.results {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+
+  button {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    text-align: left;
+    transition: background 0.15s ease;
+
+    &:hover,
+    &:focus-visible {
+      background: rgba(197, 138, 168, 0.14); // mauve'un soluk hali
+    }
+  }
+}
+
+.result-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.result-detail {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+}
+
+// ---------- Hata ve bilgi mesajları ----------
+.error {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-error);
+}
+
+.status {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.hint {
+  margin-top: -8px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+// ---------- Saatimi bilmiyorum ----------
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  cursor: pointer;
+
+  input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--color-mauve); // tarayıcının onay kutusu pembe olsun
+  }
+}
+
+// ---------- Gönder düğmesi ----------
+.submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 50px;
+  background: var(--color-mauve);
+  color: var(--color-bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 500;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 0 28px rgba(197, 138, 168, 0.38);
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+  }
+}
+
+// ---------- Gizlilik notu ----------
+.privacy {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+
+  svg {
+    width: 13px;
+    height: 13px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+  }
+}
+
+// ---------- Mobil: alanlar alt alta ----------
+@media (max-width: 640px) {
+  .fields {
+    grid-template-columns: 1fr;
+  }
+} 

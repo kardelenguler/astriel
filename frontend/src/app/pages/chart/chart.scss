@@ -1,0 +1,411 @@
+// Harita sonuç sayfası — renkler styles.scss'teki değişkenlerden gelir
+
+.chart-page {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px var(--page-padding) 80px;
+}
+
+// ================= YÜKLENİYOR / HATA =================
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 80px 20px;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.state-error p {
+  color: var(--color-text);
+}
+
+// Dönen halka: altın renkli yarım çember
+.spinner {
+  width: 42px;
+  height: 42px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-gold);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.btn {
+  padding: 12px 26px;
+  background: var(--color-mauve);
+  color: var(--color-bg);
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+}
+
+// ================= BAŞLIK =================
+.chart-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+}
+
+h1 {
+  font-size: clamp(38px, 5vw, 56px);
+}
+
+.meta {
+  color: var(--color-text-muted);
+}
+
+.change-link {
+  width: fit-content;
+  font-size: 14px;
+  color: var(--color-mauve);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+
+  &:hover {
+    border-bottom-color: var(--color-mauve);
+  }
+}
+
+// ================= BÜYÜK ÜÇLÜ =================
+.big-three {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.big-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 22px 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: transform 0.35s ease, border-color 0.35s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    border-color: rgba(201, 164, 108, 0.45); // altının soluk hali
+  }
+}
+
+.big-label {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+}
+
+.big-sign {
+  font-family: var(--font-display);
+  font-size: 34px;
+  line-height: 1.2;
+}
+
+.big-detail {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+// ================= UYARILAR =================
+.warnings {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 20px;
+  border: 1px solid rgba(201, 164, 108, 0.35);
+  border-radius: var(--radius-sm);
+  background: rgba(201, 164, 108, 0.06);
+  font-size: 14px;
+}
+
+// ================= PANELLER (gezegenler, evler, açılar) =================
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+
+  h2 {
+    font-size: 28px;
+  }
+}
+
+// Dar ekranda tablo taşarsa sadece tablo yatay kaysın, tüm sayfa değil
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th,
+td {
+  padding: 11px 12px;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--color-border);
+}
+
+thead th {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+tbody th {
+  font-weight: 500;
+}
+
+tbody tr:last-child th,
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: rgba(197, 138, 168, 0.06); // satırın üstüne gelince hafif pembe
+}
+
+.retro {
+  color: var(--color-mauve);
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+.small {
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+// ================= EVLER =================
+.houses {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.house {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  background: var(--color-input);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+}
+
+.house-no {
+  font-size: 12px;
+  color: var(--color-gold);
+}
+
+// ================= MOBİL =================
+@media (max-width: 800px) {
+  .big-three {
+    grid-template-columns: 1fr;
+  }
+
+  .houses {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+} 
+
+
+// ---------- Kaydetme ----------
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;  // dar ekranda alt satıra geçsin
+  align-items: center;
+  justify-content: flex-start; 
+  gap: 12px 20px;
+  margin-top: 8px;
+}
+
+.save-btn {
+  padding: 10px 22px;
+  background: var(--color-mauve);
+  color: var(--color-bg);
+  border: none;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease, opacity 0.2s ease;
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 0 24px rgba(197, 138, 168, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+}
+
+.save-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+
+  input {
+    height: 40px;
+    width: 220px;
+    padding: 0 14px;
+    background: var(--color-input);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+
+    &:focus {
+      border-color: var(--color-mauve);
+    }
+  }
+}
+
+.cancel-btn {
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--color-text);
+  }
+}
+
+.save-done {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-gold);
+
+  a {
+    margin-left: 6px;
+    color: var(--color-mauve);
+  }
+}
+
+.save-error {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--color-error);
+} 
+
+
+// ---------- Doğum haritası çarkı ----------
+.wheel-panel app-chart-wheel {
+  margin: 8px 0 20px;
+}
+
+.wheel-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  color: var(--color-text-muted);
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.swatch {
+  width: 22px;
+  height: 2px;
+  border-radius: 2px;
+
+  &.harmonious {
+    background: var(--color-gold);
+  }
+
+  &.hard {
+    background: var(--color-error);
+  }
+} 
+
+
+// ---------- Tıklanabilir kartlar (büyük üçlü ve evler) ----------
+button.clickable {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+
+  // Düğme içindeki yazılar alt alta dursun
+  span {
+    display: block;
+  }
+
+  &:hover {
+    border-color: rgba(197, 138, 168, 0.55);
+    box-shadow: 0 8px 30px rgba(139, 111, 181, 0.18);
+    transform: translateY(-2px);
+  }
+
+  // Açıklaması açık olan kart
+  &.selected {
+    border-color: var(--color-gold);
+    box-shadow: 0 0 28px rgba(201, 164, 108, 0.22);
+  }
+}
+
+.detail-error {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--color-error);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.clickable:hover {
+    transform: none;
+  }
+} 
+
+
+// "Bir eve dokunarak..." ipucu
+.panel-hint {
+  margin: -6px 0 16px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+} 

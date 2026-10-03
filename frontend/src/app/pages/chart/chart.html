@@ -1,0 +1,242 @@
+<section class="chart-page">
+  <!-- ================= YÜKLENİYOR ================= -->
+  @if (loading()) {
+    <div class="state" role="status">
+      <div class="spinner" aria-hidden="true"></div>
+      <p>Gökyüzü hesaplanıyor…</p>
+    </div>
+  }
+
+  <!-- ================= HATA ================= -->
+  @if (error(); as message) {
+    <div class="state state-error" role="alert">
+      <p>{{ message }}</p>
+      <a routerLink="/" class="btn">Ana sayfaya dön</a>
+    </div>
+  }
+
+  <!-- ================= SONUÇ ================= -->
+  @if (chart(); as c) {
+    <!-- Başlık -->
+    <header class="chart-header">
+      <p class="eyebrow">Doğum haritan</p>
+      <h1>{{ placeName() }}</h1>
+      <p class="meta">
+        {{ birthDateText() }}
+        · {{ birthTimeText() ?? 'saat bilinmiyor' }}
+        · {{ c.timezone }}
+      </p>
+      <div class="header-actions">
+        <a routerLink="/" class="change-link">Bilgileri değiştir</a>
+
+        @switch (saveState()) {
+          <!-- Başta: sadece düğme -->
+          @case ('idle') {
+            <button type="button" class="save-btn" (click)="startSave()">Haritayı kaydet</button>
+          }
+
+          <!-- Kaydedildikten sonra -->
+          @case ('saved') {
+            <p class="save-done" role="status">
+              Kaydedildi ✓ <a routerLink="/haritalarim">Haritalarım'da gör</a>
+            </p>
+          }
+
+          <!-- Ad yazma kutusu (editing ve saving durumları) -->
+          @default {
+            <form class="save-form" (submit)="$event.preventDefault(); saveChart()">
+              <input
+                type="text"
+                aria-label="Haritanın adı"
+                maxlength="100"
+                [value]="saveName()"
+                (input)="onSaveNameInput($event)"
+                [disabled]="saveState() === 'saving'"
+              />
+              <button type="submit" class="save-btn" [disabled]="saveState() === 'saving'">
+                {{ saveState() === 'saving' ? 'Kaydediliyor…' : 'Kaydet' }}
+              </button>
+              <button type="button" class="cancel-btn" (click)="cancelSave()">Vazgeç</button>
+            </form>
+          }
+        }
+      </div>
+
+      @if (saveError(); as message) {
+        <p class="save-error" role="alert">{{ message }}</p>
+      } 
+    </header>
+
+    <!-- Büyük üçlü: Güneş, Ay, Yükselen (tıklanınca açıklama açılır) -->
+    <div class="big-three">
+      @if (sun(); as s) {
+        <button
+          type="button"
+          class="big-card clickable"
+          [class.selected]="selected()?.id === 'point-sun'"
+          [attr.aria-expanded]="selected()?.id === 'point-sun'"
+          (click)="selectPoint('sun')"
+        >
+          <span class="big-label">Güneş</span>
+          <span class="big-sign">{{ s.sign.name }}</span>
+          <span class="big-detail">{{ s.formatted }}</span>
+        </button>
+      }
+      @if (moon(); as m) {
+        <button
+          type="button"
+          class="big-card clickable"
+          [class.selected]="selected()?.id === 'point-moon'"
+          [attr.aria-expanded]="selected()?.id === 'point-moon'"
+          (click)="selectPoint('moon')"
+        >
+          <span class="big-label">Ay</span>
+          <span class="big-sign">{{ m.sign.name }}</span>
+          <span class="big-detail">{{ m.formatted }}</span>
+        </button>
+      }
+      @if (c.ascendant; as asc) {
+        <button
+          type="button"
+          class="big-card clickable"
+          [class.selected]="selected()?.id === 'point-ascendant'"
+          [attr.aria-expanded]="selected()?.id === 'point-ascendant'"
+          (click)="selectPoint('ascendant')"
+        >
+          <span class="big-label">Yükselen</span>
+          <span class="big-sign">{{ asc.sign.name }}</span>
+          <span class="big-detail">{{ asc.formatted }}</span>
+        </button>
+      } @else {
+        <article class="big-card">
+          <p class="big-label">Yükselen</p>
+          <p class="big-sign muted">—</p>
+          <p class="big-detail">Doğum saati gerekli</p>
+        </article>
+      }
+    </div>
+
+    <!-- Seçilen kartın açıklaması -->
+    @if (pointDetail(); as detail) {
+      <app-interpretation-panel [interpretation]="detail" (closed)="closeDetail()" />
+    }
+    @if (detailError(); as message) {
+      <p class="detail-error" role="alert">{{ message }}</p>
+    } 
+
+
+
+    <!-- Doğum haritası çarkı -->
+    <section class="panel wheel-panel">
+      <h2>Doğum haritası</h2>
+      <app-chart-wheel [chart]="c" />
+      <ul class="wheel-legend">
+        <li><span class="swatch harmonious"></span>Uyumlu açılar (üçgen, altmışlık)</li>
+        <li><span class="swatch hard"></span>Zorlayıcı açılar (kare, karşıt)</li>
+      </ul>
+    </section> 
+
+
+
+    <!-- Uyarılar (saat bilinmiyor, kutup yedeği, Ay burç değiştiriyor...) -->
+    @if (c.warnings.length > 0) {
+      <div class="warnings">
+        @for (warning of c.warnings; track warning) {
+          <p>{{ warning }}</p>
+        }
+      </div>
+    }
+
+    <!-- Gezegenler -->
+    <section class="panel">
+      <h2>Gezegenler</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Gök cismi</th>
+              <th scope="col">Burç</th>
+              <th scope="col">Konum</th>
+              <th scope="col">Ev</th>
+              <th scope="col">Hareket</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (planet of c.planets; track planet.key) {
+              <tr>
+                <th scope="row">{{ planet.name }}</th>
+                <td>{{ planet.sign.name }}</td>
+                <td>{{ planet.formatted }}</td>
+                <td>{{ planet.house ?? '—' }}</td>
+                <td>
+                  @if (planet.retrograde) {
+                    <span class="retro" title="Geri hareket (retro)">℞ Retro</span>
+                  } @else {
+                    <span class="muted">İleri</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Evler (sadece saat biliniyorsa; tıklanınca açıklama açılır) -->
+    @if (c.houses.length > 0) {
+      <section class="panel">
+        <h2>Evler <span class="muted small">· {{ c.house_system?.name }}</span></h2>
+        <p class="panel-hint">Bir eve dokunarak açıklamasını görebilirsin.</p>
+
+        <div class="houses">
+          @for (house of c.houses; track $index) {
+            <button
+              type="button"
+              class="house clickable"
+              [class.selected]="selected()?.id === 'house-' + ($index + 1)"
+              [attr.aria-expanded]="selected()?.id === 'house-' + ($index + 1)"
+              (click)="selectHouse($index + 1)"
+            >
+              <span class="house-no">{{ $index + 1 }}. ev</span>
+              <span>{{ house.formatted }}</span>
+            </button>
+          }
+        </div>
+
+        <!-- Seçilen evin açıklaması -->
+        @if (houseDetail(); as detail) {
+          <app-interpretation-panel [interpretation]="detail" (closed)="closeDetail()" />
+        }
+      </section>
+    } 
+
+    <!-- Açılar -->
+    <section class="panel">
+      <h2>Açılar</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Gök cisimleri</th>
+              <th scope="col">Açı</th>
+              <th scope="col">Sapma (orb)</th>
+              <th scope="col">Durum</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (aspect of c.aspects; track $index) {
+              <tr>
+                <th scope="row">
+                  {{ planetNames().get(aspect.first) }} – {{ planetNames().get(aspect.second) }}
+                </th>
+                <td>{{ aspect.type.name }}</td>
+                <td>{{ aspect.orb.toFixed(1) }}°</td>
+                <td class="muted">{{ aspect.applying ? 'Yaklaşıyor' : 'Uzaklaşıyor' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+</section> 

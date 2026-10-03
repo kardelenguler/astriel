@@ -1,0 +1,208 @@
+.my-charts {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 16px 100px;
+}
+
+.page-header {
+  margin-bottom: 28px;
+
+  .eyebrow {
+    margin: 0 0 10px;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(32px, 4vw, 46px);
+    font-weight: 500;
+  }
+}
+
+.count {
+  margin: 8px 0 0;
+  color: var(--color-text-muted);
+}
+
+.alert {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  background: rgba(229, 138, 138, 0.1);
+  border: 1px solid rgba(229, 138, 138, 0.35);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--color-error);
+}
+
+// ---------- Yükleniyor / hata / boş liste ----------
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 60px 16px;
+  text-align: center;
+  color: var(--color-text-muted);
+
+  p {
+    margin: 0;
+  }
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-mauve);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.btn {
+  padding: 12px 26px;
+  background: var(--color-mauve);
+  color: var(--color-bg);
+  border: none;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+// ---------- Harita kartları ----------
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.chart-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 24px;
+  background: rgba(23, 19, 34, 0.65);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(10px);
+  transition: border-color 0.2s ease;
+
+  &:hover {
+    border-color: rgba(197, 138, 168, 0.45);
+  }
+
+  h2 {
+    margin: 0 0 6px;
+    font-size: 26px;
+    font-weight: 500;
+  }
+}
+
+.card-main {
+  min-width: 0;  // uzun adlar kartı taşırmasın
+}
+
+.card-meta {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.card-signs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0;
+  font-size: 14px;
+
+  b {
+    margin-right: 4px;
+    font-weight: 400;
+    color: var(--color-gold);
+  }
+}
+
+.card-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+
+  button {
+    padding: 9px 18px;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease, opacity 0.2s ease;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+}
+
+.open-btn {
+  background: var(--color-mauve);
+  color: var(--color-bg);
+  border: none;
+}
+
+.delete-btn {
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+
+  &:hover:not(:disabled) {
+    color: var(--color-error);
+    border-color: rgba(229, 138, 138, 0.5);
+  }
+}
+
+// ---------- "Geri al" çubuğu ----------
+.undo-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 14px 12px 20px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  font-size: 14px;
+  white-space: nowrap;
+
+  button {
+    padding: 8px 16px;
+    background: transparent;
+    color: var(--color-gold);
+    border: 1px solid rgba(201, 164, 108, 0.5);
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+  }
+}
+
+// ---------- Telefon: düğmeler kartın altına ----------
+@media (max-width: 640px) {
+  .chart-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+} 

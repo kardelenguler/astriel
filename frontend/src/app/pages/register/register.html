@@ -1,0 +1,103 @@
+<section class="auth-page">
+  <form class="auth-card" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+    <h1>Aramıza katıl</h1>
+    <p class="auth-subtitle">Ücretsiz hesap aç, haritalarını kaydet.</p>
+
+    @if (error(); as message) {
+      <p class="auth-alert" role="alert">{{ message }}</p>
+    }
+
+    <!-- Kullanıcı adı -->
+    <div class="auth-field">
+      <label for="username">Kullanıcı adı</label>
+      <input
+        id="username"
+        type="text"
+        formControlName="username"
+        autocomplete="username"
+        autocapitalize="none"
+        spellcheck="false"
+      />
+      @if (hasError('username', 'required')) {
+        <p class="auth-error">Bir kullanıcı adı seç.</p>
+      } @else if (hasError('username', 'pattern')) {
+        <p class="auth-error">3–30 karakter olmalı. Sadece harf, rakam ve _ kullanabilirsin.</p>
+      } @else {
+        <p class="auth-hint">Harf, rakam ve _ kullanabilirsin. Örnek: kardelen_11</p>
+      }
+    </div>
+
+    <!-- Şifre -->
+    <div class="auth-field">
+      <label for="password">Şifre</label>
+      <div class="password-box">
+        <input
+          id="password"
+          [type]="showPassword() ? 'text' : 'password'"
+          formControlName="password"
+          autocomplete="new-password"
+        />
+        <button
+          type="button"
+          class="toggle-password"
+          (click)="showPassword.set(!showPassword())"
+          [attr.aria-label]="showPassword() ? 'Şifreyi gizle' : 'Şifreyi göster'"
+        >
+          {{ showPassword() ? 'Gizle' : 'Göster' }}
+        </button>
+      </div>
+      @if (hasError('password', 'required')) {
+        <p class="auth-error">Bir şifre belirle.</p>
+      } @else if (hasError('password', 'minlength')) {
+        <p class="auth-error">Şifre en az 8 karakter olmalı.</p>
+      } @else if (hasError('password', 'maxlength')) {
+        <p class="auth-error">Şifre en fazla 128 karakter olabilir.</p>
+      } @else {
+        <p class="auth-hint">En az 8 karakter.</p>
+      }
+    </div>
+
+    <!-- Şifre tekrar -->
+    <div class="auth-field">
+      <label for="passwordConfirm">Şifre tekrar</label>
+      <input
+        id="passwordConfirm"
+        [type]="showPassword() ? 'text' : 'password'"
+        formControlName="passwordConfirm"
+        autocomplete="new-password"
+        [class.mismatch]="passwordMismatch"
+      />
+      @if (hasError('passwordConfirm', 'required')) {
+        <p class="auth-error">Şifreni tekrar yaz.</p>
+      } @else if (passwordMismatch) {
+        <p class="auth-error">Şifreler aynı değil.</p>
+      }
+    </div>
+
+    <!-- E-posta (isteğe bağlı) -->
+    <div class="auth-field">
+      <label for="email">E-posta <span class="optional">(isteğe bağlı)</span></label>
+      <input id="email" type="email" formControlName="email" autocomplete="email" />
+      @if (hasError('email')) {
+        <p class="auth-error">Geçerli bir e-posta adresi yaz ya da boş bırak.</p>
+      }
+    </div>
+
+    <!-- Görünen ad (isteğe bağlı) -->
+    <div class="auth-field">
+      <label for="displayName">Görünen ad <span class="optional">(isteğe bağlı)</span></label>
+      <input id="displayName" type="text" formControlName="displayName" autocomplete="nickname" />
+      @if (hasError('displayName')) {
+        <p class="auth-error">Görünen ad en fazla 50 karakter olabilir.</p>
+      }
+    </div>
+
+    <button type="submit" class="auth-submit" [disabled]="loading()">
+      {{ loading() ? 'Hesabın açılıyor…' : 'Kayıt Ol' }}
+    </button>
+
+    <p class="auth-switch">
+      Zaten hesabın var mı? <a routerLink="/giris">Giriş yap</a>
+    </p>
+  </form>
+</section> 

@@ -1,0 +1,71 @@
+<section class="my-charts">
+  <header class="page-header">
+    <p class="eyebrow">Haritalarım</p>
+    <h1>Kaydettiğin haritalar</h1>
+    @if (!loading() && !loadError()) {
+      <p class="count">{{ total() }} harita</p>
+    }
+  </header>
+
+  @if (actionError(); as message) {
+    <p class="alert" role="alert">{{ message }}</p>
+  }
+
+  @if (loading()) {
+    <div class="state" role="status">
+      <div class="spinner" aria-hidden="true"></div>
+      <p>Haritaların yükleniyor…</p>
+    </div>
+  } @else if (loadError(); as message) {
+    <div class="state" role="alert">
+      <p>{{ message }}</p>
+      <button type="button" class="btn" (click)="load()">Tekrar dene</button>
+    </div>
+  } @else {
+    <div class="list">
+      @for (item of charts(); track item.id) {
+        <article class="chart-card">
+          <div class="card-main">
+            <h2>{{ item.name }}</h2>
+            <p class="card-meta">
+              {{ item.place_name }} · {{ formatDate(item.birth_date) }} · {{ formatTime(item.birth_time) }}
+            </p>
+            <p class="card-signs">
+              <span><b>Güneş</b> {{ item.sun_sign.name }}</span>
+              <span><b>Ay</b> {{ item.moon_sign.name }}</span>
+              <span><b>Yükselen</b> {{ item.ascendant_sign?.name ?? '—' }}</span>
+            </p>
+          </div>
+
+          <div class="card-actions">
+            <button type="button" class="open-btn" (click)="open(item)" [disabled]="busyId() !== null">
+              {{ busyId() === item.id ? 'Açılıyor…' : 'Aç' }}
+            </button>
+            <button
+              type="button"
+              class="delete-btn"
+              (click)="remove(item)"
+              [disabled]="busyId() !== null"
+              [attr.aria-label]="item.name + ' haritasını sil'"
+            >
+              Sil
+            </button>
+          </div>
+        </article>
+      } @empty {
+        <div class="state">
+          <p>Henüz kaydettiğin bir harita yok.</p>
+          <a routerLink="/" class="btn">İlk haritanı oluştur</a>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Silindikten sonra 8 saniye görünen "Geri al" çubuğu -->
+  @if (lastDeleted(); as deleted) {
+    <div class="undo-bar" role="status">
+      <span>“{{ deleted.name }}” silindi.</span>
+      <button type="button" (click)="undoDelete()">Geri al</button>
+    </div>
+  }
+</section> 

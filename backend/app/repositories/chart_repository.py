@@ -1,0 +1,72 @@
+"""Kayıtlı doğum haritası sorguları.
+
+İki kural her sorguda geçerlidir:
+1. Silinmiş haritalar (deleted_at dolu) varsayılan olarak GÖRÜNMEZ.
+2. Her sorgu kullanıcıya göre filtrelenir; bir kullanıcı başkasının haritasına
+   repository seviyesinde bile ulaşamaz.
+
+NOT: BaseRepository.get_by_id bu iki kuralı UYGULAMAZ; haritalar için
+get_for_user kullanılır.
+"""
+
+import uuid
+from datetime import datetime, timezone 
+
+from sqlalchemy import Select, func, select
+
+from app.models.birth_chart import BirthChart
+from app.repositories.base_repository import BaseRepository
+
+
+class ChartRepository(BaseRepository[BirthChart]):
+    model = BirthChart
+
+    @staticmethod
+    def _active_charts_of(user_id: uuid.UUID) -> Select:
+        """Kullanıcının silinmemiş haritaları (ortak filtre, tekrar yazılmasın)."""
+        return select(BirthChart).where(
+            BirthChart.user_id == user_id,
+            BirthChart.deleted_at.is_(None),
+        )
+
+    def get_for_user(
+        self, chart_id: uuid.UUID, user_id: uuid.UUID, *, include_deleted: bool = False
+    ) -> BirthChart | None:
+        """Harita bu kullanıcıya aitse döndürür; değilse (veya yoksa) None.
+
+        include_deleted=True: "Geri al" için silinmiş haritayı da bulur.
+        """
+        query = select(BirthChart).where(
+            BirthChart.id == chart_id,
+            BirthChart.user_id == user_id,
+        )
+        if not include_deleted:
+            query = query.where(BirthChart.deleted_at.is_(None))
+        return self.db.scalar(query)
+
+    def list_for_user(self, user_id: uuid.UUID, *, limit: int, offset: int) -> list[BirthChart]:
+        """En yeni harita üstte. Aynı anda oluşturulanlar id'ye göre sıralanır
+        (sıralama sabit olmazsa sayfalar arasında kayıt atlanabilir/tekrarlanabilir)."""
+        query = (
+            self._active_charts_of(user_id)
+            .order_by(BirthChart.created_at.desc(), BirthChart.id.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        return list(self.db.scalars(query))
+
+    def count_for_user(self, user_id: uuid.UUID) -> int:
+        """Toplam kayıt sayısı; frontend'de "3. sayfa / 5" göstermek için."""
+        query = select(func.count()).select_from(self._active_charts_of(user_id).subquery())
+        return self.db.scalar(query) or 0 
+
+    
+    def soft_delete(self, chart: BirthChart) -> None:
+        """Haritayı silinmiş olarak işaretler; satır silinmez, "Geri al" mümkün."""
+        chart.deleted_at = datetime.now(timezone.utc)
+        self.db.flush()  # autoflush kapalı: flush olmadan sonraki sorgular değişikliği görmez
+
+    def restore(self, chart: BirthChart) -> None:
+        """Silinmiş haritayı geri getirir."""
+        chart.deleted_at = None
+        self.db.flush() 

@@ -1,0 +1,23 @@
+# ---------- Python / backend ----------
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+backend/logs/
+*.log
+
+# ---------- Gizli bilgiler (ASLA yüklenmemeli) ----------
+# Veritabanı şifresi ve gizli anahtar burada. .env.example ise yüklenir,
+# çünkü içinde sadece örnek değerler var.
+.env
+
+# ---------- Editör / işletim sistemi ----------
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# ---------- Yedekler ----------
+# Proje klasörüne konan zip yedekleri (içlerinde .env olabilir)
+*.zip 

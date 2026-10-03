@@ -1,0 +1,350 @@
+/* =========================================================
+   Astriel — ortak stiller
+   Renkler ve yazı tipleri SADECE burada tanımlanır;
+   component'ler bunları var(--renk-adi) ile kullanır.
+   ========================================================= */
+
+:root {
+  /* ---------- Renk paleti (tasarım brief'i) ---------- */
+  --color-bg: #0d0b16;          /* ana arka plan */
+  --color-surface: #171322;     /* kartlar, form kutusu */
+  --color-input: #120f1c;       /* form alanları */
+  --color-border: #2e2640;      /* ince kenarlıklar */
+
+  --color-text: #f3ebdd;        /* krem: ana yazı */
+  --color-text-muted: #a9a2b3;  /* ikincil yazı */
+
+  --color-mauve: #c58aa8;       /* ana vurgu: düğmeler */
+  --color-gold: #c9a46c;        /* ince çizgiler, ikonlar, üst başlıklar */
+  --color-purple: #8b6fb5;
+  --color-burgundy: #6e304d;
+
+  --color-error: #e58a8a;       /* hata mesajları */
+
+  /* ---------- Yazı tipleri ---------- */
+  --font-display: 'Cormorant Garamond', Georgia, serif;  /* başlıklar */
+  --font-body: 'Poppins', system-ui, sans-serif;         /* metin */
+
+  /* ---------- Ölçüler ---------- */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --page-padding: clamp(20px, 7vw, 110px);  /* ekran daraldıkça kenar boşluğu da daralır */
+}
+
+/* ---------- Temel sıfırlama ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;  /* genişliğe kenarlık ve iç boşluk da dahil olsun */
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Form elemanları sayfanın yazı tipini kullansın (tarayıcılar varsayılan olarak kullanmaz) */
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Klavyeyle gezinirken odaklanılan öğe belli olsun (erişilebilirlik) */
+:focus-visible {
+  outline: 2px solid var(--color-mauve);
+  outline-offset: 2px;
+}
+
+/* İşletim sisteminde "hareketi azalt" açıksa animasyonları kapat */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+} 
+
+// ---------- Yıldızlı arka plan (tüm sayfalarda) ----------
+// İki katman var: sabit yıldızlar + yavaşça parıldayan parlak yıldızlar.
+// Farklı karo boyutları desenin tekrar ettiğini gizler.
+body::before,
+body::after {
+  content: '';
+  position: fixed;  // sayfa kayarken yıldızlar yerinde kalsın
+  inset: 0;
+  z-index: -1;      // her şeyin arkasında dursun
+  pointer-events: none;
+}
+
+// Sabit yıldızlar + üstte hafif mor ışık
+body::before {
+  background-image:
+    radial-gradient(1.2px 1.2px at 40px 60px, rgba(243, 235, 221, 0.85), transparent),
+    radial-gradient(1.2px 1.2px at 150px 190px, rgba(243, 235, 221, 0.7), transparent),
+    radial-gradient(1.4px 1.4px at 200px 30px, rgba(201, 164, 108, 0.85), transparent),
+    radial-gradient(1px 1px at 90px 260px, rgba(243, 235, 221, 0.65), transparent),
+    radial-gradient(1px 1px at 120px 100px, rgba(243, 235, 221, 0.6), transparent),
+    radial-gradient(1.2px 1.2px at 250px 150px, rgba(197, 138, 168, 0.75), transparent),
+    radial-gradient(ellipse 80% 50% at 70% 0%, rgba(139, 111, 181, 0.16), transparent);
+  background-size:
+    230px 230px, 310px 310px, 230px 230px, 310px 310px,
+    170px 170px, 270px 270px, 100% 100%;
+  background-repeat: repeat, repeat, repeat, repeat, repeat, repeat, no-repeat;
+}
+
+// Daha parlak, ışıltılı ve parıldayan yıldızlar
+body::after {
+  background-image:
+    radial-gradient(2px 2px at 70px 120px, rgba(255, 248, 235, 1), transparent),
+    radial-gradient(5px 5px at 70px 120px, rgba(255, 248, 235, 0.25), transparent),
+    radial-gradient(2px 2px at 300px 340px, rgba(225, 190, 130, 1), transparent),
+    radial-gradient(6px 6px at 300px 340px, rgba(225, 190, 130, 0.25), transparent),
+    radial-gradient(2.5px 2.5px at 380px 60px, rgba(220, 160, 190, 0.95), transparent),
+    radial-gradient(6px 6px at 380px 60px, rgba(220, 160, 190, 0.25), transparent),
+    radial-gradient(1.8px 1.8px at 180px 250px, rgba(255, 248, 235, 0.95), transparent);
+  background-size: 420px 420px;
+  animation: twinkle 4s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+  from { opacity: 0.5; }
+  to   { opacity: 1; }
+} 
+
+
+// ---------- Giriş / kayıt sayfaları (ortak) ----------
+.auth-page {
+  display: grid;
+  place-items: center;
+  padding: 60px 16px 100px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 36px 32px;
+  background: rgba(23, 19, 34, 0.72);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(14px);
+
+  h1 {
+    margin: 0;
+    font-size: 36px;
+    font-weight: 500;
+    text-align: center;
+  }
+}
+
+.auth-subtitle {
+  margin: -8px 0 6px;
+  font-size: 14px;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  label {
+    font-size: 13px;
+    color: var(--color-text-muted);
+  }
+
+  .optional {
+    color: #6f6880;
+  }
+
+  input {
+    height: 46px;
+    width: 100%;
+    padding: 0 14px;
+    background: var(--color-input);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      border-color: var(--color-mauve);
+    }
+
+    &.ng-invalid.ng-touched {
+      border-color: var(--color-error);
+    }
+  }
+}
+
+// Şifre kutusu: sağda "Göster / Gizle" düğmesi
+.password-box {
+  position: relative;
+
+  input {
+    padding-right: 76px;
+  }
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--color-gold);
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(201, 164, 108, 0.1);
+  }
+}
+
+.auth-error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-error);
+}
+
+// Backend'den gelen hata (ör. "Kullanıcı adı veya şifre hatalı.")
+.auth-alert {
+  margin: 0;
+  padding: 12px 14px;
+  background: rgba(229, 138, 138, 0.1);
+  border: 1px solid rgba(229, 138, 138, 0.35);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--color-error);
+}
+
+.auth-submit {
+  height: 50px;
+  margin-top: 6px;
+  background: var(--color-mauve);
+  color: var(--color-bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease, opacity 0.2s ease;
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 0 28px rgba(197, 138, 168, 0.38);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+}
+
+.auth-switch {
+  margin: 0;
+  font-size: 14px;
+  text-align: center;
+  color: var(--color-text-muted);
+
+  a {
+    color: var(--color-mauve);
+  }
+} 
+
+
+// Alan altındaki gri ipucu yazısı
+.auth-hint {
+  margin: 0;
+  font-size: 12px;
+  color: #6f6880;
+}
+
+// Şifreler aynı değilse "Şifre tekrar" kutusu da kırmızı olsun
+.auth-field input.mismatch {
+  border-color: var(--color-error);
+} 
+
+
+// Chrome'un otomatik doldurduğu kutular beyaz olmasın, temaya uysun
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-text);
+  -webkit-box-shadow: 0 0 0 1000px var(--color-input) inset;
+  caret-color: var(--color-text);
+  transition: background-color 9999s ease-out;
+} 
+
+
+// ---------- Scroll ile beliren bölümler (appReveal) ----------
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+
+  &.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+} 
+
+
+// Başlık fontu (Cormorant) varsayılan olarak "eski stil" rakamlar kullanıyor;
+// bu stilde 1 rakamı ı harfine benziyor. Tüm başlıklarda düz (modern) rakamları aç.
+h1,
+h2,
+h3,
+h4 {
+  font-variant-numeric: lining-nums;
+} 

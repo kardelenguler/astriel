@@ -1,0 +1,119 @@
+<section class="hero" id="dogum-formu">
+  <!-- Süs bulutları (ekran okuyucular atlasın) -->
+  <img src="clouds-right.png" alt="" aria-hidden="true" class="deco deco-right" />
+  <img src="clouds-left.png" alt="" aria-hidden="true" class="deco deco-left" />
+
+  <div class="hero-text">
+    <p class="eyebrow">Doğum haritası · gökyüzü seninle</p>
+
+    <h1>Yıldızlar doğduğun gün senin için <em>ne anlatıyor?</em></h1>
+
+    <p class="lead">Doğum bilgilerini gir, gökyüzünün sana özel haritasını keşfet.</p>
+
+    <app-birth-form class="hero-form" (submitted)="onBirthFormSubmit($event)" />
+  </div>
+
+  <div class="hero-visual" aria-hidden="true">
+    <img src="hero-wheel.png" alt="" width="1254" height="1254" class="hero-wheel" />
+  </div>
+</section> 
+
+
+<section class="features" aria-labelledby="features-title">
+  <p class="eyebrow">Haritanda neler var?</p>
+  <h2 id="features-title">Gökyüzünü dört başlıkta keşfet</h2>
+
+  <div class="feature-grid">
+    <article class="feature-card">
+      <!-- Halkalı gezegen -->
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <circle cx="24" cy="24" r="9" />
+        <ellipse cx="24" cy="24" rx="19" ry="6" transform="rotate(-20 24 24)" />
+      </svg>
+      <h3>Gezegen Konumları</h3>
+      <p>Güneş, Ay ve gezegenlerin doğduğun andaki burçlarını ve derecelerini gör.</p>
+    </article>
+
+    <article class="feature-card">
+      <!-- Harita çarkı -->
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <circle cx="24" cy="24" r="19" />
+        <circle cx="24" cy="24" r="11" />
+        <path d="M24 5v8M24 35v8M5 24h8M35 24h8M10.6 10.6l5.6 5.6M31.8 31.8l5.6 5.6M37.4 10.6l-5.6 5.6M16.2 31.8l-5.6 5.6" />
+      </svg>
+      <h3>Doğum Haritası</h3>
+      <p>Doğum tarihine, saatine ve yerine göre haritan saniyeler içinde hesaplanır.</p>
+    </article>
+
+    <article class="feature-card">
+      <!-- 12 eve bölünmüş daire -->
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <circle cx="24" cy="24" r="19" />
+        <path d="M5 24h38M24 5v38M7.5 14.5l33 19M7.5 33.5l33-19M14.5 7.5l19 33M33.5 7.5l-19 33" />
+        <circle cx="24" cy="24" r="4" />
+      </svg>
+      <h3>Evler</h3>
+      <p>Doğum saatini biliyorsan yükselen burcunu ve 12 evin başladığı burçları öğren.</p>
+    </article>
+
+    <article class="feature-card">
+      <!-- Gezegenler arası açı üçgeni -->
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <path d="M24 8 40 38H8Z" />
+        <circle cx="24" cy="8" r="3" />
+        <circle cx="40" cy="38" r="3" />
+        <circle cx="8" cy="38" r="3" />
+      </svg>
+      <h3>Açılar</h3>
+      <p>Gezegenler arasındaki kavuşum, kare ve üçgen gibi açıları ve orblarını incele.</p>
+    </article>
+  </div>
+</section> 
+
+
+<section class="how" id="nasil-calisir" aria-labelledby="how-title">
+  <div class="how-visual" aria-hidden="true">
+    <img src="window-cat.png" alt="" width="408" height="612" />
+  </div>
+
+  <div class="how-text">
+    <p class="eyebrow">Nasıl çalışır?</p>
+    <h2 id="how-title">Üç adımda haritan hazır</h2>
+
+    <ol class="steps">
+      <li>
+        <span class="step-number">1</span>
+        <div>
+          <h3>Bilgilerini gir</h3>
+          <p>Doğum tarihini, saatini ve doğduğun yeri yaz. Saatini bilmiyorsan da haritan hesaplanır.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-number">2</span>
+        <div>
+          <h3>Gökyüzü hesaplansın</h3>
+          <p>Gezegenlerin doğduğun andaki konumları Swiss Ephemeris ile hassas şekilde hesaplanır.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-number">3</span>
+        <div>
+          <h3>Kaydet ve geri dön</h3>
+          <p>Ücretsiz bir hesap açarsan haritalarını kaydedip istediğin zaman tekrar bakabilirsin.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section> 
+
+
+<section class="cta" aria-labelledby="cta-title">
+  <img src="cta-mountains.png" alt="" aria-hidden="true" width="865" height="289" class="cta-art" />
+
+  <h2 id="cta-title">Gökyüzü seni bekliyor.</h2>
+  <p>Kendini keşfetmeye bugün başla.</p>
+
+  <button type="button" class="cta-btn" (click)="scrollToForm()">
+    Ücretsiz Haritanı Oluştur
+  </button>
+</section> 

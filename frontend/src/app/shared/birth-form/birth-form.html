@@ -1,0 +1,132 @@
+<form class="birth-form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+  <div class="fields">
+    <!-- ---------- Doğum tarihi ---------- -->
+    <div class="field">
+      <label for="birthDate">Doğum tarihi</label>
+      <div class="input-box">
+        <button type="button" class="picker-btn" aria-label="Takvimi aç"
+                (click)="birthDateInput.showPicker()">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="5" width="18" height="16" rx="2" />
+            <path d="M3 10h18M8 3v4M16 3v4" />
+          </svg>
+        </button>
+        <input #birthDateInput id="birthDate" type="date" formControlName="birthDate"
+               min="1801-01-01" max="2398-12-31" />
+      </div>
+      @if (hasError('birthDate', 'required')) {
+        <p class="error" role="alert">Doğum tarihini gir.</p>
+      }
+      @if (hasError('birthDate', 'yearRange')) {
+        <p class="error" role="alert">Yıl 1801 ile 2398 arasında olmalı.</p>
+      }
+    </div>
+
+    <!-- ---------- Doğum saati ---------- -->
+    <div class="field">
+      <label for="birthTime">Doğum saati</label>
+      <div class="input-box">
+        <button type="button" class="picker-btn" aria-label="Saat seçiciyi aç"
+                [disabled]="form.controls.unknownTime.value"
+                (click)="birthTimeInput.showPicker()">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 7v5l3 2" />
+          </svg>
+        </button>
+        <input #birthTimeInput id="birthTime" type="time" formControlName="birthTime" />
+      </div>
+      @if (hasError('birthTime', 'required')) {
+        <p class="error" role="alert">Doğum saatini gir ya da “saatimi bilmiyorum”u işaretle.</p>
+      }
+    </div>
+
+    <!-- ---------- Doğum yeri ---------- -->
+    <div class="field">
+      <label for="placeQuery">Doğum yeri</label>
+      <div class="place-row">
+        <div class="input-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" />
+            <circle cx="12" cy="9.5" r="2.5" />
+          </svg>
+          <input id="placeQuery" type="text" formControlName="placeQuery"
+                 placeholder="Şehir veya ilçe" autocomplete="off"
+                 (keydown.enter)="onPlaceEnter($event)" />
+          @if (selectedPlace()) {
+            <svg class="check" viewBox="0 0 24 24" aria-label="Seçildi">
+              <path d="M5 12.5l4.5 4.5L19 7.5" />
+            </svg>
+          }
+        </div>
+        <button type="button" class="search-btn" aria-label="Doğum yerini ara"
+                [disabled]="searching()" (click)="searchPlaces()">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="M20 20l-3.5-3.5" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Doğrulama hataları -->
+      @if (hasError('placeQuery', 'required')) {
+        <p class="error" role="alert">Doğum yerini yaz.</p>
+      }
+      @if (hasError('placeQuery', 'minlength')) {
+        <p class="error" role="alert">En az 2 harf yaz.</p>
+      }
+      @if (placeNotSelected()) {
+        <p class="error" role="alert">Büyüteçle arayıp listeden doğum yerini seç.</p>
+      }
+
+      <!-- Arama durumu -->
+      @if (searching()) {
+        <p class="status" role="status">Aranıyor…</p>
+      }
+      @if (searchError(); as message) {
+        <p class="error" role="alert">{{ message }}</p>
+      }
+
+      <!-- Sonuç listesi -->
+      @if (places(); as results) {
+        @if (results.length === 0) {
+          <p class="status" role="status">Sonuç bulunamadı. İlçe ve şehri birlikte yazmayı dene (ör. “Bucak, Burdur”).</p>
+        } @else {
+          <ul class="results" aria-label="Arama sonuçları">
+            @for (place of results; track place.display_name) {
+              <li>
+                <button type="button" (click)="selectPlace(place)">
+                  <span class="result-name">{{ place.name }}</span>
+                  <span class="result-detail">{{ place.display_name }}</span>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      }
+    </div>
+  </div>
+
+  <!-- ---------- Saatimi bilmiyorum ---------- -->
+  <label class="checkbox">
+    <input type="checkbox" formControlName="unknownTime" />
+    Doğum saatimi bilmiyorum
+  </label>
+  @if (form.controls.unknownTime.value) {
+    <p class="hint">Saat bilinmediği için yükselen burç ve evler hesaplanmaz.</p>
+  }
+
+  <!-- ---------- Gönder ---------- -->
+  <button type="submit" class="submit">
+    Doğum Haritamı Oluştur
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6" /></svg>
+  </button>
+
+  <p class="privacy">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="5" y="11" width="14" height="10" rx="2" />
+      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+    </svg>
+    Bilgilerin sadece haritanı hesaplamak için kullanılır.
+  </p>
+</form> 

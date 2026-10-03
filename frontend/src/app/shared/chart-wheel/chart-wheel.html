@@ -1,0 +1,66 @@
+<svg class="wheel" viewBox="-30 -30 560 560" role="img" [attr.aria-label]="ariaLabel()">
+  <!-- Halkalar -->
+  <circle cx="250" cy="250" r="240" class="band" />
+  <circle cx="250" cy="250" r="200" class="inner-bg" />
+  <circle cx="250" cy="250" r="240" class="ring outer" />
+  <circle cx="250" cy="250" r="200" class="ring" />
+  <circle cx="250" cy="250" r="108" class="ring aspect-ring" />
+
+  <!-- Derece çentikleri -->
+  @for (t of degreeTicks(); track $index) {
+    <line [attr.x1]="t.x1" [attr.y1]="t.y1" [attr.x2]="t.x2" [attr.y2]="t.y2" class="deg-tick" />
+  }
+
+  <!-- Burçlar -->
+  @for (s of signs(); track $index) {
+    <line [attr.x1]="s.x1" [attr.y1]="s.y1" [attr.x2]="s.x2" [attr.y2]="s.y2" class="sign-line" />
+    <text [attr.x]="s.x" [attr.y]="s.y" class="sign-glyph">{{ s.glyph }}</text>
+  }
+
+  <!-- Evler -->
+  @for (h of houses(); track h.no) {
+    <line
+      [attr.x1]="h.x1"
+      [attr.y1]="h.y1"
+      [attr.x2]="h.x2"
+      [attr.y2]="h.y2"
+      class="house-line"
+      [class.axis]="h.axis"
+    />
+    <text [attr.x]="h.x" [attr.y]="h.y" class="house-no">{{ h.no }}</text>
+  }
+
+  <!-- Açılar -->
+  @for (a of aspects(); track $index) {
+    <line
+      [attr.x1]="a.x1"
+      [attr.y1]="a.y1"
+      [attr.x2]="a.x2"
+      [attr.y2]="a.y2"
+      [attr.class]="'aspect ' + a.kind"
+      [attr.stroke-opacity]="a.opacity"
+    />
+  }
+
+  <!-- Gezegenler -->
+  @for (p of planets(); track p.key) {
+    <g class="planet">
+      <title>{{ p.title }}</title>
+      <line [attr.x1]="p.tick.x1" [attr.y1]="p.tick.y1" [attr.x2]="p.tick.x2" [attr.y2]="p.tick.y2" class="planet-tick" />
+      @if (p.connector; as c) {
+        <line [attr.x1]="c.x1" [attr.y1]="c.y1" [attr.x2]="c.x2" [attr.y2]="c.y2" class="connector" />
+      }
+      <text [attr.x]="p.x" [attr.y]="p.y" class="planet-glyph">{{ p.glyph }}</text>
+      @if (p.retrograde) {
+        <text [attr.x]="p.x + 10" [attr.y]="p.y + 9" class="retro">℞</text>
+      }
+    </g>
+  }
+
+  <!-- ASC / MC -->
+  @for (l of axisLabels(); track l.text) {
+    <text [attr.x]="l.x" [attr.y]="l.y" class="axis-label">{{ l.text }}</text>
+  }
+
+  <circle cx="250" cy="250" r="3" class="center" />
+</svg> 

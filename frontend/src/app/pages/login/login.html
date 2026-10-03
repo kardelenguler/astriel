@@ -1,0 +1,56 @@
+<section class="auth-page">
+  <form class="auth-card" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+    <h1>Tekrar hoş geldin</h1>
+    <p class="auth-subtitle">Kayıtlı haritalarına ulaşmak için giriş yap.</p>
+
+    @if (error(); as message) {
+      <p class="auth-alert" role="alert">{{ message }}</p>
+    }
+
+    <div class="auth-field">
+      <label for="username">Kullanıcı adı</label>
+      <input
+        id="username"
+        type="text"
+        formControlName="username"
+        autocomplete="username"
+        autocapitalize="none"
+        spellcheck="false"
+      />
+      @if (hasError('username')) {
+        <p class="auth-error">Kullanıcı adını yaz.</p>
+      }
+    </div>
+
+    <div class="auth-field">
+      <label for="password">Şifre</label>
+      <div class="password-box">
+        <input
+          id="password"
+          [type]="showPassword() ? 'text' : 'password'"
+          formControlName="password"
+          autocomplete="current-password"
+        />
+        <button
+          type="button"
+          class="toggle-password"
+          (click)="showPassword.set(!showPassword())"
+          [attr.aria-label]="showPassword() ? 'Şifreyi gizle' : 'Şifreyi göster'"
+        >
+          {{ showPassword() ? 'Gizle' : 'Göster' }}
+        </button>
+      </div>
+      @if (hasError('password')) {
+        <p class="auth-error">Şifreni yaz.</p>
+      }
+    </div>
+
+    <button type="submit" class="auth-submit" [disabled]="loading()">
+      {{ loading() ? 'Giriş yapılıyor…' : 'Giriş Yap' }}
+    </button>
+
+    <p class="auth-switch">
+      Hesabın yok mu? <a routerLink="/kayit">Ücretsiz kayıt ol</a>
+    </p>
+  </form>
+</section> 
