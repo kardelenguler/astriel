@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { HOUSE_MEANINGS } from '../content/houses';
+import { PLANET_MEANINGS } from '../content/planets';
 import { SIGN_MEANINGS } from '../content/signs';
 import { InterpretationService } from './interpretation.service';
 
@@ -11,6 +12,7 @@ describe('InterpretationService', () => {
     service = TestBed.inject(InterpretationService);
   });
 
+  // ------------------------------ Evler ------------------------------
   it("İkizler'deki 1. ev için doğru başlık ve cümleyi kurmalı", () => {
     const result = service.forHouse(1, { sign: { key: 'gemini' }, formatted: "29°39' İkizler" });
 
@@ -55,5 +57,53 @@ describe('InterpretationService', () => {
   it('bilinmeyen bir burç ya da ev için null dönmeli (sayfa çökmemeli)', () => {
     expect(service.forHouse(1, { sign: { key: 'yok' }, formatted: '' })).toBeNull();
     expect(service.forHouse(13, { sign: { key: 'gemini' }, formatted: '' })).toBeNull();
+  });
+
+  // ------------------------------ Gezegenler ------------------------------
+  const mercury = {
+    key: 'mercury',
+    sign: { key: 'capricorn' },
+    formatted: "24°06' Oğlak",
+    house: 8,
+    retrograde: false,
+  };
+
+  it('gezegen için burç başlığını ve ev cümlesini kurmalı', () => {
+    const result = service.forPlanet(mercury);
+
+    expect(result?.heading).toBe("Oğlak'ta Merkür");
+    expect(result?.notes?.[0]).toContain('Merkür 8. evde yer alıyor');
+    expect(result?.notes?.[0]).toContain('dönüşüm alanında');
+  });
+
+  it('retro gezegene retro notu eklemeli', () => {
+    const result = service.forPlanet({ ...mercury, retrograde: true });
+
+    expect(result?.notes?.some((n) => n.includes('retro (geri)'))).toBe(true);
+  });
+
+  it('doğum saati bilinmiyorsa (ev yok) ev cümlesi eklenmemeli', () => {
+    const result = service.forPlanet({ ...mercury, house: null });
+
+    expect(result?.notes).toEqual([]);
+  });
+
+  it('bütün gezegen-burç-ev kombinasyonları eksiksiz metin üretmeli', () => {
+    for (const planetKey of Object.keys(PLANET_MEANINGS)) {
+      for (const signKey of Object.keys(SIGN_MEANINGS)) {
+        for (let house = 1; house <= 12; house++) {
+          const result = service.forPlanet({
+            key: planetKey,
+            sign: { key: signKey },
+            formatted: '',
+            house,
+            retrograde: true,
+          });
+          const allText = [result!.text, ...(result!.notes ?? [])].join(' ');
+
+          expect(allText).not.toContain('undefined');
+        }
+      }
+    }
   });
 }); 

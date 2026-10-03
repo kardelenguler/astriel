@@ -8,7 +8,7 @@ import logging
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.core.exceptions import AuthenticationError, ConflictError
+from app.core.exceptions import AuthenticationError, ConflictError, InvalidInputError
 from app.core.security import (
     create_access_token,
     decode_access_token,
@@ -24,6 +24,10 @@ logger = logging.getLogger(__name__)
 # Yanlış kullanıcı adı ile yanlış şifre AYNI mesajı alır;
 # aksi halde hangi kullanıcı adlarının kayıtlı olduğu öğrenilebilir.
 INVALID_CREDENTIALS = "Kullanıcı adı veya şifre hatalı."
+
+# Hesap ayarlarında şifre yanlışsa 401 DEĞİL 422 döner: frontend 401 görünce
+# kullanıcıyı çıkışa atar, oysa burada sadece bir uyarı gösterilmeli.
+WRONG_CURRENT_PASSWORD = "Mevcut şifre hatalı."
 
 # Kullanıcı bulunamasa bile şifre doğrulaması yapılır. Yoksa "kullanıcı yok" yanıtı
 # çok hızlı, "şifre yanlış" yanıtı yavaş döner ve süreden kullanıcı adı tahmin edilir.
@@ -91,4 +95,26 @@ class AuthService:
         if user is None or not user.is_active:
             # Token geçerli ama kullanıcı silinmiş ya da devre dışı
             raise AuthenticationError(detail=f"token kullanıcısı yok/pasif: {user_id}")
-        return user 
+        return user
+
+    # --------------------------- Hesap ayarları ---------------------------
+    def change_password(self, user: User, current_password: str, new_password: str) -> None:
+        """Mevcut şifre doğruysa şifreyi değiştirir."""
+        if not verify_password(current_password, user.hashed_password):
+            raise InvalidInputError(WRONG_CURRENT_PASSWORD)
+        if current_password == new_password:
+            raise InvalidInputError("Yeni şifre mevcut şifreyle aynı olamaz.")
+
+        user.hashed_password = hash_password(new_password)
+        self.db.commit()
+        logger.info("Şifre değiştirildi: id=%s", user.id)
+
+    def delete_account(self, user: User, password: str) -> None:
+        """Şifre doğruysa kullanıcıyı ve TÜM haritalarını kalıcı olarak siler."""
+        if not verify_password(password, user.hashed_password):
+            raise InvalidInputError(WRONG_CURRENT_PASSWORD)
+
+        user_id = user.id
+        self.db.delete(user)  # haritalar da silinir (modeldeki cascade)
+        self.db.commit()
+        logger.info("Hesap silindi: id=%s", user_id) 

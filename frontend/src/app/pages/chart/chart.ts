@@ -35,7 +35,7 @@ export class Chart {
   private readonly router = inject(Router);
   private readonly chartService = inject(ChartService);
   private readonly savedCharts = inject(SavedChartsService);
-  private readonly interpretations = inject(InterpretationService); // YENİ (yorumlar)
+  private readonly interpretations = inject(InterpretationService);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly auth = inject(AuthService);
 
@@ -53,7 +53,7 @@ export class Chart {
   readonly saveName = signal('Benim haritam');
   readonly saveError = signal<string | null>(null);
 
-  // ---------- YENİ (yorumlar): açık olan açıklama ----------
+  // ---------- Açık olan açıklama ----------
   readonly selected = signal<Interpretation | null>(null);
   readonly detailError = signal<string | null>(null);
 
@@ -67,6 +67,12 @@ export class Chart {
   readonly houseDetail = computed(() => {
     const detail = this.selected();
     return detail?.id.startsWith('house-') ? detail : null;
+  });
+
+  /** YENİ (gezegenler): tablodan bir gezegen seçiliyse onun açıklaması */
+  readonly planetDetail = computed(() => {
+    const detail = this.selected();
+    return detail?.id.startsWith('planet-') ? detail : null;
   });
 
   // ---------- Hesaplanan değerler (chart değişince kendiliğinden güncellenir) ----------
@@ -85,7 +91,7 @@ export class Chart {
       .subscribe((params) => this.load(params));
   }
 
-  // ================= YENİ (yorumlar) =================
+  // ================= Yorumlar =================
 
   /** Güneş, Ay veya Yükselen kartı tıklanınca */
   selectPoint(key: PointKey): void {
@@ -104,6 +110,15 @@ export class Chart {
       return;
     }
     this.toggle(`house-${houseNo}`, () => this.interpretations.forHouse(houseNo, cusp));
+  }
+
+  /** YENİ (gezegenler): tablodaki gezegen adı tıklanınca */
+  selectPlanet(key: string): void {
+    const planet = this.chart()?.planets.find((p) => p.key === key);
+    if (!planet) {
+      return;
+    }
+    this.toggle(`planet-${key}`, () => this.interpretations.forPlanet(planet));
   }
 
   closeDetail(): void {
@@ -194,7 +209,7 @@ export class Chart {
     this.request = request;
     this.saveState.set('idle');
     this.saveError.set(null);
-    this.closeDetail(); // YENİ (yorumlar)
+    this.closeDetail();
 
     if (!request) {
       this.error.set('Adresteki doğum bilgileri eksik veya hatalı. Ana sayfadan tekrar dene.');

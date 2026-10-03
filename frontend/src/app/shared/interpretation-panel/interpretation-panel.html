@@ -14,5 +14,9 @@
   <h4>{{ interpretation().heading }}</h4>
   <p class="text">{{ interpretation().text }}</p>
 
+  @for (note of interpretation().notes ?? []; track $index) {
+    <p class="text extra">{{ note }}</p>
+  }
+
   <p class="note">Astrolojik geleneğe dayanan genel bir açıklamadır.</p>
 </section> 

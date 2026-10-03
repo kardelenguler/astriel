@@ -256,3 +256,13 @@ button.btn {
     transition: none;
   }
 } 
+
+// Selamlama artık Hesabım sayfasına giden bir link
+a.greeting {
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover strong {
+    color: var(--color-mauve);
+  }
+} 

@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-from app.api.v1.routes import auth, chart, health, places 
+from app.api.v1.routes import account, auth, chart, health, places
 from app.schemas.error import ErrorResponse
 
 # Tüm endpoint'lerin dokümantasyonunda hata yanıtlarının gerçek biçimi görünsün
@@ -16,5 +16,6 @@ api_router = APIRouter(
 
 api_router.include_router(health.router, tags=["Sağlık"])
 api_router.include_router(auth.router, tags=["Kimlik"])
+api_router.include_router(account.router, tags=["Hesap"])
 api_router.include_router(chart.router, tags=["Harita"])
 api_router.include_router(places.router, tags=["Yer arama"]) 

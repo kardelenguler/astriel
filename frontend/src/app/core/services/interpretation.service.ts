@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { HOUSE_MEANINGS } from '../content/houses';
+import { PLANET_MEANINGS } from '../content/planets';
 import { POINT_MEANINGS, PointKey } from '../content/points';
 import { SIGN_MEANINGS, SignMeaning } from '../content/signs';
 import { Interpretation } from '../models/interpretation';
@@ -9,6 +10,13 @@ import { Interpretation } from '../models/interpretation';
 interface Placement {
   sign: { key: string };
   formatted: string; // "29°39' İkizler"
+}
+
+/** Gezegenler için ek bilgi: hangi evde ve geri hareket ediyor mu */
+interface PlanetPlacement extends Placement {
+  key: string;
+  house: number | null; // doğum saati bilinmiyorsa null
+  retrograde: boolean;
 }
 
 /**
@@ -54,6 +62,44 @@ export class InterpretationService {
       description: point.description,
       heading: point.heading(sign),
       text: this.signText(sign, point.area),
+      source: 'static',
+    };
+  }
+
+  /** Örnek: forPlanet(Merkür) → "Oğlak'ta Merkür" + ev ve retro notları */
+  forPlanet(planet: PlanetPlacement): Interpretation | null {
+    const meaning = PLANET_MEANINGS[planet.key];
+    const sign = SIGN_MEANINGS[planet.sign.key];
+    if (!meaning || !sign) {
+      return null;
+    }
+
+    const notes: string[] = [];
+
+    const house = planet.house !== null ? HOUSE_MEANINGS[planet.house] : undefined;
+    if (house) {
+      notes.push(
+        `${meaning.title} ${planet.house}. evde yer alıyor. Bu yerleşim, ${meaning.themes} ` +
+          `temalarının özellikle ${house.title.toLocaleLowerCase('tr-TR')} alanında öne çıkabileceğini gösterir.`,
+      );
+    }
+
+    if (planet.retrograde) {
+      notes.push(
+        `${meaning.title} doğum anında retro (geri) hareket ediyordu. Retro gezegenlerin temaları, ` +
+          'geleneksel olarak daha içe dönük ve gözden geçirilerek yaşanan konularla ilişkilendirilir.',
+      );
+    }
+
+    return {
+      id: `planet-${planet.key}`,
+      title: meaning.title,
+      keywords: meaning.keywords,
+      position: planet.formatted,
+      description: meaning.description,
+      heading: `${sign.locative} ${meaning.title}`,
+      text: this.signText(sign, meaning.area),
+      notes,
       source: 'static',
     };
   }

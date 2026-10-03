@@ -37,6 +37,7 @@ function clearToken(): void {
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/auth`;
+  private readonly accountUrl = `${environment.apiUrl}/account`;
 
   // Giriş yapan kullanıcı (yoksa null). Dışarıdan sadece okunabilir.
   private readonly currentUser = signal<User | null>(null);
@@ -81,6 +82,22 @@ export class AuthService {
   logout(): void {
     clearToken();
     this.currentUser.set(null);
+  }
+
+  // ---------- Hesap ayarları ----------
+
+  changePassword(currentPassword: string, newPassword: string): Observable<void> {
+    return this.http.post<void>(`${this.accountUrl}/password`, {
+      current_password: currentPassword,
+      new_password: newPassword,
+    });
+  }
+
+  /** Hesabı kalıcı olarak siler; başarılı olursa oturumu da kapatır */
+  deleteAccount(password: string): Observable<void> {
+    return this.http
+      .delete<void>(this.accountUrl, { body: { password } })
+      .pipe(tap(() => this.logout()));
   }
 
   private loadCurrentUser(): Observable<User> {

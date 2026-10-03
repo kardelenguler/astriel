@@ -1,0 +1,137 @@
+<section class="account">
+  <header class="page-header">
+    <p class="eyebrow">Hesabım</p>
+    <h1>Hesap ayarları</h1>
+  </header>
+
+  @if (auth.user(); as user) {
+    <!-- ================= Profil ================= -->
+    <div class="panel">
+      <h2>Profil</h2>
+      <dl class="profile">
+        <div>
+          <dt>Kullanıcı adı</dt>
+          <dd>{{ user.username }}</dd>
+        </div>
+        <div>
+          <dt>Görünen ad</dt>
+          <dd>{{ user.display_name || '—' }}</dd>
+        </div>
+        <div>
+          <dt>E-posta</dt>
+          <dd>{{ user.email || 'Eklenmemiş' }}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- ================= Şifre değiştir ================= -->
+    <form class="panel" [formGroup]="passwordForm" (ngSubmit)="changePassword()" novalidate>
+      <h2>Şifre değiştir</h2>
+
+      @if (passwordSuccess()) {
+        <p class="success" role="status">Şifren değiştirildi.</p>
+      }
+      @if (passwordError(); as message) {
+        <p class="auth-alert" role="alert">{{ message }}</p>
+      }
+
+      <div class="auth-field">
+        <label for="current-password">Mevcut şifre</label>
+        <input id="current-password" type="password" formControlName="currentPassword" autocomplete="current-password" />
+        @if (passwordFieldError('currentPassword', 'required')) {
+          <p class="auth-error">Mevcut şifreni yaz.</p>
+        }
+      </div>
+
+      <div class="auth-field">
+        <label for="new-password">Yeni şifre</label>
+        <input id="new-password" type="password" formControlName="newPassword" autocomplete="new-password" />
+        @if (passwordFieldError('newPassword', 'required')) {
+          <p class="auth-error">Yeni bir şifre belirle.</p>
+        } @else if (passwordFieldError('newPassword', 'minlength')) {
+          <p class="auth-error">Şifre en az 8 karakter olmalı.</p>
+        } @else if (passwordFieldError('newPassword', 'maxlength')) {
+          <p class="auth-error">Şifre en fazla 128 karakter olabilir.</p>
+        } @else {
+          <p class="auth-hint">En az 8 karakter.</p>
+        }
+      </div>
+
+      <div class="auth-field">
+        <label for="new-password-confirm">Yeni şifre tekrar</label>
+        <input
+          id="new-password-confirm"
+          type="password"
+          formControlName="newPasswordConfirm"
+          autocomplete="new-password"
+          [class.mismatch]="passwordMismatch"
+        />
+        @if (passwordFieldError('newPasswordConfirm', 'required')) {
+          <p class="auth-error">Yeni şifreni tekrar yaz.</p>
+        } @else if (passwordMismatch) {
+          <p class="auth-error">Şifreler aynı değil.</p>
+        }
+      </div>
+
+      <button type="submit" class="auth-submit" [disabled]="passwordSaving()">
+        {{ passwordSaving() ? 'Kaydediliyor…' : 'Şifreyi değiştir' }}
+      </button>
+    </form>
+
+    <!-- ================= Hesabı sil ================= -->
+    <div class="panel danger">
+      <h2>Hesabı sil</h2>
+      <p class="danger-text">
+        Hesabın ve kayıtlı bütün haritaların <strong>kalıcı olarak</strong> silinir.
+        Bu işlem geri alınamaz.
+      </p>
+
+      @if (!deleteOpen()) {
+        <button type="button" class="danger-btn" (click)="deleteOpen.set(true)">
+          Hesabımı silmek istiyorum
+        </button>
+      } @else {
+        <form class="delete-form" [formGroup]="deleteForm" (ngSubmit)="deleteAccount()" novalidate>
+          @if (deleteError(); as message) {
+            <p class="auth-alert" role="alert">{{ message }}</p>
+          }
+
+          <div class="auth-field">
+            <label for="delete-username">
+              Onaylamak için kullanıcı adını yaz: <strong>{{ user.username }}</strong>
+            </label>
+            <input
+              id="delete-username"
+              type="text"
+              formControlName="confirmUsername"
+              autocomplete="off"
+              autocapitalize="none"
+              spellcheck="false"
+            />
+          </div>
+
+          <div class="auth-field">
+            <label for="delete-password">Şifren</label>
+            <input id="delete-password" type="password" formControlName="password" autocomplete="current-password" />
+            @if (deleteForm.controls.password.touched && deleteForm.controls.password.hasError('required')) {
+              <p class="auth-error">Şifreni yaz.</p>
+            }
+          </div>
+
+          <div class="danger-actions">
+            <button
+              type="submit"
+              class="danger-btn filled"
+              [disabled]="deleting() || !usernameConfirmed()"
+            >
+              {{ deleting() ? 'Siliniyor…' : 'Hesabımı kalıcı olarak sil' }}
+            </button>
+            <button type="button" class="cancel-btn" (click)="cancelDelete()">Vazgeç</button>
+          </div>
+        </form>
+      }
+    </div>
+  } @else {
+    <p class="loading" role="status">Hesap bilgilerin yükleniyor…</p>
+  }
+</section> 
