@@ -53,6 +53,12 @@ class PermissionDeniedError(AppError):
     default_message = "Bu işlem için yetkiniz yok."
 
 
+class TooManyRequestsError(AppError):
+    status_code = 429
+    code = "too_many_requests"
+    default_message = "Çok fazla hatalı deneme yapıldı. Lütfen birkaç dakika sonra tekrar deneyin."
+
+
 class ExternalServiceError(AppError):
     status_code = 503
     code = "service_unavailable"
