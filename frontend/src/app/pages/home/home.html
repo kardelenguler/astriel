@@ -10,7 +10,12 @@
 
     <p class="lead">Doğum bilgilerini gir, gökyüzünün sana özel haritasını keşfet.</p>
 
-    <app-birth-form class="hero-form" (submitted)="onBirthFormSubmit($event)" />
+    <app-birth-form
+      class="hero-form"
+      [initialValue]="initialValue"
+      (submitted)="onBirthFormSubmit($event)"
+    />     
+
   </div>
 
   <div class="hero-visual" aria-hidden="true">

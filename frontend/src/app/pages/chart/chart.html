@@ -27,8 +27,8 @@
         · {{ c.timezone }}
       </p>
       <div class="header-actions">
-        <a routerLink="/" class="change-link">Bilgileri değiştir</a>
 
+        <a routerLink="/" queryParamsHandling="preserve" class="change-link">Bilgileri değiştir</a>         
         @switch (saveState()) {
           <!-- Başta: sadece düğme -->
           @case ('idle') {

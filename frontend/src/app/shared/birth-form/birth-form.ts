@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, output, signal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
@@ -48,6 +48,9 @@ export class BirthForm {
   private readonly placesService = inject(PlacesService);
   private readonly destroyRef = inject(DestroyRef);
 
+  /** YENİ: "Bilgileri değiştir" ile gelindiyse formun önceden doldurulacağı değer */
+  readonly initialValue = input<BirthFormValue | null>(null);
+
   /** Form geçerli şekilde gönderilince tetiklenir; kullanan component dinler */
   readonly submitted = output<BirthFormValue>();
 
@@ -90,6 +93,14 @@ export class BirthForm {
           this.selectedPlace.set(null);
         }
       });
+
+    // YENİ: başlangıç değeri verildiyse formu doldur
+    effect(() => {
+      const value = this.initialValue();
+      if (value) {
+        untracked(() => this.fill(value));
+      }
+    });
   }
 
   /** Bir alanda gösterilecek hata var mı? (kullanıcı alana dokunduktan sonra) */
@@ -154,5 +165,17 @@ export class BirthForm {
       birthTime: unknownTime ? null : birthTime,
       place,
     });
+  }
+
+  /** YENİ: formu verilen bilgilerle doldurur (yer de seçili gelir, tekrar aramak gerekmez) */
+  private fill(value: BirthFormValue): void {
+    this.form.controls.birthDate.setValue(value.birthDate);
+    if (value.birthTime) {
+      this.form.controls.unknownTime.setValue(false);
+      this.form.controls.birthTime.setValue(value.birthTime);
+    } else {
+      this.form.controls.unknownTime.setValue(true); // saat alanını da kapatır
+    }
+    this.selectPlace(value.place);
   }
 } 
