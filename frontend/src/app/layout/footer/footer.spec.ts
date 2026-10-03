@@ -1,21 +1,26 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+
 import { Footer } from './footer';
 
 describe('Footer', () => {
-  let component: Footer;
-  let fixture: ComponentFixture<Footer>;
-
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Footer],
+      providers: [provideRouter([])],
     }).compileComponents();
+  });
 
-    fixture = TestBed.createComponent(Footer);
-    component = fixture.componentInstance;
+  it('oluşturulabilmeli', () => {
+    const fixture = TestBed.createComponent(Footer);
+    expect(fixture.componentInstance).toBeTruthy();
+  });
+
+  it('telif yılı bu yıl olmalı', async () => {
+    const fixture = TestBed.createComponent(Footer);
     await fixture.whenStable();
-  });
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(text).toContain(String(new Date().getFullYear()));
   });
-});
+}); 
