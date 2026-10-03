@@ -113,7 +113,11 @@ Veritabanı gerektiren testler `.env` içindeki `TEST_DATABASE_URL` adresini kul
 Bu değer tanımlı değilse o testler atlanır. 
 
 
+## Dokümantasyon
 
+- [API](docs/api.md): uç noktalar, hata biçimi, doğrulama kuralları
+- [Mimari](docs/architecture.md): katmanlar, hesaplama akışı, güvenlik
+- [Veritabanı](docs/database.md): tablolar ve tasarım kararları 
 
 ## Yol Haritası
 
