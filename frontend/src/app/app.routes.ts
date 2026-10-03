@@ -5,6 +5,8 @@ import { About } from './pages/about/about';
 import { Account } from './pages/account/account';
 import { Chart } from './pages/chart/chart';
 import { Home } from './pages/home/home';
+import { Privacy } from './pages/legal/privacy';
+import { Terms } from './pages/legal/terms';
 import { Login } from './pages/login/login';
 import { MyCharts } from './pages/my-charts/my-charts';
 import { NotFound } from './pages/not-found/not-found';
@@ -13,7 +15,7 @@ import { Register } from './pages/register/register';
 export const routes: Routes = [
   { path: '', component: Home, title: 'Astriel · Doğum Haritası' },
   { path: 'harita', component: Chart, title: 'Doğum Haritan · Astriel' },
-  // YENİ: kayıtlı harita (/harita/<id>), sadece sahibine açılır
+  // Kayıtlı harita (/harita/<id>), sadece sahibine açılır
   {
     path: 'harita/:id',
     component: Chart,
@@ -21,6 +23,8 @@ export const routes: Routes = [
     title: 'Kayıtlı Haritan · Astriel',
   },
   { path: 'hakkinda', component: About, title: 'Hakkında · Astriel' },
+  { path: 'gizlilik', component: Privacy, title: 'Gizlilik Politikası · Astriel' },
+  { path: 'kullanim-sartlari', component: Terms, title: 'Kullanım Şartları · Astriel' },
   { path: 'giris', component: Login, canActivate: [guestGuard], title: 'Giriş Yap · Astriel' },
   { path: 'kayit', component: Register, canActivate: [guestGuard], title: 'Kayıt Ol · Astriel' },
   {

@@ -1,0 +1,50 @@
+.legal {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 48px var(--page-padding) 110px;
+  line-height: 1.75;
+
+  .eyebrow {
+    margin: 0 0 14px;
+    font-size: 13px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+  }
+
+  h1 {
+    margin: 0 0 8px;
+    font-size: clamp(32px, 4vw, 46px);
+    font-weight: 500;
+  }
+
+  .updated {
+    margin: 0 0 40px;
+    font-size: 14px;
+    color: var(--color-text-muted);
+  }
+
+  h2 {
+    margin: 40px 0 12px;
+    font-size: 26px;
+    font-weight: 500;
+  }
+
+  p,
+  li {
+    color: var(--color-text-muted);
+  }
+
+  ul {
+    padding-left: 20px;
+  }
+
+  strong {
+    color: var(--color-text);
+    font-weight: 500;
+  }
+
+  a {
+    color: var(--color-mauve);
+  }
+} 
