@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
+import { AnalyticsService } from './core/services/analytics.service';
 import { AuthService } from './core/services/auth.service';
 import { CanonicalService } from './core/services/canonical.service';
 import { Footer } from './layout/footer/footer';
@@ -18,5 +19,7 @@ export class App {
     inject(AuthService).restoreSession();
     // Her sayfada Google için doğru canonical adresi
     inject(CanonicalService).init();
+    // Ziyaretçi sayacı (sadece sayfa adı gider, kişisel veri gitmez)
+    inject(AnalyticsService).init();
   }
 } 
