@@ -409,3 +409,28 @@ button.clickable {
   font-size: 13px;
   color: var(--color-text-muted);
 } 
+
+
+// Gezegenler tablosundaki tıklanabilir gezegen adları
+.planet-btn {
+  padding: 2px 0;
+  background: none;  // tarayıcının beyaz düğme arka planını kaldır
+  border: none;
+  border-bottom: 1px dashed rgba(197, 138, 168, 0.45);
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    color: var(--color-mauve);
+    border-bottom-color: var(--color-mauve);
+  }
+
+  // Açıklaması açık olan gezegen
+  &.selected {
+    color: var(--color-gold);
+    border-bottom: 1px solid var(--color-gold);
+  }
+} 
