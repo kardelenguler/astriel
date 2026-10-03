@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 
@@ -7,6 +7,7 @@ import { ChartSummary } from '../../core/models/saved-chart';
 import { SavedChartsService } from '../../core/services/saved-charts.service';
 
 const UNDO_SECONDS = 8;
+const PAGE_SIZE = 20; // her istekte gelen harita sayısı (backend en fazla 50'ye izin veriyor) 
 const NAME_MAX_LENGTH = 100; // YENİ (adlandırma): backend'deki sınırın aynısı
 
 @Component({
@@ -22,7 +23,11 @@ export class MyCharts {
 
   readonly charts = signal<ChartSummary[]>([]);
   readonly total = signal(0);
-  readonly loading = signal(true);
+  readonly loading = signal(true); 
+  readonly loadingMore = signal(false);                  // "Daha fazla yükle" isteği sürüyor mu
+  /** Sunucuda henüz getirilmemiş harita kaldı mı */
+  readonly hasMore = computed(() => this.charts().length < this.total());
+  readonly PAGE_SIZE = PAGE_SIZE; 
   readonly loadError = signal<string | null>(null);    // liste hiç yüklenemediyse
   readonly actionError = signal<string | null>(null);  // aç/sil/geri al başarısızsa
   readonly busyId = signal<string | null>(null);       // işlem süren kartın id'si
@@ -46,7 +51,7 @@ export class MyCharts {
     this.loadError.set(null);
 
     this.savedCharts
-      .list()
+      .list(PAGE_SIZE, 0) // ilk sayfa: en baştan 20 harita
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (result) => {
@@ -59,7 +64,40 @@ export class MyCharts {
           this.loading.set(false);
         },
       });
-  }
+  } 
+
+  /** Listenin sonuna bir sonraki 20 haritayı ekler */
+  loadMore(): void {
+    if (this.loadingMore() || !this.hasMore()) {
+      return; // çift tıklamada iki istek gitmesin, gelecek kayıt yoksa istek atılmasın
+    }
+    this.loadingMore.set(true);
+    this.actionError.set(null);
+
+    // offset = elimizdeki harita sayısı. Silinen haritalar listeden çıktığı için
+    // bu sayı her zaman "sunucuda kaçıncı kayıttan devam edileceğini" doğru verir.
+    this.savedCharts
+      .list(PAGE_SIZE, this.charts().length)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (result) => {
+          this.charts.update((list) => [...list, ...result.items]); // eskilerin sonuna ekle
+          this.total.set(result.total);
+          this.loadingMore.set(false);
+        },
+        error: (error) => {
+          this.actionError.set(getErrorMessage(error));
+          this.loadingMore.set(false);
+        },
+      });
+  } 
+
+  /** Listeyi ilk sayfaya geri indirir (sunucuya istek atmaz) */
+  showLess(): void {
+    this.charts.update((list) => list.slice(0, PAGE_SIZE));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } 
+
 
   /** Kayıtlı haritanın bilgilerini alıp harita sayfasında aç */
   open(item: ChartSummary): void {

@@ -94,7 +94,31 @@
         </div>
       }
     </div>
-  }
+
+    <!-- Sunucuda gösterilmemiş harita kaldıysa -->
+    @if (hasMore() || charts().length > PAGE_SIZE) {
+      <div class="load-more">
+        <div class="load-more-buttons">
+          @if (hasMore()) {
+            <button
+              type="button"
+              class="btn"
+              (click)="loadMore()"
+              [disabled]="loadingMore()"
+              [attr.aria-busy]="loadingMore()"
+            >
+              {{ loadingMore() ? 'Yükleniyor…' : 'Daha fazla yükle' }}
+            </button>
+          }
+          @if (charts().length > PAGE_SIZE) {
+            <button type="button" class="btn btn-ghost" (click)="showLess()">Daha az göster</button>
+          }
+        </div>
+        <p class="load-more-info">{{ charts().length }} / {{ total() }} harita gösteriliyor</p>
+      </div>
+    } 
+  } 
+
 
   <!-- Silindikten sonra 8 saniye görünen "Geri al" çubuğu -->
   @if (lastDeleted(); as deleted) {

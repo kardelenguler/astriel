@@ -120,7 +120,7 @@ Bu değer tanımlı değilse o testler atlanır.
 - [x] Swiss Ephemeris ile harita hesaplama motoru
 - [x] Kayıt, giriş ve harita kaydetme
 - [x] Burç çarkı ve temel yorumlar (Güneş, Ay, Yükselen, 12 ev)
-- [ ] Kayıtlı haritalarda sayfalama
+- [x] Kayıtlı haritalarda sayfalama 
 - [ ] Gezegen + burç + ev kombinasyonlarından kural tabanlı yorum motoru
 - [ ] Yapay zekâ ile kişiye özel harita yorumları
 - [ ] Günlük ve haftalık burç yorumları  
