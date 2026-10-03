@@ -26,7 +26,31 @@
       @for (item of charts(); track item.id) {
         <article class="chart-card">
           <div class="card-main">
-            <h2>{{ item.name }}</h2>
+            @if (editingId() === item.id) {
+              <!-- Ad düzenleme kutusu -->
+              <form class="rename-form" (submit)="$event.preventDefault(); saveRename(item)">
+                <input
+                  [id]="'rename-' + item.id"
+                  type="text"
+                  aria-label="Haritanın yeni adı"
+                  maxlength="100"
+                  [value]="editName()"
+                  (input)="onRenameInput($event)"
+                  (keydown.escape)="cancelRename()"
+                  [disabled]="busyId() === item.id"
+                />
+                <button type="submit" class="save-btn" [disabled]="busyId() === item.id">
+                  {{ busyId() === item.id ? 'Kaydediliyor…' : 'Kaydet' }}
+                </button>
+                <button type="button" class="cancel-btn" (click)="cancelRename()">Vazgeç</button>
+              </form>
+              @if (renameError(); as message) {
+                <p class="rename-error" role="alert">{{ message }}</p>
+              }
+            } @else {
+              <h2>{{ item.name }}</h2>
+            }
+
             <p class="card-meta">
               {{ item.place_name }} · {{ formatDate(item.birth_date) }} · {{ formatTime(item.birth_time) }}
             </p>
@@ -37,20 +61,31 @@
             </p>
           </div>
 
-          <div class="card-actions">
-            <button type="button" class="open-btn" (click)="open(item)" [disabled]="busyId() !== null">
-              {{ busyId() === item.id ? 'Açılıyor…' : 'Aç' }}
-            </button>
-            <button
-              type="button"
-              class="delete-btn"
-              (click)="remove(item)"
-              [disabled]="busyId() !== null"
-              [attr.aria-label]="item.name + ' haritasını sil'"
-            >
-              Sil
-            </button>
-          </div>
+          @if (editingId() !== item.id) {
+            <div class="card-actions">
+              <button type="button" class="open-btn" (click)="open(item)" [disabled]="busyId() !== null">
+                {{ busyId() === item.id ? 'Açılıyor…' : 'Aç' }}
+              </button>
+              <button
+                type="button"
+                class="ghost-btn"
+                (click)="startRename(item)"
+                [disabled]="busyId() !== null"
+                [attr.aria-label]="item.name + ' haritasının adını değiştir'"
+              >
+                Adı değiştir
+              </button>
+              <button
+                type="button"
+                class="delete-btn"
+                (click)="remove(item)"
+                [disabled]="busyId() !== null"
+                [attr.aria-label]="item.name + ' haritasını sil'"
+              >
+                Sil
+              </button>
+            </div>
+          }
         </article>
       } @empty {
         <div class="state">

@@ -206,3 +206,83 @@
     align-items: flex-start;
   }
 } 
+
+
+// ---------- Adı değiştir ----------
+.ghost-btn {
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+
+  &:hover:not(:disabled) {
+    border-color: rgba(197, 138, 168, 0.5);
+  }
+}
+
+.card-main {
+  flex: 1; // düzenleme kutusu kartın genişliğini kullanabilsin
+}
+
+.rename-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+
+  input {
+    flex: 1;
+    min-width: 180px;
+    max-width: 380px;
+    height: 42px;
+    padding: 0 14px;
+    background: var(--color-input);
+    border: 1px solid var(--color-mauve);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-display);
+    font-size: 20px;
+    outline: none;
+  }
+
+  button {
+    padding: 9px 18px;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: progress;
+    }
+  }
+}
+
+.save-btn {
+  background: var(--color-mauve);
+  color: var(--color-bg);
+  border: none;
+}
+
+.cancel-btn {
+  background: transparent;
+  color: var(--color-text-muted);
+  border: none;
+
+  &:hover {
+    color: var(--color-text);
+  }
+}
+
+.rename-error {
+  margin: -2px 0 8px;
+  font-size: 13px;
+  color: var(--color-error);
+}
+
+// Telefonda üç düğme sığsın diye alt satıra geçebilsin
+@media (max-width: 640px) {
+  .card-actions {
+    flex-wrap: wrap;
+  }
+} 

@@ -31,4 +31,8 @@ export class SavedChartsService {
   restore(id: string): Observable<unknown> {
     return this.http.post(`${this.baseUrl}/${id}/restore`, null);
   }
+
+  rename(id: string, name: string): Observable<unknown> {
+    return this.http.patch(`${this.baseUrl}/${id}`, { name });
+  }
 } 

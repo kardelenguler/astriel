@@ -7,6 +7,7 @@ import { ChartSummary } from '../../core/models/saved-chart';
 import { SavedChartsService } from '../../core/services/saved-charts.service';
 
 const UNDO_SECONDS = 8;
+const NAME_MAX_LENGTH = 100; // YENİ (adlandırma): backend'deki sınırın aynısı
 
 @Component({
   selector: 'app-my-charts',
@@ -26,6 +27,11 @@ export class MyCharts {
   readonly actionError = signal<string | null>(null);  // aç/sil/geri al başarısızsa
   readonly busyId = signal<string | null>(null);       // işlem süren kartın id'si
   readonly lastDeleted = signal<ChartSummary | null>(null);
+
+  // ---------- YENİ (adlandırma) ----------
+  readonly editingId = signal<string | null>(null);    // adı düzenlenen kartın id'si
+  readonly editName = signal('');
+  readonly renameError = signal<string | null>(null);
 
   private undoTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -124,6 +130,67 @@ export class MyCharts {
         error: (error) => this.actionError.set(getErrorMessage(error)),
       });
   }
+
+  // ================= YENİ (adlandırma) =================
+
+  startRename(item: ChartSummary): void {
+    if (this.busyId()) {
+      return;
+    }
+    this.editingId.set(item.id);
+    this.editName.set(item.name);
+    this.renameError.set(null);
+    // Kutu ekrana çizildikten sonra imleci içine koy
+    setTimeout(() => document.getElementById(`rename-${item.id}`)?.focus());
+  }
+
+  cancelRename(): void {
+    this.editingId.set(null);
+    this.renameError.set(null);
+  }
+
+  onRenameInput(event: Event): void {
+    this.editName.set((event.target as HTMLInputElement).value);
+    this.renameError.set(null);
+  }
+
+  saveRename(item: ChartSummary): void {
+    if (this.busyId()) {
+      return; // çift tıklamada iki istek gitmesin
+    }
+
+    const name = this.editName().trim();
+    if (!name) {
+      this.renameError.set('Haritana bir ad ver.');
+      return;
+    }
+    if (name.length > NAME_MAX_LENGTH) {
+      this.renameError.set(`Ad en fazla ${NAME_MAX_LENGTH} karakter olabilir.`);
+      return;
+    }
+    if (name === item.name) {
+      this.cancelRename(); // değişiklik yoksa isteğe gerek yok
+      return;
+    }
+
+    this.busyId.set(item.id);
+    this.savedCharts
+      .rename(item.id, name)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.charts.update((list) => list.map((c) => (c.id === item.id ? { ...c, name } : c)));
+          this.busyId.set(null);
+          this.cancelRename();
+        },
+        error: (error) => {
+          this.renameError.set(getErrorMessage(error));
+          this.busyId.set(null);
+        },
+      });
+  }
+
+  // ================= Yardımcılar =================
 
   /** "2005-01-26" -> "26 Ocak 2005" */
   formatDate(isoDate: string): string {
