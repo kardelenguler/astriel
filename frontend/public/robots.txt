@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /harita
+Disallow: /haritalarim
+Disallow: /hesabim
+Disallow: /giris
+Disallow: /kayit
+
+Sitemap: https://astriel.onrender.com/sitemap.xml 
