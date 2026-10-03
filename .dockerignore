@@ -1,0 +1,20 @@
+# Pakete GİRMEYECEK dosyalar
+
+# Gizli bilgiler (en önemlisi!)
+**/.env
+
+# Bilgisayarda yeniden oluşturulabilen büyük klasörler
+**/.venv
+**/node_modules
+**/.angular
+**/dist
+**/__pycache__
+**/.pytest_cache
+
+# Sunucuda gerekmeyenler
+backend/logs
+backend/tests
+docs
+.git
+.vscode
+*.zip 

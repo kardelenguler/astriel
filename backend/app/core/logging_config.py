@@ -24,14 +24,16 @@ def setup_logging() -> None:
     root_logger.setLevel(settings.log_level)
     root_logger.handlers.clear()  # iki kez çağrılırsa her log çift yazılmasın
 
-    # 1) Terminale yaz
+    # 1) Terminale yaz (production'da sunucu panelleri logları buradan toplar)
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(formatter)
     root_logger.addHandler(console_handler)
 
-    # 2) Dosyaya yaz: 5 MB dolunca yeni dosyaya geçer, en fazla 3 eski dosya tutar.
-    #    Testlerde dosyaya yazılmaz; yoksa gerçek log dosyası test kayıtlarıyla dolar.
-    if settings.environment != "test":
+    # 2) Dosyaya SADECE geliştirme ortamında yaz: 5 MB dolunca yeni dosyaya geçer,
+    #    en fazla 3 eski dosya tutar.
+    #    - Testlerde yazılmaz: gerçek log dosyası test kayıtlarıyla dolmasın.
+    #    - Production'da yazılmaz: sunucunun diski her yeniden başlatmada silinir.
+    if settings.environment == "development":
         LOG_DIR.mkdir(exist_ok=True)
         file_handler = RotatingFileHandler(
             LOG_DIR / "astriel.log",

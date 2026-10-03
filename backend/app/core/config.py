@@ -1,13 +1,14 @@
 """Uygulama ayarları.
 
-Tüm ayarlar .env dosyasından okunur ve Pydantic ile doğrulanır.
-Projenin geri kalanı ayarlara SADECE buradan erişir:
+Tüm ayarlar .env dosyasından (production'da sunucunun ortam değişkenlerinden)
+okunur ve Pydantic ile doğrulanır. Projenin geri kalanı ayarlara SADECE
+buradan erişir:
 
     from app.core.config import settings
 """
 
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -31,11 +32,9 @@ class Settings(BaseSettings):
     # ---------- Veritabanı ----------
     database_url: SecretStr  # varsayılan yok: .env'de yoksa uygulama başlamaz
 
-
     # ---------- Test ----------
     # Tanımlı değilse veritabanı gerektiren testler atlanır
-    test_database_url: SecretStr | None = None 
-
+    test_database_url: SecretStr | None = None
 
     # ---------- Güvenlik ----------
     secret_key: SecretStr
@@ -43,6 +42,9 @@ class Settings(BaseSettings):
 
     # ---------- Frontend ----------
     cors_origins: str = "http://localhost:4200"
+    # YENİ: Derlenmiş Angular dosyalarının klasörü (ng build çıktısı).
+    # Tanımlıysa FastAPI siteyi de sunar (production'da tek adres: hem site hem API).
+    frontend_dist: Path | None = None
 
     # ---------- Yer arama (Nominatim / OpenStreetMap) ----------
     geocoder_url: str = "https://nominatim.openstreetmap.org/search"
@@ -51,9 +53,19 @@ class Settings(BaseSettings):
     geocoder_user_agent: str = Field(min_length=10)
     geocoder_timeout_seconds: float = Field(default=5.0, gt=0)
 
-
     # ---------- Astroloji ----------
     ephe_path: Path = Path("ephemeris")
+
+    # YENİ: Neon/Render gibi servisler adresi "postgresql://..." verir;
+    # bizim sürücümüz (psycopg 3) "postgresql+psycopg://..." bekler. Otomatik çevir.
+    @field_validator("database_url", "test_database_url", mode="before")
+    @classmethod
+    def use_psycopg_driver(cls, value: Any) -> Any:
+        if isinstance(value, str):
+            for prefix in ("postgres://", "postgresql://"):
+                if value.startswith(prefix):
+                    return "postgresql+psycopg://" + value.removeprefix(prefix)
+        return value
 
     @field_validator("secret_key")
     @classmethod
@@ -73,6 +85,15 @@ class Settings(BaseSettings):
         if self.ephe_path.is_absolute():
             return self.ephe_path
         return BASE_DIR / self.ephe_path
+
+    @property
+    def frontend_dir(self) -> Path | None:
+        """YENİ: frontend_dist göreliyse backend/ klasörüne göre mutlak yola çevirir."""
+        if self.frontend_dist is None:
+            return None
+        if self.frontend_dist.is_absolute():
+            return self.frontend_dist
+        return (BASE_DIR / self.frontend_dist).resolve()
 
 
 settings = Settings() 
