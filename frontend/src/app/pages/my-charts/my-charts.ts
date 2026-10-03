@@ -99,34 +99,10 @@ export class MyCharts {
   } 
 
 
-  /** Kayıtlı haritanın bilgilerini alıp harita sayfasında aç */
+  /** Kayıtlı haritayı kendi adresinde aç (/harita/<id>), yeniden hesaplanmaz */
   open(item: ChartSummary): void {
-    if (this.busyId()) {
-      return;
-    }
-    this.busyId.set(item.id);
-    this.actionError.set(null);
-
-    this.savedCharts
-      .get(item.id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (saved) =>
-          this.router.navigate(['/harita'], {
-            queryParams: {
-              tarih: saved.birth_date,
-              saat: saved.birth_time?.slice(0, 5) ?? undefined, // "14:15:00" -> "14:15"
-              enlem: saved.latitude,
-              boylam: saved.longitude,
-              yer: saved.place_name,
-            },
-          }),
-        error: (error) => {
-          this.actionError.set(getErrorMessage(error));
-          this.busyId.set(null);
-        },
-      });
-  }
+    this.router.navigate(['/harita', item.id]);
+  } 
 
   remove(item: ChartSummary): void {
     if (this.busyId()) {

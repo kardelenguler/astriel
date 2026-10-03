@@ -19,7 +19,7 @@
   @if (chart(); as c) {
     <!-- Başlık -->
     <header class="chart-header">
-      <p class="eyebrow">Doğum haritan</p>
+      <p class="eyebrow">{{ savedName() ?? 'Doğum haritan' }}</p> 
       <h1>{{ placeName() }}</h1>
       <p class="meta">
         {{ birthDateText() }}
@@ -27,8 +27,7 @@
         · {{ c.timezone }}
       </p>
       <div class="header-actions">
-        <a routerLink="/" queryParamsHandling="preserve" class="change-link">Bilgileri değiştir</a>
-
+        <a routerLink="/" [queryParams]="editParams()" class="change-link">Bilgileri değiştir</a> 
         @switch (saveState()) {
           <!-- Başta: sadece düğme -->
           @case ('idle') {

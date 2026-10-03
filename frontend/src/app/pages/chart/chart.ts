@@ -1,6 +1,7 @@
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, ParamMap, Params, Router, RouterLink } from '@angular/router';
+import { combineLatest } from 'rxjs';
 
 import { PointKey } from '../../core/content/points';
 import { getErrorMessage } from '../../core/http/error-message';
@@ -21,8 +22,9 @@ const NAME_MAX_LENGTH = 100; // backend'deki sınırın aynısı
 type SaveState = 'idle' | 'editing' | 'saving' | 'saved';
 
 /**
- * Harita sonuç sayfası (/harita?tarih=...&saat=...&enlem=...&boylam=...&yer=...).
- * Bilgiler adresten okunur: sayfa yenilense veya bağlantı paylaşılsa da harita tekrar oluşur.
+ * Harita sonuç sayfası. İki şekilde açılır:
+ * 1) /harita?tarih=...&saat=...&enlem=...&boylam=...&yer=...  -> bilgiler adresten okunur, harita hesaplanır
+ * 2) /harita/<id>  -> kayıtlı harita veritabanından gelir, yeniden HESAPLANMAZ
  */
 @Component({
   selector: 'app-chart',
@@ -46,6 +48,8 @@ export class Chart {
   readonly placeName = signal('');
   readonly birthDateText = signal(''); // "26 Ocak 2005"
   readonly birthTimeText = signal<string | null>(null); // "14:15" veya null
+  readonly savedName = signal<string | null>(null); // kayıtlı haritanın adı (sadece /harita/<id>)
+  readonly editParams = signal<Params>({}); // "Bilgileri değiştir" bağlantısı formu bu bilgilerle doldurur
 
   // ---------- Kaydetme durumu ----------
   private request: ChartCalculateRequest | null = null; // kaydederken tekrar lazım
@@ -85,10 +89,18 @@ export class Chart {
   );
 
   constructor() {
-    // Adres değişince (ör. tarayıcının geri/ileri düğmesi) haritayı yeniden hesapla
-    this.route.queryParamMap
+    // Adres değişince (ör. tarayıcının geri/ileri düğmesi) haritayı yeniden yükle.
+    // Adreste id varsa kayıtlı harita açılır, yoksa adresteki bilgilerle hesaplanır.
+    combineLatest([this.route.paramMap, this.route.queryParamMap])
       .pipe(takeUntilDestroyed())
-      .subscribe((params) => this.load(params));
+      .subscribe(([routeParams, queryParams]) => {
+        const id = routeParams.get('id');
+        if (id) {
+          this.loadSaved(id);
+        } else {
+          this.load(queryParams);
+        }
+      });
   }
 
   // ================= Yorumlar =================
@@ -202,14 +214,56 @@ export class Chart {
 
   // ================= Hesaplama =================
 
+  /** Başka bir haritaya geçilince kaydetme kutusu ve açık açıklama sıfırlansın */
+  private resetPage(): void {
+    this.saveState.set('idle');
+    this.saveError.set(null);
+    this.savedName.set(null);
+    this.closeDetail();
+  }
+
+  /** /harita/<id>: kayıtlı haritayı veritabanındaki haliyle gösterir (yeniden hesaplamaz) */
+  private loadSaved(id: string): void {
+    this.resetPage();
+    this.request = null; // zaten kayıtlı, tekrar kaydedilmez
+    this.saveState.set('saved'); // "Kaydet" yerine "Kaydedildi ✓" görünsün
+
+    this.loading.set(true);
+    this.error.set(null);
+    this.chart.set(null);
+
+    this.savedCharts
+      .get(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (saved) => {
+          const time = saved.birth_time?.slice(0, 5) ?? null; // "14:15:00" -> "14:15"
+          this.savedName.set(saved.name);
+          this.placeName.set(saved.place_name);
+          this.birthDateText.set(this.formatDate(saved.birth_date));
+          this.birthTimeText.set(time);
+          this.editParams.set({
+            tarih: saved.birth_date,
+            saat: time ?? undefined,
+            enlem: saved.latitude,
+            boylam: saved.longitude,
+            yer: saved.place_name,
+          });
+          this.chart.set(saved.chart);
+          this.loading.set(false);
+        },
+        error: (error) => {
+          this.error.set(getErrorMessage(error));
+          this.loading.set(false);
+        },
+      });
+  }
+
   private load(params: ParamMap): void {
     const request = this.parseParams(params);
 
-    // Başka bir haritaya geçilince kaydetme kutusu ve açık açıklama sıfırlansın
+    this.resetPage();
     this.request = request;
-    this.saveState.set('idle');
-    this.saveError.set(null);
-    this.closeDetail();
 
     if (!request) {
       this.error.set('Adresteki doğum bilgileri eksik veya hatalı. Ana sayfadan tekrar dene.');
@@ -218,6 +272,7 @@ export class Chart {
     }
 
     this.placeName.set(params.get('yer') ?? '');
+    this.editParams.set(Object.fromEntries(params.keys.map((key) => [key, params.get(key)])));
     this.birthDateText.set(this.formatDate(request.birth_date));
     this.birthTimeText.set(request.birth_time);
 

@@ -13,6 +13,13 @@ import { Register } from './pages/register/register';
 export const routes: Routes = [
   { path: '', component: Home, title: 'Astriel · Doğum Haritası' },
   { path: 'harita', component: Chart, title: 'Doğum Haritan · Astriel' },
+  // YENİ: kayıtlı harita (/harita/<id>), sadece sahibine açılır
+  {
+    path: 'harita/:id',
+    component: Chart,
+    canActivate: [authGuard],
+    title: 'Kayıtlı Haritan · Astriel',
+  },
   { path: 'hakkinda', component: About, title: 'Hakkında · Astriel' },
   { path: 'giris', component: Login, canActivate: [guestGuard], title: 'Giriş Yap · Astriel' },
   { path: 'kayit', component: Register, canActivate: [guestGuard], title: 'Kayıt Ol · Astriel' },
