@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, map, switchMap, tap } from 'rxjs';
+import { Observable, switchMap, tap } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { RegisterRequest, TokenResponse, User } from '../models/user';
@@ -105,9 +105,6 @@ export class AuthService {
       .get<User>(`${this.baseUrl}/me`, {
         headers: { Authorization: `Bearer ${readToken()}` },
       })
-      .pipe(
-        tap((user) => this.currentUser.set(user)),
-        map((user) => user),
-      );
+      .pipe(tap((user) => this.currentUser.set(user))); 
   }
 } 

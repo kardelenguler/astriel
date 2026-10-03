@@ -66,10 +66,11 @@ class ChartService:
         warnings.extend(planets.warnings)
         aspects = find_aspects(planets.planets)
 
+        # Doğum tarihi kişisel veridir; log'a yazılmaz.
         logger.info(
-            "Harita hesaplandı: %s, saat_biliniyor=%s, uyarı=%d",
-            request.birth_date, time_known, len(warnings),
-        )
+            "Harita hesaplandı: saat_biliniyor=%s, uyarı=%d",
+            time_known, len(warnings),
+        ) 
 
         return ChartResponse(
             utc_datetime=conversion.utc,
