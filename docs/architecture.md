@@ -23,13 +23,13 @@ backend/app/
 │   ├── v1/routes/  Uç noktalar: isteği alır, servise verir, yanıtı döner
 │   ├── deps.py     Bağımlılık enjeksiyonu (oturum, servisler, giriş yapmış kullanıcı)
 │   └── exception_handlers.py   Tüm hataları ortak JSON biçimine çevirir
-├── services/       İş kuralları (kayıt, giriş, harita kaydetme, yeniden hesaplama)
+├── services/       İş kuralları (kayıt, giriş, harita kaydetme, yeniden hesaplama, eski kayıt temizliği)
 ├── repositories/   Veritabanı sorguları (SQLAlchemy); servisler SQL bilmez
 ├── models/         Veritabanı tabloları (SQLAlchemy ORM)
 ├── schemas/        İstek/yanıt modelleri ve doğrulama (Pydantic v2)
 ├── astro/          Hesaplama motoru: saat dönüşümü, gezegenler, evler, açılar, burçlar
 ├── clients/        Dış servisler (Nominatim); projenin geri kalanı servisi tanımaz
-├── core/           Ayarlar (.env), güvenlik (Argon2, JWT), loglama, hata sınıfları, deneme sınırı
+├── core/           Ayarlar (.env), güvenlik (Argon2, JWT), loglama, hata sınıfları, istek sınırları
 └── db/             Veritabanı bağlantısı ve ortak model sınıfı
 ```
 
@@ -56,7 +56,7 @@ frontend/src/app/
 │   ├── guards/     Giriş gerektiren / sadece misafire açık sayfalar
 │   ├── models/     Backend yanıtlarının TypeScript karşılıkları
 │   └── content/    Burç, gezegen, ev ve nokta açıklama metinleri
-├── pages/          Sayfalar (ana sayfa, harita, haritalarım, giriş, kayıt, hesabım, hakkında)
+├── pages/          Sayfalar (ana sayfa, harita, haritalarım, giriş, kayıt, hesabım, hakkında, gizlilik, kullanım şartları)
 ├── shared/         Tekrar kullanılan bileşenler (doğum formu, burç çarkı, yorum paneli)
 └── layout/         Üst menü ve alt bilgi
 ```
@@ -64,20 +64,26 @@ frontend/src/app/
 - Standalone bileşenler ve **signals** kullanılır; durum `signal`, türetilen değerler `computed` ile tutulur.
 - Arayüz kütüphanesi yoktur; tüm stiller SCSS ile projeye özel yazılmıştır.
 - Harita sayfası iki şekilde açılır: `/harita?tarih=...` adresteki bilgilerle hesaplar (paylaşılabilir bağlantı), `/harita/:id` kayıtlı haritayı veritabanındaki haliyle gösterir.
+- Oturum düşerse (token geçersiz veya şifre değişmiş) giriş gerektiren sayfadaki kullanıcı giriş sayfasına yönlendirilir; giriş yapınca aynı sayfaya döner. Sunucuya geçici olarak ulaşılamazsa oturum kapatılmaz, "Tekrar dene" gösterilir.
 
 ## Güvenlik
 
-- Şifreler Argon2 ile hash'lenir; oturum JWT ile tutulur.
+- Şifreler Argon2 ile hash'lenir; oturum JWT ile tutulur. Token şifrenin parmak izini taşır:
+  şifre değişince eski oturumlar geçersiz olur.
 - Gizli bilgiler (`SECRET_KEY`, veritabanı adresi) `.env` dosyasında durur ve depoya eklenmez.
-- Giriş denemeleri kullanıcı adı + IP başına sınırlandırılır.
+- Giriş denemeleri kullanıcı adı + IP başına, yer aramaları IP başına sınırlandırılır.
+  Gerçek IP, `X-Forwarded-For` başlığının sonundan okunur; istemcinin yazdığı sahte değerler yok sayılır.
+- Yer arama aynı anda en fazla 5 isteği sıraya alır; fazlası beklemeden reddedilir,
+  böylece aramalar sunucunun geri kalanını kilitleyemez.
 - Kullanıcı sadece kendi haritalarına erişebilir; başkasının haritası için `404` döner.
-- Loglara şifre ve doğum tarihi gibi kişisel veriler yazılmaz.
+- Loglara şifre, doğum bilgisi ve aranan yer adı yazılmaz; istek adresleri (access log) kaydedilmez.
+- Ziyaretçi sayacına (GoatCounter) sadece sayfa adı gönderilir; adresteki doğum bilgileri gitmez.
 
 ## Testler
 
-- **Backend:** `pytest` ile unit testler (hesaplama motoru, şemalar, güvenlik) ve ayrı bir PostgreSQL test veritabanı kullanan integration testler (API, servisler, repository'ler).
-- **Frontend:** Vitest ile bileşen ve servis testleri.
+- **Backend:** `pytest` ile unit testler (hesaplama motoru, şemalar, güvenlik, istek sınırları) ve ayrı bir PostgreSQL test veritabanı kullanan integration testler (API, servisler, repository'ler). Test paketleri `requirements-dev.txt` içindedir.
+- **Frontend:** Vitest ile bileşen ve servis testleri (oturum davranışı, hata mesajları dahil).
 
 ## Yayın
 
-`Dockerfile` iki aşamalıdır: önce Angular derlenir, sonra Python imajına kopyalanır. Render her `git push` sonrası imajı yeniden oluşturur; açılışta `alembic upgrade head` ile veritabanı güncellenir, sonra `uvicorn` başlar. Veritabanı Neon (yönetilen PostgreSQL) üzerindedir.
+`Dockerfile` iki aşamalıdır: önce Angular derlenir, sonra Python imajına kopyalanır. Render her `git push` sonrası imajı yeniden oluşturur; açılışta `alembic upgrade head` ile veritabanı güncellenir, sonra `uvicorn` başlar. Uygulama her açıldığında 30 günden eski silinmiş haritaları kalıcı olarak temizler. Veritabanı Neon (yönetilen PostgreSQL) üzerindedir.

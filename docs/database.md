@@ -54,7 +54,9 @@ Bir kullanıcının birden çok kayıtlı haritası olabilir. Kullanıcı silini
 
 **Motor sürümü değişince otomatik yenileme.** Kayıtlı harita açılırken `engine_version` güncel sürümle aynıysa `chart_data` olduğu gibi döner. Farklıysa (ör. efemeris dosyaları veya hesaplama kodu güncellendiyse) harita doğum bilgilerinden yeniden hesaplanır ve kayıt güncellenir.
 
-**Yumuşak silme.** Silinen harita gerçekten silinmez, `deleted_at` doldurulur. Listelerde görünmez, kullanıcı "Geri al" derse `deleted_at` tekrar `NULL` yapılır.
+**Yumuşak silme.** Silinen harita hemen silinmez, `deleted_at` doldurulur. Listelerde görünmez, kullanıcı "Geri al" derse `deleted_at` tekrar `NULL` yapılır. Silinmesinin üzerinden 30 gün geçen haritalar uygulama her açıldığında kalıcı olarak silinir (`purge_old_deleted_charts`).
+
+**Hesap silme veritabanına bırakılır.** Kullanıcı silinirken haritaları tek tek belleğe yüklenmez (`passive_deletes=True`); `ON DELETE CASCADE` hepsini tek seferde siler.
 
 **Veritabanı seviyesinde kontrol.** Enlem/boylam API'de zaten doğrulanır; `CHECK` kısıtları, API doğrulaması atlansa bile hatalı verinin veritabanına girmesini engelleyen son savunma hattıdır.
 
@@ -62,9 +64,11 @@ Bir kullanıcının birden çok kayıtlı haritası olabilir. Kullanıcı silini
 
 ## Göç geçmişi
 
+Uygulanma sırasıyla:
+
 | Göç | Değişiklik |
 |---|---|
 | `32361f4f149e` | `users` ve `birth_charts` tabloları |
-| `46a9a258b2e0` | `birth_charts.deleted_at` (yumuşak silme) |
-| `91e32f267b38` | `users.username` eklendi, `email` isteğe bağlı oldu |
 | `9e59ccaafeca` | `engine_version` sütunu genişletildi |
+| `91e32f267b38` | `users.username` eklendi, `email` isteğe bağlı oldu |
+| `46a9a258b2e0` | `birth_charts.deleted_at` (yumuşak silme) |
