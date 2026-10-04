@@ -221,10 +221,24 @@ tbody tr:hover {
   font-size: 14px;
 }
 
+// "1. ev" yazısı: gezegen adları gibi kesik çizgili (tıklanabilir olduğu belli olsun)
 .house-no {
+  align-self: flex-start;
   font-size: 12px;
   color: var(--color-gold);
+  border-bottom: 1px dashed rgba(197, 138, 168, 0.45);
+  transition: color 0.2s ease, border-color 0.2s ease;
 }
+
+.house:hover .house-no {
+  color: var(--color-mauve);
+  border-bottom-color: var(--color-mauve);
+}
+
+// Açıklaması açık olan ev
+.house.selected .house-no {
+  border-bottom: 1px solid var(--color-gold);
+} 
 
 // ================= MOBİL =================
 @media (max-width: 800px) {
@@ -402,13 +416,35 @@ button.clickable {
   }
 } 
 
-
-// "Bir eve dokunarak..." ipucu
 .panel-hint {
   margin: -6px 0 16px;
   font-size: 13px;
-  color: var(--color-text-muted);
+  color: rgba(197, 138, 168, 0.85); // soluk mauve: fark edilir ama başlığı ezmez
+
+  // Başına küçük yıldız
+  &::before {
+    content: '✦ ';
+    color: var(--color-gold);
+  }
 } 
+
+// Büyük üçlü: "GÜNEŞ / AY / YÜKSELEN" yazısı evler gibi kesik çizgili (tıklanabilir olduğu belli olsun)
+.big-card.clickable .big-label {
+  align-self: flex-start;
+  padding-bottom: 2px;
+  border-bottom: 1px dashed rgba(197, 138, 168, 0.8);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.big-card.clickable:hover .big-label {
+  color: var(--color-mauve);
+  border-bottom-color: var(--color-mauve);
+}
+
+// Açıklaması açık olan kart
+.big-card.selected .big-label {
+  border-bottom: 1px solid var(--color-gold);
+}
 
 
 // Gezegenler tablosundaki tıklanabilir gezegen adları
@@ -416,7 +452,7 @@ button.clickable {
   padding: 2px 0;
   background: none;  // tarayıcının beyaz düğme arka planını kaldır
   border: none;
-  border-bottom: 1px dashed rgba(197, 138, 168, 0.45);
+  border-bottom: 1px dashed rgba(197, 138, 168, 0.8);
   font: inherit;
   color: inherit;
   text-align: left;

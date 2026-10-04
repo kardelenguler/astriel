@@ -67,7 +67,7 @@
     </header>
 
     <!-- Büyük üçlü: Güneş, Ay, Yükselen (tıklanınca açıklama açılır) -->
-    <div class="big-three">
+    <div class="big-three"> 
       @if (sun(); as s) {
         <button
           type="button"
@@ -145,7 +145,7 @@
     <!-- Gezegenler (adlarına tıklanınca açıklama açılır) -->
     <section class="panel">
       <h2>Gezegenler</h2>
-      <p class="panel-hint">Bir gök cismine dokunarak açıklamasını görebilirsin.</p>
+      <p class="panel-hint">Gezegen adlarına dokunarak açıklamalarını görebilirsin.</p> 
       <div class="table-wrap">
         <table>
           <thead>
@@ -197,8 +197,7 @@
     @if (c.houses.length > 0) {
       <section class="panel">
         <h2>Evler <span class="muted small">· {{ c.house_system?.name }}</span></h2>
-        <p class="panel-hint">Bir eve dokunarak açıklamasını görebilirsin.</p>
-
+        <p class="panel-hint">Evlere dokunarak açıklamalarını görebilirsin.</p> 
         <div class="houses">
           @for (house of c.houses; track $index) {
             <button
