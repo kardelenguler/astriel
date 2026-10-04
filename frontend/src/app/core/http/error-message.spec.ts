@@ -38,4 +38,35 @@ describe('getErrorMessage', () => {
     expect(getErrorMessage(new Error('Cannot read properties of undefined'))).toBe(DEFAULT_MESSAGE);
     expect(getErrorMessage(undefined)).toBe(DEFAULT_MESSAGE);
   });
-}); 
+
+  it('alan hatası varsa hangi alanın neden hatalı olduğunu göstermeli', () => {
+    const error = new HttpErrorResponse({
+      status: 422,
+      error: {
+        error: {
+          code: 'invalid_input',
+          message: 'Girilen bilgiler geçersiz. Lütfen işaretli alanları kontrol edin.',
+          fields: [{ field: 'email', message: 'Geçerli bir e-posta adresi giriniz.' }],
+        },
+      },
+    });
+
+    expect(getErrorMessage(error)).toBe('E-posta: Geçerli bir e-posta adresi giriniz.');
+  });
+
+  it('tanınmayan alan adında sadece mesajı göstermeli', () => {
+    const error = new HttpErrorResponse({
+      status: 422,
+      error: {
+        error: {
+          code: 'invalid_input',
+          message: 'Girilen bilgiler geçersiz.',
+          fields: [{ field: 'bilinmeyen', message: 'Bu alan zorunludur.' }],
+        },
+      },
+    });
+
+    expect(getErrorMessage(error)).toBe('Bu alan zorunludur.');
+  }); 
+
+});

@@ -44,6 +44,14 @@ def test_register_short_password_returns_field_error(db_client):
     assert response.status_code == 422
     assert response.json()["error"]["fields"][0]["field"] == "password"
 
+def test_register_invalid_email_returns_turkish_field_error(db_client):
+    # Angular'ın kontrolünden geçen ama gerçek bir alan adı olmayan e-posta
+    response = db_client.post(REGISTER, json={**USER, "email": "ali@mail"})
+    assert response.status_code == 422
+    [field] = response.json()["error"]["fields"]
+    assert field["field"] == "email"
+    assert field["message"] == "Geçerli bir e-posta adresi giriniz."
+    
 
 # =============================== GİRİŞ ===============================
 def test_login(db_client):

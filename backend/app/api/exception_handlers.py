@@ -61,23 +61,27 @@ def _display_value(value: Any) -> Any:
         return int(value)
     return value 
 
-
-
 def translate_message(error: dict[str, Any]) -> str:
     """Pydantic hatasını Türkçe mesaja çevirir.
 
     Bizim validator'larımızdaki ValueError mesajları zaten Türkçedir;
     Pydantic onların başına "Value error, " ekler, o önek temizlenir.
     """
+    # EmailStr'nin hatası İngilizce gelir ("value is not a valid email address: ...")
+    if error["type"] == "value_error" and "valid email address" in error["msg"]:
+        return "Geçerli bir e-posta adresi giriniz."
+
     template = _TURKISH_MESSAGES.get(error["type"])
     if template is None:
         return error["msg"].removeprefix("Value error, ")
     try:
         context = {key: _display_value(value) for key, value in error.get("ctx", {}).items()}
-        return template.format(**context) 
+        return template.format(**context)
     except (KeyError, IndexError):
         # Şablonda beklenen bir değer ctx'te yoksa orijinal mesaja dön
-        return error["msg"].removeprefix("Value error, ") 
+        return error["msg"].removeprefix("Value error, ")
+    
+
 
 def _error_response(
     status_code: int,
