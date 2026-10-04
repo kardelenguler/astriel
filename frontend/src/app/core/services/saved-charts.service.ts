@@ -35,4 +35,4 @@ export class SavedChartsService {
   rename(id: string, name: string): Observable<unknown> {
     return this.http.patch(`${this.baseUrl}/${id}`, { name });
   }
-} 
+}

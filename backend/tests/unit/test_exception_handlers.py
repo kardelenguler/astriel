@@ -38,4 +38,4 @@ def test_format_field_path(location, expected):
     ],
 )
 def test_translate_message(error, expected):
-    assert translate_message(error) == expected 
+    assert translate_message(error) == expected

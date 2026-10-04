@@ -37,4 +37,4 @@ def get_db() -> Generator[Session, None, None]:
         db.rollback()
         raise
     finally:
-        db.close() 
+        db.close()

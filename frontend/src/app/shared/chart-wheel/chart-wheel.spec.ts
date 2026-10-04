@@ -70,4 +70,4 @@ describe('ChartWheel', () => {
     expect(distance).toBeGreaterThan(20); // semboller yaklaşık 19px boyutunda
     expect(element.querySelectorAll('line.connector').length).toBeGreaterThan(0);
   });
-}); 
+});

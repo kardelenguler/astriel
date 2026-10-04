@@ -68,4 +68,4 @@ class ExternalServiceError(AppError):
 class CalculationError(AppError):
     status_code = 500
     code = "calculation_error"
-    default_message = "Harita hesaplanırken bir sorun oluştu." 
+    default_message = "Harita hesaplanırken bir sorun oluştu."

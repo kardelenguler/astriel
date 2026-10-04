@@ -16,4 +16,4 @@ class UserRepository(BaseRepository[User]):
         return self.db.scalar(select(User).where(User.username == username))
 
     def get_by_email(self, email: str) -> User | None:
-        return self.db.scalar(select(User).where(User.email == email)) 
+        return self.db.scalar(select(User).where(User.email == email))

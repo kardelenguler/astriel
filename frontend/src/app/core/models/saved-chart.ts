@@ -38,4 +38,4 @@ export interface SavedChart {
   longitude: number;
   created_at: string;
   chart: ChartResponse;
-} 
+}

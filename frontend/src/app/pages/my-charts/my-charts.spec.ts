@@ -124,4 +124,4 @@ describe('MyCharts', () => {
 
     expect(navigated).toEqual([['/harita', 'id-1']]);
   });
-}); 
+});

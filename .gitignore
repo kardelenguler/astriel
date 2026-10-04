@@ -20,4 +20,4 @@ Desktop.ini
 
 # ---------- Yedekler ----------
 # Proje klasörüne konan zip yedekleri (içlerinde .env olabilir)
-*.zip 
+*.zip

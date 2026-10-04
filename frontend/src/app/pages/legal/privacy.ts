@@ -7,4 +7,4 @@ import { RouterLink } from '@angular/router';
   templateUrl: './privacy.html',
   styleUrl: './legal.scss',
 })
-export class Privacy {} 
+export class Privacy {}

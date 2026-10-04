@@ -67,6 +67,6 @@ describe('getErrorMessage', () => {
     });
 
     expect(getErrorMessage(error)).toBe('Bu alan zorunludur.');
-  }); 
+  });
 
 });

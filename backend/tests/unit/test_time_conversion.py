@@ -58,4 +58,4 @@ def test_invalid_timezone_raises(tz_name):
     ],
 )
 def test_timezone_at(latitude, longitude, expected):
-    assert timezone_at(latitude, longitude) == expected 
+    assert timezone_at(latitude, longitude) == expected

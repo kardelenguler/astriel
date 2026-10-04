@@ -17,7 +17,7 @@
   <!-- Sağ: giriş yaptıysa ad + çıkış, yapmadıysa giriş / kayıt (masaüstü) -->
   <div class="actions">
     @if (auth.user(); as user) {
-      <a routerLink="/hesabim" class="greeting" title="Hesap ayarları">Merhaba, <strong>{{ user.display_name || user.username }}</strong></a> 
+      <a routerLink="/hesabim" class="greeting" title="Hesap ayarları">Merhaba, <strong>{{ user.display_name || user.username }}</strong></a>
       <button type="button" class="btn btn-outline" (click)="logout()">Çıkış Yap</button>
     } @else {
       <a routerLink="/giris" class="btn btn-outline">Giriş Yap</a>
@@ -51,7 +51,7 @@
 
     <div class="mobile-actions">
       @if (auth.user(); as user) {
-        <a routerLink="/hesabim" class="greeting" (click)="closeMenu()">Merhaba, <strong>{{ user.display_name || user.username }}</strong> · Hesabım</a> 
+        <a routerLink="/hesabim" class="greeting" (click)="closeMenu()">Merhaba, <strong>{{ user.display_name || user.username }}</strong> · Hesabım</a>
         <button type="button" class="btn btn-outline" (click)="logout()">Çıkış Yap</button>
       } @else {
         <a routerLink="/giris" class="btn btn-outline" (click)="closeMenu()">Giriş Yap</a>
@@ -59,4 +59,4 @@
       }
     </div>
   </nav>
-}  
+}

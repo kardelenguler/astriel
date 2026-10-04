@@ -36,4 +36,4 @@ describe('Account', () => {
 
     expect(component.usernameConfirmed()).toBe(false);
   });
-}); 
+});

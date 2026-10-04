@@ -10,7 +10,7 @@ get_for_user kullanılır.
 """
 
 import uuid
-from datetime import datetime, timezone 
+from datetime import datetime, timezone
 
 from sqlalchemy import Select, delete, func, select
 
@@ -58,9 +58,9 @@ class ChartRepository(BaseRepository[BirthChart]):
     def count_for_user(self, user_id: uuid.UUID) -> int:
         """Toplam kayıt sayısı; frontend'de "3. sayfa / 5" göstermek için."""
         query = select(func.count()).select_from(self._active_charts_of(user_id).subquery())
-        return self.db.scalar(query) or 0 
+        return self.db.scalar(query) or 0
 
-    
+
     def soft_delete(self, chart: BirthChart) -> None:
         """Haritayı silinmiş olarak işaretler; satır silinmez, "Geri al" mümkün."""
         chart.deleted_at = datetime.now(timezone.utc)
@@ -82,4 +82,4 @@ class ChartRepository(BaseRepository[BirthChart]):
                 BirthChart.deleted_at < cutoff,
             )
         )
-        return result.rowcount or 0    
+        return result.rowcount or 0

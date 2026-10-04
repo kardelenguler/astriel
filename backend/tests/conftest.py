@@ -81,7 +81,7 @@ def db_client(db_session: Session) -> Generator[TestClient, None, None]:
     try:
         yield TestClient(app)
     finally:
-        app.dependency_overrides.clear() 
+        app.dependency_overrides.clear()
 
 @pytest.fixture(autouse=True)
 def _reset_limiters():
@@ -93,4 +93,4 @@ def _reset_limiters():
     yield
     login_limiter.clear()
     search_limiter.clear()
-    
+

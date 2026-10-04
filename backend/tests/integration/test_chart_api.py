@@ -1,6 +1,6 @@
 """Harita API'si entegrasyon testleri: istek -> route -> servis -> motor -> yanıt."""
 
-import pytest 
+import pytest
 
 URL = "/api/v1/charts/calculate"
 
@@ -11,7 +11,7 @@ VALID = {
     "longitude": 30.7133,
 }
 
-@pytest.mark.db 
+@pytest.mark.db
 def test_health(client):
     response = client.get("/api/v1/health")
     assert response.status_code == 200
@@ -66,7 +66,7 @@ def test_missing_body_field(client):
     assert response.status_code == 422
     field_error = response.json()["error"]["fields"][0]
     assert field_error["field"] == "latitude"
-    assert field_error["message"] == "Bu alan zorunludur." 
+    assert field_error["message"] == "Bu alan zorunludur."
 
 
 
@@ -76,4 +76,4 @@ def test_timezone_aware_birth_time_rejected(client):
     field_error = response.json()["error"]["fields"][0]
     assert field_error["field"] == "birth_time"
     assert "yerel saat" in field_error["message"]
-    assert "hiç yaşanmadı" not in field_error["message"] 
+    assert "hiç yaşanmadı" not in field_error["message"]

@@ -73,4 +73,4 @@ export class Home {
     const place = { name, display_name: name, latitude, longitude, country: '' } as Place;
     return { birthDate: date, birthTime: time, place };
   }
-} 
+}

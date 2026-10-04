@@ -170,4 +170,3 @@ def purge_old_deleted_charts(db: Session, *, now: datetime | None = None) -> int
     if count:
         logger.info("Süresi dolan %d silinmiş harita kalıcı olarak silindi.", count)
     return count
- 

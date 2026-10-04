@@ -17,4 +17,4 @@ describe('Home', () => {
     const fixture = TestBed.createComponent(Home);
     expect(fixture.componentInstance).toBeTruthy();
   });
-}); 
+});

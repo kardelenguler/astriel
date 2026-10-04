@@ -35,4 +35,4 @@ class BaseRepository(Generic[ModelT]):
 
     def delete(self, obj: ModelT) -> None:
         self.db.delete(obj)
-        self.db.flush() 
+        self.db.flush()

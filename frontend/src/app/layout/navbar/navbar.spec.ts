@@ -26,4 +26,4 @@ describe('Navbar', () => {
     expect(text).toContain('Giriş Yap');
     expect(text).toContain('Kayıt Ol');
   });
-}); 
+});

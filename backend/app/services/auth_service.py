@@ -133,4 +133,4 @@ class AuthService:
         user_id = user.id
         self.db.delete(user)  # haritalar da silinir (modeldeki cascade)
         self.db.commit()
-        logger.info("Hesap silindi: id=%s", user_id) 
+        logger.info("Hesap silindi: id=%s", user_id)

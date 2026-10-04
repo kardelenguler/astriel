@@ -37,4 +37,4 @@ export const POINT_MEANINGS: Record<PointKey, PointMeaning> = {
     area: 'dışarıya ilk izlenimini verirken',
     heading: (sign) => `Yükselen ${sign.name}`,
   },
-}; 
+};

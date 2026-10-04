@@ -23,4 +23,4 @@ describe('Footer', () => {
 
     expect(text).toContain(String(new Date().getFullYear()));
   });
-}); 
+});

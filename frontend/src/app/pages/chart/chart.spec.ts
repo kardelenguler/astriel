@@ -117,4 +117,4 @@ describe('Chart', () => {
     expect(chartService.requests).toEqual([]);
     expect(page.saveState()).toBe('saved'); // tekrar "Kaydet" düğmesi çıkmamalı
   });
-});  
+});

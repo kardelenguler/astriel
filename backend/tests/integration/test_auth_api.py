@@ -51,7 +51,7 @@ def test_register_invalid_email_returns_turkish_field_error(db_client):
     [field] = response.json()["error"]["fields"]
     assert field["field"] == "email"
     assert field["message"] == "Geçerli bir e-posta adresi giriniz."
-    
+
 
 # =============================== GİRİŞ ===============================
 def test_login(db_client):
@@ -85,4 +85,4 @@ def test_me_without_token(db_client):
 def test_me_with_invalid_token(db_client):
     response = db_client.get(ME, headers={"Authorization": "Bearer sahte-token"})
     assert response.status_code == 401
-    assert response.json()["error"]["code"] == "unauthorized" 
+    assert response.json()["error"]["code"] == "unauthorized"

@@ -23,4 +23,4 @@ def test_health_returns_503_when_database_is_down(client):
         app.dependency_overrides.clear()  # diğer testleri etkilemesin
 
     assert response.status_code == 503
-    assert response.json() == {"status": "degraded", "database": "unavailable"} 
+    assert response.json() == {"status": "degraded", "database": "unavailable"}

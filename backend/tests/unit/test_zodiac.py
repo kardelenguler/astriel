@@ -14,7 +14,7 @@ from app.astro.zodiac import degree_in_sign, format_position, normalize, sign_of
         (359.9, "Balık"),
         (-10, "Balık"),  # negatif açı
         (720, "Koç"),  # 360'tan büyük açı
-                (-1e-15, "Koç"),  # kayan nokta: -1e-15 % 360 == 360.0; çökmeden 0° (Koç) sayılmalı 
+                (-1e-15, "Koç"),  # kayan nokta: -1e-15 % 360 == 360.0; çökmeden 0° (Koç) sayılmalı
     ],
 )
 def test_sign_of(longitude, expected):
@@ -37,4 +37,4 @@ def test_format_position_basic():
 def test_format_position_truncates_and_stays_in_sign():
     # 59.9999° = Boğa 29°59.994' -> kesilince hâlâ Boğa olmalı (İkizler'e taşmamalı)
     assert format_position(59.9999) == "29°59' Boğa"
-    assert sign_of(59.9999).name == "Boğa" 
+    assert sign_of(59.9999).name == "Boğa"

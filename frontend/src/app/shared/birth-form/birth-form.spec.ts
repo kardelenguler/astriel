@@ -60,4 +60,4 @@ describe('BirthForm', () => {
     expect(component.form.controls.unknownTime.value).toBe(true);
     expect(component.form.controls.birthTime.disabled).toBe(true);
   });
-}); 
+});

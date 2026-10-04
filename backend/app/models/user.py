@@ -21,7 +21,7 @@ class User(Base, TimestampMixin):
     username: Mapped[str] = mapped_column(String(30), unique=True, index=True)
     # İsteğe bağlı: girilmezse şifre sıfırlama yapılamaz
     email: Mapped[str | None] = mapped_column(String(255), unique=True, index=True)
-       
+
     hashed_password: Mapped[str] = mapped_column(String(255))
     display_name: Mapped[str | None] = mapped_column(String(100))
     is_active: Mapped[bool] = mapped_column(default=True)
@@ -30,4 +30,4 @@ class User(Base, TimestampMixin):
     charts: Mapped[list[BirthChart]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
-    ) 
+    )

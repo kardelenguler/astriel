@@ -25,4 +25,4 @@ describe('AnalyticsService', () => {
     expect(service.toSafePath('/hakkinda')).toBe('/hakkinda');
     expect(service.toSafePath('/')).toBe('/');
   });
-}); 
+});

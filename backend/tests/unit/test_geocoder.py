@@ -144,4 +144,3 @@ def test_rate_limit_waits_between_requests(monkeypatch):
 
     assert len(waits) == 1
     assert 0 < waits[0] <= 1.0
-    

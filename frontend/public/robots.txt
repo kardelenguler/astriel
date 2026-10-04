@@ -7,4 +7,4 @@ Disallow: /hesabim
 Disallow: /giris
 Disallow: /kayit
 
-Sitemap: https://astriel.onrender.com/sitemap.xml 
+Sitemap: https://astriel.onrender.com/sitemap.xml

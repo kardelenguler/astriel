@@ -39,4 +39,4 @@ def test_successful_login_resets_the_counter(db_client):
     # Sayaç sıfırlandığı için tekrar 4 hatalı deneme yapılabilir
     for _ in range(MAX_FAILED_ATTEMPTS - 1):
         assert _login(db_client, "yanlis-sifre").status_code == 401
-    assert _login(db_client, PASSWORD).status_code == 200 
+    assert _login(db_client, PASSWORD).status_code == 200

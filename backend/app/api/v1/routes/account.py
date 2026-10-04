@@ -36,4 +36,3 @@ def change_password(
 )
 def delete_account(data: AccountDeleteRequest, user: CurrentUser, auth: AuthServiceDep) -> None:
     auth.delete_account(user, data.password)
-    

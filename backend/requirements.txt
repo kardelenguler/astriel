@@ -1,11 +1,12 @@
+# Sunucuda (Render) kurulan paketler. Testler için ayrıca: requirements-dev.txt
 # Sürümler sabitlenmiştir: her kurulumda aynı ortam oluşsun.
-# Güncellerken: sürümü değiştir -> pip install -r requirements.txt -> pytest
+# Güncellerken: sürümü değiştir -> pip install -r requirements-dev.txt -> pytest
 
 # Web
 fastapi==0.141.1
 uvicorn[standard]==0.54.0
-python-multipart==0.0.32 
-httpx2==2.13.1  
+python-multipart==0.0.32
+httpx2==2.13.1
 
 # Ayarlar ve doğrulama
 pydantic-settings==2.15.0
@@ -23,8 +24,4 @@ tzdata==2026.4
 # Kimlik doğrulama
 pwdlib[argon2]==0.3.1
 pyjwt==2.15.1
-email-validator==2.3.0 
-
-
-# Test
-pytest==9.1.1
+email-validator==2.3.0

@@ -238,7 +238,7 @@ tbody tr:hover {
 // Açıklaması açık olan ev
 .house.selected .house-no {
   border-bottom: 1px solid var(--color-gold);
-} 
+}
 
 // ================= MOBİL =================
 @media (max-width: 800px) {
@@ -249,7 +249,7 @@ tbody tr:hover {
   .houses {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-} 
+}
 
 
 // ---------- Kaydetme ----------
@@ -257,7 +257,7 @@ tbody tr:hover {
   display: flex;
   flex-wrap: wrap;  // dar ekranda alt satıra geçsin
   align-items: center;
-  justify-content: flex-start; 
+  justify-content: flex-start;
   gap: 12px 20px;
   margin-top: 8px;
 }
@@ -336,7 +336,7 @@ tbody tr:hover {
   margin: 8px 0 0;
   font-size: 13px;
   color: var(--color-error);
-} 
+}
 
 
 // ---------- Doğum haritası çarkı ----------
@@ -374,7 +374,7 @@ tbody tr:hover {
   &.hard {
     background: var(--color-error);
   }
-} 
+}
 
 
 // ---------- Tıklanabilir kartlar (büyük üçlü ve evler) ----------
@@ -414,7 +414,7 @@ button.clickable {
   button.clickable:hover {
     transform: none;
   }
-} 
+}
 
 .panel-hint {
   margin: -6px 0 16px;
@@ -426,7 +426,7 @@ button.clickable {
     content: '✦ ';
     color: var(--color-gold);
   }
-} 
+}
 
 // Büyük üçlü: "GÜNEŞ / AY / YÜKSELEN" yazısı evler gibi kesik çizgili (tıklanabilir olduğu belli olsun)
 .big-card.clickable .big-label {
@@ -469,4 +469,4 @@ button.clickable {
     color: var(--color-gold);
     border-bottom: 1px solid var(--color-gold);
   }
-} 
+}

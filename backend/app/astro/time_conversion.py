@@ -14,7 +14,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from timezonefinder import TimezoneFinder
 
-from app.core.exceptions import InvalidInputError 
+from app.core.exceptions import InvalidInputError
 
 logger = logging.getLogger(__name__)
 
@@ -103,4 +103,4 @@ def local_to_utc(birth_date: date, birth_time: time, tz_name: str) -> UtcConvers
         utc=first.astimezone(timezone.utc),
         utc_offset_hours=offset_hours,
         warnings=warnings,
-    ) 
+    )

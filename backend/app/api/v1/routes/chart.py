@@ -105,4 +105,4 @@ def delete_chart(chart_id: uuid.UUID, user: CurrentUser, service: SavedChartServ
 def restore_chart(
     chart_id: uuid.UUID, user: CurrentUser, service: SavedChartServiceDep
 ) -> SavedChartOut:
-    return service.restore(user, chart_id) 
+    return service.restore(user, chart_id)

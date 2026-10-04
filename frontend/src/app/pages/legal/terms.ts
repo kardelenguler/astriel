@@ -7,4 +7,4 @@ import { RouterLink } from '@angular/router';
   templateUrl: './terms.html',
   styleUrl: './legal.scss',
 })
-export class Terms {} 
+export class Terms {}

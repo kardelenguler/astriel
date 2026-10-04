@@ -99,4 +99,4 @@ def test_token_of_deleted_user_rejected(service, db_session):
     service.users.delete(user)
     db_session.commit()
     with pytest.raises(AuthenticationError):
-        service.get_current_user(token) 
+        service.get_current_user(token)

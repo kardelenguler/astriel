@@ -106,4 +106,4 @@ def calculate_planets(jd: float, cusps: Sequence[float] | None = None) -> Planet
         planets=tuple(planets),
         used_fallback_model=used_fallback,
         warnings=tuple(warnings),
-    ) 
+    )

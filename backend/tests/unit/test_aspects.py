@@ -68,7 +68,7 @@ def test_sorted_by_orb():
 def test_real_chart_aspects_are_within_orb():
     jd = julian_day(datetime(2000, 3, 20, 7, 35, tzinfo=timezone.utc))
     for aspect in find_aspects(calculate_planets(jd).planets):
-        assert aspect.orb <= aspect.type.orb 
+        assert aspect.orb <= aspect.type.orb
 
 
 
@@ -90,4 +90,4 @@ def test_opposition_near_180_applying():
     still = _planet("b", 180.05)  # karşıtlık noktası 0.05°, a oraya doğru gidiyor
     aspects = find_aspects([fast, still])
     assert aspects[0].type.key == "opposition"
-    assert aspects[0].applying  
+    assert aspects[0].applying

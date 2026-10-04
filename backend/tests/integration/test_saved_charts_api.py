@@ -104,4 +104,4 @@ def test_delete_and_restore_flow(db_client, owner):
     assert db_client.get(CHARTS, headers=owner).json()["total"] == 0
 
     assert db_client.post(f"{url}/restore", headers=owner).status_code == 200
-    assert db_client.get(url, headers=owner).status_code == 200 
+    assert db_client.get(url, headers=owner).status_code == 200

@@ -1,7 +1,7 @@
 """create users and birth_charts
 
 Revision ID: 32361f4f149e
-Revises: 
+Revises:
 Create Date: 2026-09-28 14:24:37.879922
 
 """

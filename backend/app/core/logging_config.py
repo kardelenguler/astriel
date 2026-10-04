@@ -46,4 +46,4 @@ def setup_logging() -> None:
 
     # 3) httpx2 her isteğin adresini INFO seviyesinde yazar; adreste kullanıcının
     #    aradığı doğum yeri bulunduğu için sadece uyarı ve hatalar loglansın.
-    logging.getLogger("httpx2").setLevel(logging.WARNING) 
+    logging.getLogger("httpx2").setLevel(logging.WARNING)

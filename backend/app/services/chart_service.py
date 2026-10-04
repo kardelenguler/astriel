@@ -109,4 +109,3 @@ class ChartService:
             f"Ay bu gün {sign_at_start.name} burcundan {sign_at_end.name} burcuna geçiyor; "
             "doğum saati olmadan Ay burcu kesin değil."
         )
-    

@@ -63,4 +63,4 @@ def test_cannot_escape_site_folder(site_client):
 def test_unknown_api_path_returns_json_404(site_client):
     response = site_client.get("/api/v1/olmayan-adres")
     assert response.status_code == 404
-    assert "error" in response.json() 
+    assert "error" in response.json()

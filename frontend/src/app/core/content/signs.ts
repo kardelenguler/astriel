@@ -86,4 +86,4 @@ export const SIGN_MEANINGS: Record<string, SignMeaning> = {
     themes: 'sezgi, hayal gücü, empati ve duyarlılık',
     style: 'sezgilerine güvenme, empati kurma ve hayal gücünü kullanma eğiliminde olabilir.',
   },
-}; 
+};

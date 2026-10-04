@@ -75,4 +75,4 @@ export interface ChartResponse {
   aspects: Aspect[];
   warnings: string[]; // kullanıcıya gösterilecek Türkçe uyarılar
   engine_version: string;
-} 
+}

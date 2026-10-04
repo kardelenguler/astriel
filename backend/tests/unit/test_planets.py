@@ -43,4 +43,4 @@ def test_houses_assigned_with_cusps():
     houses = calculate_houses(JD_EQUINOX, 36.9, 30.7, "P")
     result = calculate_planets(JD_EQUINOX, houses.cusp_longitudes)
     for planet in result.planets:
-        assert planet.house is not None and 1 <= planet.house <= 12 
+        assert planet.house is not None and 1 <= planet.house <= 12

@@ -75,4 +75,4 @@ def test_service_down_returns_503(client, fake_geocoder):
     fake_geocoder.error = ExternalServiceError(detail="sahte: Nominatim kapalı")
     response = client.get(URL, params={"q": "Antalya"})
     assert response.status_code == 503
-    assert response.json()["error"]["code"] == "service_unavailable" 
+    assert response.json()["error"]["code"] == "service_unavailable"

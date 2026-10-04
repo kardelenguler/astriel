@@ -42,4 +42,4 @@ export const routes: Routes = [
 
   // Tanınmayan her adres buraya düşer. Bu satır her zaman EN SONDA olmalı.
   { path: '**', component: NotFound, title: 'Sayfa bulunamadı · Astriel' },
-]; 
+];

@@ -74,4 +74,4 @@ export function mockChart(options: { timeKnown?: boolean } = {}): ChartResponse 
     warnings: [],
     engine_version: 'test',
   } as ChartResponse;
-} 
+}

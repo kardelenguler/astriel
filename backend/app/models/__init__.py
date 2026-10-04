@@ -7,4 +7,4 @@ yeni bir model eklendiğinde buraya da eklenmelidir.
 from app.models.birth_chart import BirthChart
 from app.models.user import User
 
-__all__ = ["BirthChart", "User"] 
+__all__ = ["BirthChart", "User"]

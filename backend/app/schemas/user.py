@@ -67,4 +67,4 @@ class TokenResponse(BaseModel):
     """Giriş başarılı olunca dönen token."""
 
     access_token: str
-    token_type: str = "bearer" 
+    token_type: str = "bearer"

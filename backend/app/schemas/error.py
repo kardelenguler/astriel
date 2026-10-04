@@ -19,4 +19,4 @@ class ErrorDetail(BaseModel):
 
 
 class ErrorResponse(BaseModel):
-    error: ErrorDetail 
+    error: ErrorDetail

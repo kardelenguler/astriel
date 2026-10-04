@@ -12,4 +12,4 @@ class PlaceOut(BaseModel):
     display_name: str  # "Antalya, Akdeniz Bölgesi, Türkiye" (listede gösterilir)
     latitude: float
     longitude: float
-    country: str | None 
+    country: str | None

@@ -5,7 +5,7 @@
   Angular'daki TypeScript interface'leri bu modellerin birebir karşılığıdır.
 """
 
-import uuid 
+import uuid
 from datetime import date, datetime, time
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -65,7 +65,7 @@ class ChartCreateRequest(ChartCalculateRequest):
     """Haritayı kaydetmek için: hesaplama bilgilerine ek olarak ad ve yer adı."""
 
     name: str = Field(min_length=1, max_length=100, examples=["Benim haritam"])
-    place_name: str = Field(min_length=1, max_length=200, examples=["Antalya, Türkiye"]) 
+    place_name: str = Field(min_length=1, max_length=200, examples=["Antalya, Türkiye"])
 
 # =============================== YANIT ===============================
 class FromAttributesModel(BaseModel):
@@ -123,7 +123,7 @@ class HouseSystemOut(BaseModel):
 class ChartResponse(BaseModel):
     utc_datetime: datetime
     utc_offset_hours: float
-    timezone: str  # koordinattan bulunan IANA adı, ör. "Europe/Istanbul"  
+    timezone: str  # koordinattan bulunan IANA adı, ör. "Europe/Istanbul"
     time_known: bool
     house_system: HouseSystemOut | None  # saat bilinmiyorsa None
     ascendant: PointOut | None
@@ -132,7 +132,7 @@ class ChartResponse(BaseModel):
     planets: list[PlanetOut]
     aspects: list[AspectOut]
     warnings: list[str]
-    engine_version: str 
+    engine_version: str
 
 
 
@@ -180,4 +180,4 @@ class SavedChartOut(BaseModel):
     latitude: float
     longitude: float
     created_at: datetime
-    chart: ChartResponse 
+    chart: ChartResponse

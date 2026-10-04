@@ -26,4 +26,4 @@ describe('App', () => {
     expect(element.querySelector('app-navbar')).not.toBeNull();
     expect(element.querySelector('app-footer')).not.toBeNull();
   });
-}); 
+});

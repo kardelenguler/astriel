@@ -105,4 +105,3 @@ def test_client_ip_falls_back_to_connection_without_header():
 def test_client_ip_falls_back_when_header_too_short():
     # Beklenenden kısa başlık güvenilmez: bağlantının kendi IP'si kullanılır
     assert client_ip(_request("9.9.9.9", host="127.0.0.1")) == "127.0.0.1"
-    

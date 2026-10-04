@@ -23,4 +23,4 @@ describe('About', () => {
 
     expect(text).toContain('OpenStreetMap');
   });
-}); 
+});

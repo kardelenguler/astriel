@@ -6,19 +6,19 @@ Route fonksiyonlarında parametre olarak yazmak yeterlidir:
 
 FastAPI her istek için gerekeni üretir; oturum istek bitince kapatılır.
 """
-from functools import lru_cache 
+from functools import lru_cache
 from typing import Annotated
 
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
-from app.clients.geocoder import NominatimGeocoder 
+from app.clients.geocoder import NominatimGeocoder
 from app.db.session import get_db
 from app.models.user import User
 from app.services.auth_service import AuthService
 from app.services.chart_service import ChartService
-from app.services.saved_chart_service import SavedChartService 
+from app.services.saved_chart_service import SavedChartService
 
 # ------------------------------ Veritabanı ------------------------------
 DbSession = Annotated[Session, Depends(get_db)]
@@ -38,7 +38,7 @@ def get_saved_chart_service(db: DbSession, calculator: ChartServiceDep) -> Saved
     return SavedChartService(db, calculator)
 
 
-SavedChartServiceDep = Annotated[SavedChartService, Depends(get_saved_chart_service)] 
+SavedChartServiceDep = Annotated[SavedChartService, Depends(get_saved_chart_service)]
 
 
 # ------------------------------ Dış servisler ------------------------------
@@ -53,7 +53,7 @@ def get_geocoder() -> NominatimGeocoder:
     return NominatimGeocoder()
 
 
-GeocoderDep = Annotated[NominatimGeocoder, Depends(get_geocoder)] 
+GeocoderDep = Annotated[NominatimGeocoder, Depends(get_geocoder)]
 
 def get_auth_service(db: DbSession) -> AuthService:
     return AuthService(db)
@@ -75,4 +75,4 @@ def get_current_user(
 
 
 # Bir route'a bu parametreyi eklemek, o route'u "giriş zorunlu" yapar
-CurrentUser = Annotated[User, Depends(get_current_user)] 
+CurrentUser = Annotated[User, Depends(get_current_user)]

@@ -95,4 +95,4 @@ Tüm hatalar aynı biçimde döner:
 
 ## Giriş deneme sınırı
 
-Aynı kullanıcı adı + IP adresi için 5 dakika içinde 5 hatalı giriş yapılırsa giriş geçici olarak engellenir (`429`). Başarılı giriş sayacı sıfırlar. Sayaçlar bellekte tutulur; birden fazla sunucuya geçilirse Redis gibi ortak bir depoya taşınmalıdır. 
+Aynı kullanıcı adı + IP adresi için 5 dakika içinde 5 hatalı giriş yapılırsa giriş geçici olarak engellenir (`429`). Başarılı giriş sayacı sıfırlar. Sayaçlar bellekte tutulur; birden fazla sunucuya geçilirse Redis gibi ortak bir depoya taşınmalıdır.

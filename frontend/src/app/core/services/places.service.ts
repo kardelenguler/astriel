@@ -19,4 +19,4 @@ export class PlacesService {
   search(query: string): Observable<Place[]> {
     return this.http.get<Place[]>(this.url, { params: { q: query } });
   }
-} 
+}

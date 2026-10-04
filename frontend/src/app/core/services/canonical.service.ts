@@ -31,4 +31,4 @@ export class CanonicalService {
     }
     link.href = href;
   }
-} 
+}

@@ -113,4 +113,4 @@ export const PLANET_MEANINGS: Record<string, PlanetMeaning> = {
     area: 'hassas noktalarıyla yüzleştiğinde',
     themes: 'iyileşme ve hassasiyet',
   },
-}; 
+};

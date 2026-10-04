@@ -140,7 +140,7 @@ h1 {
   .deco-left {
     display: none;
   }
-} 
+}
 
 
 // ---------- Özellik kartları ----------
@@ -225,7 +225,7 @@ h1 {
   .feature-card:hover {
     transform: none;
   }
-} 
+}
 
 
 // ---------- Nasıl çalışır? ----------
@@ -301,7 +301,7 @@ h1 {
   border: 1px solid var(--color-gold);
   border-radius: 50%;
   font-family: var(--font-body);
-  font-size: 17px; 
+  font-size: 17px;
   color: var(--color-gold);
   box-shadow: 0 0 18px rgba(201, 164, 108, 0.2);
 }
@@ -316,7 +316,7 @@ h1 {
   .how-visual img {
     max-width: 260px;
   }
-} 
+}
 
 
 // ---------- Çağrı bandı ----------
@@ -367,7 +367,7 @@ h1 {
 // Alttaki düğmeyle gelince form ekranın tepesine yapışmasın
 .hero {
   scroll-margin-top: 16px;
-} 
+}
 
 // ---------- Telefon (600px ve altı): daha kompakt görünüm ----------
 @media (max-width: 600px) {
@@ -493,4 +493,4 @@ h1 {
     padding: 13px 26px;
     font-size: 14px;
   }
-} 
+}

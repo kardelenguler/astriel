@@ -92,4 +92,3 @@ def test_expired_token_has_friendly_message():
 def test_invalid_tokens_rejected(token):
     with pytest.raises(AuthenticationError):
         decode_access_token(token)
-        

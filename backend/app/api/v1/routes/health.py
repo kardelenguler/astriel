@@ -26,4 +26,4 @@ def health_check(db: DbSession, response: Response) -> dict[str, str]:
         # İzleme araçları sadece durum koduna bakar; 200 dönersek sunucuyu sağlıklı sanırlar
         response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
         return {"status": "degraded", "database": "unavailable"}
-    return {"status": "ok", "database": "ok"} 
+    return {"status": "ok", "database": "ok"}

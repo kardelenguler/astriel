@@ -45,4 +45,4 @@ export class AnalyticsService {
       // Sayaç çalışmasa da site çalışmaya devam etmeli
     }
   }
-} 
+}

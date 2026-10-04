@@ -79,7 +79,7 @@ def test_response_is_json_serializable():
 )
 def test_timezone_resolved_from_coordinates(latitude, longitude, expected):
     chart = service.calculate(_request(latitude=latitude, longitude=longitude))
-    assert chart.timezone == expected 
+    assert chart.timezone == expected
 
 
 
@@ -101,4 +101,4 @@ def test_supported_year_boundaries(birth_date, birth_time, location):
     chart = service.calculate(_request(birth_date=birth_date, birth_time=birth_time, **location))
     assert len(chart.planets) == 12
     # Efemeris dosyası kapsamı dışına düşülürse yedek modele geçilir; bu olmamalı
-    assert not any("yedek model" in w for w in chart.warnings) 
+    assert not any("yedek model" in w for w in chart.warnings)

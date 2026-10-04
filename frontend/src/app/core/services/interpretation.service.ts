@@ -111,4 +111,4 @@ export class InterpretationService {
       `Kişi ${area} ${sign.style}`
     );
   }
-} 
+}

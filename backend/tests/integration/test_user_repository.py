@@ -63,4 +63,4 @@ def test_many_users_without_email_allowed(db_session):
     repo = UserRepository(db_session)
     repo.add(_user("ali"))
     repo.add(_user("ayse"))
-    assert repo.get_by_username("ayse").email is None 
+    assert repo.get_by_username("ayse").email is None

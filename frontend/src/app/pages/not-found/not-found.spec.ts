@@ -15,4 +15,4 @@ describe('NotFound', () => {
     const fixture = TestBed.createComponent(NotFound);
     expect(fixture.componentInstance).toBeTruthy();
   });
-}); 
+});

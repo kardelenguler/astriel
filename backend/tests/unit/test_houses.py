@@ -56,4 +56,4 @@ def test_polar_latitude_falls_back_to_whole_sign():
 
 def test_invalid_house_system_raises():
     with pytest.raises(InvalidInputError):
-        calculate_houses(JD, *ANTALYA, "X") 
+        calculate_houses(JD, *ANTALYA, "X")

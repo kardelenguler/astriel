@@ -39,7 +39,7 @@ def test_placidus_houses_structure():
     assert len(houses.cusps) == 12
     # Placidus'ta 1. ev = Yükselen, 10. ev = MC
     assert houses.cusps[0] == pytest.approx(houses.ascendant)
-    assert houses.cusps[9] == pytest.approx(houses.midheaven) 
+    assert houses.cusps[9] == pytest.approx(houses.midheaven)
 
 
 
@@ -60,4 +60,4 @@ def test_ephemeris_files_are_used_in_other_threads():
     thread.join()
 
     assert results["sun_from_file"]
-    assert 240 <= results["chiron"] < 270 
+    assert 240 <= results["chiron"] < 270

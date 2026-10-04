@@ -228,4 +228,4 @@ export class ChartWheel {
     }
     return parts.join(', ');
   });
-} 
+}

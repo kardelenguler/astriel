@@ -8,13 +8,13 @@ Her hata aynı biçimde döner; Angular tek bir yerden yakalayıp gösterebilir:
 """
 
 import logging
-from collections.abc import Awaitable, Callable, Sequence 
+from collections.abc import Awaitable, Callable, Sequence
 from typing import Any
 
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse, Response 
-from starlette.exceptions import HTTPException as StarletteHTTPException 
+from fastapi.responses import JSONResponse, Response
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.core.exceptions import AppError
 
 logger = logging.getLogger(__name__)
@@ -59,7 +59,7 @@ def _display_value(value: Any) -> Any:
     """90.0 -> 90 (kullanıcıya '90.0' yerine '90' gösterilsin); diğerleri aynen kalır."""
     if isinstance(value, float) and value.is_integer():
         return int(value)
-    return value 
+    return value
 
 def translate_message(error: dict[str, Any]) -> str:
     """Pydantic hatasını Türkçe mesaja çevirir.
@@ -80,7 +80,7 @@ def translate_message(error: dict[str, Any]) -> str:
     except (KeyError, IndexError):
         # Şablonda beklenen bir değer ctx'te yoksa orijinal mesaja dön
         return error["msg"].removeprefix("Value error, ")
-    
+
 
 
 def _error_response(
@@ -93,7 +93,7 @@ def _error_response(
     error: dict = {"code": code, "message": message}
     if fields:
         error["fields"] = fields
-    return JSONResponse(status_code=status_code, content={"error": error}, headers=headers) 
+    return JSONResponse(status_code=status_code, content={"error": error}, headers=headers)
 
 
 async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
@@ -106,7 +106,7 @@ async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
 
 # Starlette'in kendi fırlattığı HTTP hataları (olmayan adres, yanlış metot...) -> kod ve Türkçe mesaj
 _HTTP_ERRORS: dict[int, tuple[str, str]] = {
-    401: ("unauthorized", "Lütfen giriş yapın."), 
+    401: ("unauthorized", "Lütfen giriş yapın."),
     404: ("not_found", "Aradığınız adres bulunamadı."),
     405: ("method_not_allowed", "Bu adres bu işlem türünü desteklemiyor."),
 }
@@ -152,7 +152,7 @@ async def unhandled_error_middleware(
         logger.exception("Beklenmeyen hata: %s %s", request.method, request.url.path)
         return _error_response(
             status.HTTP_500_INTERNAL_SERVER_ERROR, "internal_error", AppError.default_message
-        ) 
+        )
 
 
 def register_exception_handlers(app: FastAPI) -> None:
@@ -160,4 +160,4 @@ def register_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(AppError, app_error_handler)
     app.add_exception_handler(StarletteHTTPException, http_error_handler)
     app.add_exception_handler(RequestValidationError, validation_error_handler)
-    app.middleware("http")(unhandled_error_middleware) 
+    app.middleware("http")(unhandled_error_middleware)

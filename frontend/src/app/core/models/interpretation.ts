@@ -15,4 +15,4 @@ export interface Interpretation {
   text: string;         // burç birleşimi
   notes?: string[];     // ek paragraflar (ev yerleşimi, retro notu gibi)
   source: InterpretationSource;
-} 
+}

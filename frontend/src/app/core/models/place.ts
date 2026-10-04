@@ -8,4 +8,4 @@ export interface Place {
   latitude: number;
   longitude: number;
   country: string | null;
-} 
+}

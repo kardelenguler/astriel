@@ -63,4 +63,4 @@ export class Login {
     const url = this.route.snapshot.queryParamMap.get('donus');
     return url && url.startsWith('/') && !url.startsWith('//') ? url : '/';
   }
-} 
+}

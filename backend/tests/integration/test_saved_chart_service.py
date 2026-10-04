@@ -115,7 +115,7 @@ def test_outdated_chart_is_recalculated(service, owner, db_session):
     db_session.flush()
 
     service.get(owner, saved.id)
-    assert chart.engine_version == ENGINE_VERSION  # yeniden hesaplanıp güncellendi 
+    assert chart.engine_version == ENGINE_VERSION  # yeniden hesaplanıp güncellendi
 
 # =============================== KALICI TEMİZLİK ===============================
 def test_purge_removes_only_charts_deleted_long_ago(service, owner, db_session):
@@ -142,4 +142,3 @@ def test_purge_removes_only_charts_deleted_long_ago(service, owner, db_session):
     # Yeni silinen hâlâ geri alınabilir, silinmemiş olana dokunulmadı
     assert service.restore(owner, recent.id).name == "Yeni silinen"
     assert service.get(owner, kept.id).name == "Silinmemiş"
-    

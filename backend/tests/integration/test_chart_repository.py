@@ -75,7 +75,7 @@ def test_restore_makes_chart_visible_again(repo, owner):
     chart = repo.add(_chart(owner))
     repo.soft_delete(chart)
     repo.restore(chart)
-    assert repo.get_for_user(chart.id, owner.id) is chart 
+    assert repo.get_for_user(chart.id, owner.id) is chart
 
 
 # =============================== LİSTE ===============================
@@ -83,7 +83,7 @@ def test_list_newest_first_and_only_active_own_charts(repo, owner, stranger):
     repo.add(_chart(owner, "eski", minutes=0))
     repo.add(_chart(owner, "yeni", minutes=10))
     silinen = repo.add(_chart(owner, "silinen", minutes=20))
-    repo.soft_delete(silinen) 
+    repo.soft_delete(silinen)
     repo.add(_chart(stranger, "baskasinin", minutes=30))
 
     names = [c.name for c in repo.list_for_user(owner.id, limit=10, offset=0)]
@@ -102,6 +102,6 @@ def test_list_pagination(repo, owner):
 
 def test_count_ignores_deleted_and_others(repo, owner, stranger):
     repo.add(_chart(owner))
-    repo.soft_delete(repo.add(_chart(owner))) 
+    repo.soft_delete(repo.add(_chart(owner)))
     repo.add(_chart(stranger))
-    assert repo.count_for_user(owner.id) == 1 
+    assert repo.count_for_user(owner.id) == 1

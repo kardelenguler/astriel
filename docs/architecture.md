@@ -80,4 +80,4 @@ frontend/src/app/
 
 ## Yayın
 
-`Dockerfile` iki aşamalıdır: önce Angular derlenir, sonra Python imajına kopyalanır. Render her `git push` sonrası imajı yeniden oluşturur; açılışta `alembic upgrade head` ile veritabanı güncellenir, sonra `uvicorn` başlar. Veritabanı Neon (yönetilen PostgreSQL) üzerindedir. 
+`Dockerfile` iki aşamalıdır: önce Angular derlenir, sonra Python imajına kopyalanır. Render her `git push` sonrası imajı yeniden oluşturur; açılışta `alembic upgrade head` ile veritabanı güncellenir, sonra `uvicorn` başlar. Veritabanı Neon (yönetilen PostgreSQL) üzerindedir.

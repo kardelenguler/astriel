@@ -22,4 +22,4 @@ export class App {
     // Ziyaretçi sayacı (sadece sayfa adı gider, kişisel veri gitmez)
     inject(AnalyticsService).init();
   }
-} 
+}

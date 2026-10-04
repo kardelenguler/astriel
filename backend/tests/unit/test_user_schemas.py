@@ -58,4 +58,4 @@ def test_email_is_normalized():
 
 def test_invalid_email_rejected():
     with pytest.raises(ValidationError):
-        UserCreate(**{**VALID, "email": "mail-degil"}) 
+        UserCreate(**{**VALID, "email": "mail-degil"})

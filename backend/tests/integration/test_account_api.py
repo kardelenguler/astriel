@@ -122,4 +122,4 @@ def test_delete_account_removes_user_and_all_charts(db_client, db_session):
 
 def test_delete_account_requires_login(db_client):
     response = db_client.request("DELETE", ACCOUNT_URL, json={"password": PASSWORD})
-    assert response.status_code == 401 
+    assert response.status_code == 401

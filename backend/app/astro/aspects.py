@@ -99,4 +99,4 @@ def find_aspects(planets: Sequence[PlanetPosition]) -> tuple[Aspect, ...]:
             )
         )
 
-    return tuple(sorted(aspects, key=lambda a: a.orb)) 
+    return tuple(sorted(aspects, key=lambda a: a.orb))

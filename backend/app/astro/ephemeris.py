@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 import swisseph as swe
 
 from app.core.config import settings
-from app.core.exceptions import CalculationError 
+from app.core.exceptions import CalculationError
 
 
 logger = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ _thread_state = threading.local()
 def _ensure_ephe_path() -> None:
     if not getattr(_thread_state, "ephe_path_set", False):
         swe.set_ephe_path(str(settings.ephe_dir))
-        _thread_state.ephe_path_set = True 
+        _thread_state.ephe_path_set = True
 
 EPHEMERIS_VERSION: str = swe.version
 
@@ -39,7 +39,7 @@ EPHEMERIS_VERSION: str = swe.version
 # ±12 saat Ay kontrolü yapılınca) bir gün kayabilir. Ör. Antalya 01.01.1800 00:30 -> UTC 1799;
 # o tarih için seas_12.se1 gerekir ve Chiron hesaplanamaz (test_supported_year_boundaries).
 MIN_YEAR = 1801
-MAX_YEAR = 2398 
+MAX_YEAR = 2398
 
 # Dışarıya sade anahtarlar açılır; Swiss Ephemeris sabitleri bu dosyada kalır.
 BODY_IDS: dict[str, int] = {
@@ -85,7 +85,7 @@ def julian_day(moment: datetime) -> float:
 
 def calc_body(jd: float, body_key: str) -> RawBodyPosition:
     """Bir gök cisminin konumunu hesaplar."""
-    _ensure_ephe_path()  
+    _ensure_ephe_path()
     flags = swe.FLG_SWIEPH | swe.FLG_SPEED
     try:
         values, return_flag, message = swe.calc_ut(jd, BODY_IDS[body_key], flags)
@@ -117,4 +117,4 @@ def calc_houses(jd: float, latitude: float, longitude: float, system: str) -> Ra
     # pysweph 13 eleman döndürür ve 0. eleman boştur; farklı sürümlere karşı iki durumu da ele al
     twelve = cusps[1:13] if len(cusps) == 13 else cusps[:12]
 
-    return RawHouses(cusps=tuple(twelve), ascendant=points[0], midheaven=points[1]) 
+    return RawHouses(cusps=tuple(twelve), ascendant=points[0], midheaven=points[1])

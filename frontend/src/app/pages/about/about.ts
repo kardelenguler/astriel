@@ -93,4 +93,4 @@ export class About {
     const to = polar(96, PLANETS[b].degrees);
     return { x1: from.x, y1: from.y, x2: to.x, y2: to.y };
   });
-} 
+}

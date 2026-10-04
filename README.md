@@ -77,7 +77,7 @@ python -m venv .venv
 # macOS / Linux
 source .venv/bin/activate
 
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 ```
 
 `.env.example` dosyasını `.env` adıyla kopyala ve içindeki değerleri doldur
@@ -135,4 +135,4 @@ Bu değer tanımlı değilse o testler atlanır.
 - [x] Kayıtlı haritalarda sayfalama ve kalıcı harita adresleri
 - [ ] Gezegen + burç + ev kombinasyonlarından kural tabanlı yorum motoru
 - [ ] Yapay zekâ ile kişiye özel harita yorumları
-- [ ] Günlük ve haftalık burç yorumları 
+- [ ] Günlük ve haftalık burç yorumları

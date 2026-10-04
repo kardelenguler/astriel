@@ -49,4 +49,4 @@ describe('InterpretationPanel', () => {
 
     expect(closedCount).toBe(1);
   });
-}); 
+});

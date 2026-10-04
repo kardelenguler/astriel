@@ -98,7 +98,7 @@ button {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-} 
+}
 
 // ---------- Yıldızlı arka plan (tüm sayfalarda) ----------
 // İki katman var: sabit yıldızlar + yavaşça parıldayan parlak yıldızlar.
@@ -145,7 +145,7 @@ body::after {
 @keyframes twinkle {
   from { opacity: 0.5; }
   to   { opacity: 1; }
-} 
+}
 
 
 // ---------- Giriş / kayıt sayfaları (ortak) ----------
@@ -292,7 +292,7 @@ body::after {
   a {
     color: var(--color-mauve);
   }
-} 
+}
 
 
 // Alan altındaki gri ipucu yazısı
@@ -305,7 +305,7 @@ body::after {
 // Şifreler aynı değilse "Şifre tekrar" kutusu da kırmızı olsun
 .auth-field input.mismatch {
   border-color: var(--color-error);
-} 
+}
 
 
 // Chrome'un otomatik doldurduğu kutular beyaz olmasın, temaya uysun
@@ -316,7 +316,7 @@ input:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0 1000px var(--color-input) inset;
   caret-color: var(--color-text);
   transition: background-color 9999s ease-out;
-} 
+}
 
 
 // ---------- Scroll ile beliren bölümler (appReveal) ----------
@@ -337,7 +337,7 @@ input:-webkit-autofill:focus {
     transform: none;
     transition: none;
   }
-} 
+}
 
 
 // Başlık fontu (Cormorant) varsayılan olarak "eski stil" rakamlar kullanıyor;
@@ -347,4 +347,4 @@ h2,
 h3,
 h4 {
   font-variant-numeric: lining-nums;
-} 
+}

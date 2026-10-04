@@ -16,4 +16,4 @@ def test_commit_inside_test_works(db_session):
 
 def test_previous_test_was_rolled_back(db_session):
     # Bir önceki test kullanıcı ekleyip commit etti; burada tablo yine boş olmalı
-    assert db_session.scalar(select(func.count()).select_from(User)) == 0 
+    assert db_session.scalar(select(func.count()).select_from(User)) == 0

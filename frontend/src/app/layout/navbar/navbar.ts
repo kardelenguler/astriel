@@ -43,4 +43,4 @@ export class Navbar {
     this.auth.logout();
     this.router.navigateByUrl('/');
   }
-} 
+}

@@ -68,4 +68,4 @@ def format_position(longitude: float) -> str:
     sign = SIGNS[total_minutes // (30 * 60)]
     minutes_in_sign = total_minutes % (30 * 60)
     degrees, minutes = divmod(minutes_in_sign, 60)
-    return f"{degrees}°{minutes:02d}' {sign.name}" 
+    return f"{degrees}°{minutes:02d}' {sign.name}"

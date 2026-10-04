@@ -10,4 +10,4 @@ import { RouterLink } from '@angular/router';
 export class Footer {
   // Telif yılı her yıl elle değiştirilmesin
   protected readonly year = new Date().getFullYear();
-} 
+}

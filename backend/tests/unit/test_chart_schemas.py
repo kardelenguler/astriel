@@ -49,7 +49,7 @@ def test_whitespace_is_stripped():
 )
 def test_invalid_requests_rejected(override):
     with pytest.raises(ValidationError):
-        ChartCalculateRequest(**{**VALID, **override}) 
+        ChartCalculateRequest(**{**VALID, **override})
 
 
 
@@ -65,4 +65,4 @@ def test_planet_out_from_engine_dataclass():
     sun = calculate_planets(jd).planets[0]
     out = PlanetOut.model_validate(sun)
     assert out.key == "sun"
-    assert out.sign.name == sun.sign.name 
+    assert out.sign.name == sun.sign.name

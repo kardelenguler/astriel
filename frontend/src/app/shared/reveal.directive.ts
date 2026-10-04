@@ -35,4 +35,4 @@ export class Reveal implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.observer?.disconnect();
   }
-} 
+}

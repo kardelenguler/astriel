@@ -8,10 +8,10 @@ bilgilerinden yeniden hesaplanabildiği için chart_data bir önbellek gibidir.
 from __future__ import annotations
 
 import uuid
-from datetime import date, datetime, time 
+from datetime import date, datetime, time
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, String 
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -50,10 +50,10 @@ class BirthChart(Base, TimestampMixin):
     chart_data: Mapped[dict[str, Any]] = mapped_column(JSONB)
     engine_version: Mapped[str] = mapped_column(String(50))
 
-    
+
     # ---------- Yumuşak silme ----------
     # Dolu ise harita "silinmiş" sayılır ve listelerde görünmez;
     # kullanıcı "Geri al" derse tekrar None yapılır.
-    deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True)) 
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
-    user: Mapped[User] = relationship(back_populates="charts") 
+    user: Mapped[User] = relationship(back_populates="charts")

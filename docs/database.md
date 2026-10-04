@@ -67,4 +67,4 @@ Bir kullanıcının birden çok kayıtlı haritası olabilir. Kullanıcı silini
 | `32361f4f149e` | `users` ve `birth_charts` tabloları |
 | `46a9a258b2e0` | `birth_charts.deleted_at` (yumuşak silme) |
 | `91e32f267b38` | `users.username` eklendi, `email` isteğe bağlı oldu |
-| `9e59ccaafeca` | `engine_version` sütunu genişletildi | 
+| `9e59ccaafeca` | `engine_version` sütunu genişletildi |

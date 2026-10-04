@@ -17,4 +17,4 @@ export interface ApiErrorBody {
 
 export interface ApiErrorResponse {
   error: ApiErrorBody;
-} 
+}

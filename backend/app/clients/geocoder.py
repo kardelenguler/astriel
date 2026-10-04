@@ -144,4 +144,3 @@ class NominatimGeocoder:
         self._cache[key] = places
         if len(self._cache) > CACHE_SIZE:
             self._cache.popitem(last=False)  # en uzun süredir kullanılmayanı at
-            

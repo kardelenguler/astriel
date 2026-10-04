@@ -94,4 +94,4 @@ export const HOUSE_MEANINGS: Record<number, HouseMeaning> = {
       '12. ev; iç dünya, bilinçdışı, yalnız kalma ihtiyacı ve kişinin geri çekildiği alanla ilişkilendirilir.',
     area: 'kendi iç dünyasına döndüğünde',
   },
-}; 
+};
