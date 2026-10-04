@@ -3,6 +3,10 @@
     <h1>Tekrar hoş geldin</h1>
     <p class="auth-subtitle">Kayıtlı haritalarına ulaşmak için giriş yap.</p>
 
+    @if (sessionExpired && !error()) {
+      <p class="auth-alert" role="status">Oturumunun süresi doldu. Devam etmek için tekrar giriş yap.</p>
+    }
+        
     @if (error(); as message) {
       <p class="auth-alert" role="alert">{{ message }}</p>
     }

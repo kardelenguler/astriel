@@ -1,7 +1,7 @@
 <section class="account">
   <header class="page-header">
     <p class="eyebrow">Hesabım</p>
-    <h1>Hesap ayarları</h1>
+    <h1>Hesap Ayarları</h1>
   </header>
 
   @if (auth.user(); as user) {
@@ -26,7 +26,7 @@
 
     <!-- ================= Şifre değiştir ================= -->
     <form class="panel" [formGroup]="passwordForm" (ngSubmit)="changePassword()" novalidate>
-      <h2>Şifre değiştir</h2>
+      <h2>Şifre Değiştir</h2>
 
       @if (passwordSuccess()) {
         <p class="success" role="status">Şifren değiştirildi.</p>
@@ -80,7 +80,7 @@
 
     <!-- ================= Hesabı sil ================= -->
     <div class="panel danger">
-      <h2>Hesabı sil</h2>
+      <h2>Hesabı Sil</h2>
       <p class="danger-text">
         Hesabın ve kayıtlı bütün haritaların <strong>kalıcı olarak</strong> silinir.
         Bu işlem geri alınamaz.
@@ -131,7 +131,14 @@
         </form>
       }
     </div>
+  } @else if (auth.restoreFailed()) {
+    <div class="panel">
+      <p class="auth-alert" role="alert">
+        Hesap bilgilerin yüklenemedi. İnternet bağlantını kontrol edip tekrar dene.
+      </p>
+      <button type="button" class="auth-submit" (click)="auth.restoreSession()">Tekrar Dene</button>
+    </div>
   } @else {
     <p class="loading" role="status">Hesap bilgilerin yükleniyor…</p>
-  }
+  } 
 </section> 

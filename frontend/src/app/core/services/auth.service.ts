@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, switchMap, tap } from 'rxjs';
 
@@ -44,6 +44,11 @@ export class AuthService {
   readonly user = this.currentUser.asReadonly();
   readonly isLoggedIn = computed(() => this.currentUser() !== null);
 
+  // Token var ama sunucuya ulaşılamadığı için kullanıcı bilgisi yüklenemediyse true.
+  // Sayfalar bu durumda "Tekrar dene" gösterir (sonsuza kadar "yükleniyor" demez).
+  private readonly restoreFailedState = signal(false);
+  readonly restoreFailed = this.restoreFailedState.asReadonly();
+
   get token(): string | null {
     return readToken();
   }
@@ -69,19 +74,28 @@ export class AuthService {
   }
 
   // Sayfa yenilendiğinde: kayıtlı token varsa kullanıcıyı geri yükle.
-  // Token süresi dolmuş ya da bozuksa sessizce temizle.
+  // SADECE token geçersizse (401) çıkış yapılır. Sunucu o an kapalıysa, Render
+  // yeniden başlıyorsa ya da internet koptuysa kullanıcı boşuna çıkışa atılmaz.
   restoreSession(): void {
     if (!readToken()) {
       return;
     }
+    this.restoreFailedState.set(false);
     this.loadCurrentUser().subscribe({
-      error: () => this.logout(),
+      error: (error: unknown) => {
+        if (error instanceof HttpErrorResponse && error.status === 401) {
+          this.logout();
+        } else {
+          this.restoreFailedState.set(true);
+        }
+      },
     });
   }
 
   logout(): void {
     clearToken();
     this.currentUser.set(null);
+    this.restoreFailedState.set(false);
   }
 
   // ---------- Hesap ayarları ----------
@@ -105,6 +119,6 @@ export class AuthService {
       .get<User>(`${this.baseUrl}/me`, {
         headers: { Authorization: `Bearer ${readToken()}` },
       })
-      .pipe(tap((user) => this.currentUser.set(user))); 
+      .pipe(tap((user) => this.currentUser.set(user)));
   }
 } 

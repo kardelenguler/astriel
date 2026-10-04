@@ -26,6 +26,10 @@ export class Login {
   protected readonly error = signal<string | null>(null);
   protected readonly showPassword = signal(false);
 
+  /** Oturum süresi dolduğu için buraya yönlendirildiyse (?oturum=doldu) bilgi gösterilir */
+  protected readonly sessionExpired =
+    this.route.snapshot.queryParamMap.get('oturum') === 'doldu';
+
   hasError(name: 'username' | 'password'): boolean {
     const control = this.form.controls[name];
     return control.invalid && control.touched;
@@ -33,10 +37,10 @@ export class Login {
 
   onSubmit(): void {
     if (this.loading()) {
-      return;  // çift tıklamada iki istek gitmesin
+      return; // çift tıklamada iki istek gitmesin
     }
     if (this.form.invalid) {
-      this.form.markAllAsTouched();  // boş alanların hatası görünsün
+      this.form.markAllAsTouched(); // boş alanların hatası görünsün
       return;
     }
 
