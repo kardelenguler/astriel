@@ -1,6 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, switchMap, tap } from 'rxjs';
+import { Observable, map, switchMap, tap } from 'rxjs';
+
 
 import { environment } from '../../../environments/environment';
 import { RegisterRequest, TokenResponse, User } from '../models/user';
@@ -99,12 +100,20 @@ export class AuthService {
   }
 
   // ---------- Hesap ayarları ----------
-
+  /**
+   * Şifreyi değiştirir. Backend eski şifreyle alınmış tüm token'ları geçersiz
+   * sayar ve yeni token döndürür; bu cihazdaki oturum yeni token'la devam eder.
+   */
   changePassword(currentPassword: string, newPassword: string): Observable<void> {
-    return this.http.post<void>(`${this.accountUrl}/password`, {
-      current_password: currentPassword,
-      new_password: newPassword,
-    });
+    return this.http
+      .post<TokenResponse>(`${this.accountUrl}/password`, {
+        current_password: currentPassword,
+        new_password: newPassword,
+      })
+      .pipe(
+        tap((res) => saveToken(res.access_token)),
+        map(() => undefined),
+      );
   }
 
   /** Hesabı kalıcı olarak siler; başarılı olursa oturumu da kapatır */

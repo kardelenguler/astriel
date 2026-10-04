@@ -11,8 +11,9 @@ from sqlalchemy.orm import Session
 from app.core.exceptions import AuthenticationError, ConflictError, InvalidInputError
 from app.core.security import (
     create_access_token,
-    decode_access_token,
     hash_password,
+    password_fingerprint,
+    read_access_token,
     verify_password,
 )
 from app.models.user import User
@@ -29,9 +30,16 @@ INVALID_CREDENTIALS = "Kullanıcı adı veya şifre hatalı."
 # kullanıcıyı çıkışa atar, oysa burada sadece bir uyarı gösterilmeli.
 WRONG_CURRENT_PASSWORD = "Mevcut şifre hatalı."
 
+PASSWORD_CHANGED = "Şifren değiştirildiği için oturumun kapandı. Lütfen yeni şifrenle giriş yap."
+
 # Kullanıcı bulunamasa bile şifre doğrulaması yapılır. Yoksa "kullanıcı yok" yanıtı
 # çok hızlı, "şifre yanlış" yanıtı yavaş döner ve süreden kullanıcı adı tahmin edilir.
 _DUMMY_HASH = hash_password("zamanlama-saldirisina-karsi-sahte-sifre")
+
+
+def _token_for(user: User) -> str:
+    """Kullanıcının ŞU ANKİ şifresine bağlı token üretir."""
+    return create_access_token(user.id, password_fingerprint(user.hashed_password))
 
 
 class AuthService:
@@ -86,20 +94,27 @@ class AuthService:
         """Bilgiler doğruysa erişim token'ı döndürür."""
         user = self.authenticate(username, password)
         logger.info("Giriş yapıldı: id=%s", user.id)
-        return create_access_token(user.id)
+        return _token_for(user)
 
     # ------------------------- Token -> kullanıcı -------------------------
     def get_current_user(self, token: str) -> User:
-        user_id = decode_access_token(token)  # geçersizse zaten AuthenticationError
-        user = self.users.get_by_id(user_id)
+        data = read_access_token(token)  # geçersizse zaten AuthenticationError
+        user = self.users.get_by_id(data.user_id)
         if user is None or not user.is_active:
             # Token geçerli ama kullanıcı silinmiş ya da devre dışı
-            raise AuthenticationError(detail=f"token kullanıcısı yok/pasif: {user_id}")
+            raise AuthenticationError(detail=f"token kullanıcısı yok/pasif: {data.user_id}")
+        if data.fingerprint != password_fingerprint(user.hashed_password):
+            # Token eski şifreyle alınmış: şifre değiştirildikten sonra eski oturumlar kapanır
+            raise AuthenticationError(PASSWORD_CHANGED, detail="token eski şifreye ait")
         return user
 
     # --------------------------- Hesap ayarları ---------------------------
-    def change_password(self, user: User, current_password: str, new_password: str) -> None:
-        """Mevcut şifre doğruysa şifreyi değiştirir."""
+    def change_password(self, user: User, current_password: str, new_password: str) -> str:
+        """Mevcut şifre doğruysa şifreyi değiştirir ve YENİ şifreye bağlı token döndürür.
+
+        Diğer cihazlardaki (eski şifreyle alınmış) oturumlar geçersiz olur; şifreyi
+        değiştiren kişi yeni token'la devam eder.
+        """
         if not verify_password(current_password, user.hashed_password):
             raise InvalidInputError(WRONG_CURRENT_PASSWORD)
         if current_password == new_password:
@@ -108,6 +123,7 @@ class AuthService:
         user.hashed_password = hash_password(new_password)
         self.db.commit()
         logger.info("Şifre değiştirildi: id=%s", user.id)
+        return _token_for(user)
 
     def delete_account(self, user: User, password: str) -> None:
         """Şifre doğruysa kullanıcıyı ve TÜM haritalarını kalıcı olarak siler."""

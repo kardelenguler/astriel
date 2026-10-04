@@ -13,6 +13,8 @@ from app.core.security import (
     create_access_token,
     decode_access_token,
     hash_password,
+    password_fingerprint,
+    read_access_token,
     verify_password,
 )
 
@@ -35,6 +37,12 @@ def test_same_password_gives_different_hashes():
     assert hash_password("abc12345") != hash_password("abc12345")
 
 
+def test_password_fingerprint_changes_with_password():
+    first = password_fingerprint(hash_password("gizli-sifre-123"))
+    second = password_fingerprint(hash_password("yeni-sifre-456"))
+    assert first != second
+
+
 # =============================== TOKEN ===============================
 def _make_token(payload: dict, secret: str | None = None) -> str:
     """Test için elle token üretir (bozuk/eksik token senaryoları için)."""
@@ -49,6 +57,14 @@ def _in(minutes: int) -> datetime:
 def test_token_round_trip():
     user_id = uuid.uuid4()
     assert decode_access_token(create_access_token(user_id)) == user_id
+
+
+def test_token_carries_password_fingerprint():
+    user_id = uuid.uuid4()
+    fingerprint = password_fingerprint(hash_password("gizli-sifre-123"))
+    data = read_access_token(create_access_token(user_id, fingerprint))
+    assert data.user_id == user_id
+    assert data.fingerprint == fingerprint
 
 
 def test_expired_token_has_friendly_message():
@@ -75,4 +91,5 @@ def test_expired_token_has_friendly_message():
 )
 def test_invalid_tokens_rejected(token):
     with pytest.raises(AuthenticationError):
-        decode_access_token(token) 
+        decode_access_token(token)
+        

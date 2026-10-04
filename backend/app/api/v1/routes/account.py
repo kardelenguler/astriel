@@ -5,6 +5,7 @@ from fastapi import APIRouter, status
 from app.api.deps import AuthServiceDep, CurrentUser
 from app.schemas.account import AccountDeleteRequest, PasswordChangeRequest
 from app.schemas.error import ErrorResponse
+from app.schemas.user import TokenResponse
 
 router = APIRouter(prefix="/account")
 
@@ -16,12 +17,15 @@ _ERRORS = {
 
 @router.post(
     "/password",
-    status_code=status.HTTP_204_NO_CONTENT,
-    summary="Şifreyi değiştir",
+    response_model=TokenResponse,
+    summary="Şifreyi değiştir (diğer oturumlar kapanır, yeni token döner)",
     responses=_ERRORS,
 )
-def change_password(data: PasswordChangeRequest, user: CurrentUser, auth: AuthServiceDep) -> None:
-    auth.change_password(user, data.current_password, data.new_password)
+def change_password(
+    data: PasswordChangeRequest, user: CurrentUser, auth: AuthServiceDep
+) -> TokenResponse:
+    token = auth.change_password(user, data.current_password, data.new_password)
+    return TokenResponse(access_token=token)
 
 
 @router.delete(
@@ -31,4 +35,5 @@ def change_password(data: PasswordChangeRequest, user: CurrentUser, auth: AuthSe
     responses=_ERRORS,
 )
 def delete_account(data: AccountDeleteRequest, user: CurrentUser, auth: AuthServiceDep) -> None:
-    auth.delete_account(user, data.password) 
+    auth.delete_account(user, data.password)
+    

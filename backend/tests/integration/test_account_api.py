@@ -27,17 +27,26 @@ def _login_status(client, password: str) -> int:
 
 # ------------------------------ Şifre değiştirme ------------------------------
 def test_change_password_success(db_client):
-    headers = _register_and_login(db_client)
+    old_headers = _register_and_login(db_client)
     response = db_client.post(
         PASSWORD_URL,
         json={"current_password": PASSWORD, "new_password": "yeni-sifre-456"},
-        headers=headers,
+        headers=old_headers,
     )
 
-    assert response.status_code == 204
+    assert response.status_code == 200
     assert _login_status(db_client, "yeni-sifre-456") == 200
     assert _login_status(db_client, PASSWORD) == 401
 
+    # Eski şifreyle alınmış token artık geçersiz (başka cihazdaki oturum kapanır)
+    old = db_client.get(ME, headers=old_headers)
+    assert old.status_code == 401
+    assert "Şifren değiştirildiği için" in old.json()["error"]["message"]
+
+    # Şifreyi değiştiren kişi dönen YENİ token'la devam eder
+    new_token = response.json()["access_token"]
+    me = db_client.get(ME, headers={"Authorization": f"Bearer {new_token}"})
+    assert me.status_code == 200
 
 def test_change_password_with_wrong_current_password(db_client):
     headers = _register_and_login(db_client)
