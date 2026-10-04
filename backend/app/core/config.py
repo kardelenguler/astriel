@@ -42,7 +42,7 @@ class Settings(BaseSettings):
 
     # ---------- Frontend ----------
     cors_origins: str = "http://localhost:4200"
-    # YENİ: Derlenmiş Angular dosyalarının klasörü (ng build çıktısı).
+    # Derlenmiş Angular dosyalarının klasörü (ng build çıktısı).
     # Tanımlıysa FastAPI siteyi de sunar (production'da tek adres: hem site hem API).
     frontend_dist: Path | None = None
 
@@ -56,7 +56,7 @@ class Settings(BaseSettings):
     # ---------- Astroloji ----------
     ephe_path: Path = Path("ephemeris")
 
-    # YENİ: Neon/Render gibi servisler adresi "postgresql://..." verir;
+    # Neon/Render gibi servisler adresi "postgresql://..." verir;
     # bizim sürücümüz (psycopg 3) "postgresql+psycopg://..." bekler. Otomatik çevir.
     @field_validator("database_url", "test_database_url", mode="before")
     @classmethod
@@ -88,7 +88,7 @@ class Settings(BaseSettings):
 
     @property
     def frontend_dir(self) -> Path | None:
-        """YENİ: frontend_dist göreliyse backend/ klasörüne göre mutlak yola çevirir."""
+        """frontend_dist göreliyse backend/ klasörüne göre mutlak yola çevirir."""
         if self.frontend_dist is None:
             return None
         if self.frontend_dist.is_absolute():
@@ -96,4 +96,4 @@ class Settings(BaseSettings):
         return (BASE_DIR / self.frontend_dist).resolve()
 
 
-settings = Settings() 
+settings = Settings()

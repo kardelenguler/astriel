@@ -7,9 +7,8 @@ import { ChartSummary } from '../../core/models/saved-chart';
 import { SavedChartsService } from '../../core/services/saved-charts.service';
 
 const UNDO_SECONDS = 8;
-const PAGE_SIZE = 20; // her istekte gelen harita sayısı (backend en fazla 50'ye izin veriyor) 
-const NAME_MAX_LENGTH = 100; // YENİ (adlandırma): backend'deki sınırın aynısı
-
+const PAGE_SIZE = 20; // her istekte gelen harita sayısı (backend en fazla 50'ye izin veriyor)
+const NAME_MAX_LENGTH = 100; // backend'deki sınırın aynısı
 
 /** Backend'deki sıralamanın aynısı: en yeni üstte, aynı anda oluşturulanlar id'ye göre */
 function newestFirst(a: ChartSummary, b: ChartSummary): number {
@@ -17,7 +16,7 @@ function newestFirst(a: ChartSummary, b: ChartSummary): number {
     return a.created_at < b.created_at ? 1 : -1;
   }
   return a.id < b.id ? 1 : -1;
-} 
+}
 
 @Component({
   selector: 'app-my-charts',
@@ -32,17 +31,17 @@ export class MyCharts {
 
   readonly charts = signal<ChartSummary[]>([]);
   readonly total = signal(0);
-  readonly loading = signal(true); 
-  readonly loadingMore = signal(false);                  // "Daha fazla yükle" isteği sürüyor mu
+  readonly loading = signal(true);
+  readonly loadingMore = signal(false); // "Daha fazla yükle" isteği sürüyor mu
   /** Sunucuda henüz getirilmemiş harita kaldı mı */
   readonly hasMore = computed(() => this.charts().length < this.total());
-  readonly PAGE_SIZE = PAGE_SIZE; 
+  readonly PAGE_SIZE = PAGE_SIZE;
   readonly loadError = signal<string | null>(null);    // liste hiç yüklenemediyse
   readonly actionError = signal<string | null>(null);  // aç/sil/geri al başarısızsa
   readonly busyId = signal<string | null>(null);       // işlem süren kartın id'si
   readonly lastDeleted = signal<ChartSummary | null>(null);
 
-  // ---------- YENİ (adlandırma) ----------
+  // ---------- Adlandırma ----------
   readonly editingId = signal<string | null>(null);    // adı düzenlenen kartın id'si
   readonly editName = signal('');
   readonly renameError = signal<string | null>(null);
@@ -73,7 +72,7 @@ export class MyCharts {
           this.loading.set(false);
         },
       });
-  } 
+  }
 
   /** Listenin sonuna bir sonraki 20 haritayı ekler */
   loadMore(): void {
@@ -99,19 +98,18 @@ export class MyCharts {
           this.loadingMore.set(false);
         },
       });
-  } 
+  }
 
   /** Listeyi ilk sayfaya geri indirir (sunucuya istek atmaz) */
   showLess(): void {
     this.charts.update((list) => list.slice(0, PAGE_SIZE));
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  } 
-
+  }
 
   /** Kayıtlı haritayı kendi adresinde aç (/harita/<id>), yeniden hesaplanmaz */
   open(item: ChartSummary): void {
     this.router.navigate(['/harita', item.id]);
-  } 
+  }
 
   remove(item: ChartSummary): void {
     if (this.busyId()) {
@@ -159,8 +157,7 @@ export class MyCharts {
       });
   }
 
-
-  // ================= YENİ (adlandırma) =================
+  // ================= Adlandırma =================
 
   startRename(item: ChartSummary): void {
     if (this.busyId()) {
@@ -241,4 +238,4 @@ export class MyCharts {
     this.lastDeleted.set(item);
     this.undoTimer = setTimeout(() => this.lastDeleted.set(null), UNDO_SECONDS * 1000);
   }
-} 
+}

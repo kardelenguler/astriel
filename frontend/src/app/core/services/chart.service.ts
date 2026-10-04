@@ -6,8 +6,8 @@ import { environment } from '../../../environments/environment';
 import { ChartCalculateRequest, ChartResponse } from '../models/chart';
 
 /**
- * Doğum haritası işlemleri (backend: /charts).
- * Şimdilik sadece kaydetmeden hesaplama; kayıtlı haritalar giriş sistemiyle eklenecek.
+ * Doğum haritası hesaplama (backend: POST /charts/calculate).
+ * Sadece kaydetmeden hesaplama; kayıtlı haritalar için SavedChartsService kullanılır.
  */
 @Injectable({ providedIn: 'root' })
 export class ChartService {
@@ -18,4 +18,4 @@ export class ChartService {
   calculate(request: ChartCalculateRequest): Observable<ChartResponse> {
     return this.http.post<ChartResponse>(`${this.url}/calculate`, request);
   }
-} 
+}

@@ -73,7 +73,7 @@ export class Chart {
     return detail?.id.startsWith('house-') ? detail : null;
   });
 
-  /** YENİ (gezegenler): tablodan bir gezegen seçiliyse onun açıklaması */
+  /** Tablodan bir gezegen seçiliyse onun açıklaması */
   readonly planetDetail = computed(() => {
     const detail = this.selected();
     return detail?.id.startsWith('planet-') ? detail : null;
@@ -124,7 +124,7 @@ export class Chart {
     this.toggle(`house-${houseNo}`, () => this.interpretations.forHouse(houseNo, cusp));
   }
 
-  /** YENİ (gezegenler): tablodaki gezegen adı tıklanınca */
+  /** Tablodaki gezegen adı tıklanınca */
   selectPlanet(key: string): void {
     const planet = this.chart()?.planets.find((p) => p.key === key);
     if (!planet) {
@@ -161,7 +161,7 @@ export class Chart {
   startSave(): void {
     // isLoggedIn() yerine token'a bakılır: sayfa yeni açıldığında kullanıcı bilgisi
     // birkaç an sonra yüklenir; o arada "giriş yapmamış" sanılıp harita kaybolmasın.
-    if (!this.auth.token) { 
+    if (!this.auth.token) {
       // Giriş yapınca bu haritaya geri dönülsün
       this.router.navigate(['/giris'], { queryParams: { donus: this.router.url } });
       return;
@@ -311,7 +311,7 @@ export class Chart {
 
     if (!dateOk || !timeOk || !latitudeOk || !longitudeOk) {
       return null;
-    } 
+    }
     return { birth_date: date, birth_time: time, latitude, longitude };
   }
 
@@ -325,4 +325,4 @@ export class Chart {
       timeZone: 'UTC',
     }).format(new Date(`${isoDate}T00:00:00Z`));
   }
-} 
+}

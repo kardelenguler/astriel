@@ -1,8 +1,7 @@
 """Harita iş mantığı.
 
 calculate(): astro motorunun parçalarını doğru sırayla çağırıp tek bir harita üretir.
-Kayıtlı haritalarla ilgili işlemler (kaydet, listele, sil) kullanıcı sistemi
-eklendiğinde bu sınıfa eklenecek.
+Kayıtlı haritalarla ilgili işlemler (kaydet, listele, sil) SavedChartService'tedir.
 """
 
 import logging
@@ -70,7 +69,7 @@ class ChartService:
         logger.info(
             "Harita hesaplandı: saat_biliniyor=%s, uyarı=%d",
             time_known, len(warnings),
-        ) 
+        )
 
         return ChartResponse(
             utc_datetime=conversion.utc,
@@ -109,4 +108,5 @@ class ChartService:
         return (
             f"Ay bu gün {sign_at_start.name} burcundan {sign_at_end.name} burcuna geçiyor; "
             "doğum saati olmadan Ay burcu kesin değil."
-        ) 
+        )
+    

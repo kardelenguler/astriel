@@ -48,7 +48,7 @@ export class BirthForm {
   private readonly placesService = inject(PlacesService);
   private readonly destroyRef = inject(DestroyRef);
 
-  /** YENİ: "Bilgileri değiştir" ile gelindiyse formun önceden doldurulacağı değer */
+  /** "Bilgileri değiştir" ile gelindiyse formun önceden doldurulacağı değer */
   readonly initialValue = input<BirthFormValue | null>(null);
 
   /** Form geçerli şekilde gönderilince tetiklenir; kullanan component dinler */
@@ -94,7 +94,7 @@ export class BirthForm {
         }
       });
 
-    // YENİ: başlangıç değeri verildiyse formu doldur
+    // Başlangıç değeri verildiyse formu doldur
     effect(() => {
       const value = this.initialValue();
       if (value) {
@@ -144,12 +144,6 @@ export class BirthForm {
     this.placeNotSelected.set(false);
   }
 
-  /** Yer kutusunda Enter: formu göndermek yerine arama yap */
-  onPlaceEnter(event: Event): void {
-    event.preventDefault();
-    this.searchPlaces();
-  }
-
   /**
    * Takvim/saat seçiciyi açar. showPicker() bazı tarayıcılarda desteklenmez ya da hata
    * fırlatır; o durumda kutuya odaklanılır, kullanıcı elle yazabilir.
@@ -161,7 +155,12 @@ export class BirthForm {
       input.focus();
     }
   }
-  
+
+  /** Yer kutusunda Enter: formu göndermek yerine arama yap */
+  onPlaceEnter(event: Event): void {
+    event.preventDefault();
+    this.searchPlaces();
+  }
 
   onSubmit(): void {
     const place = this.selectedPlace();
@@ -180,7 +179,7 @@ export class BirthForm {
     });
   }
 
-  /** YENİ: formu verilen bilgilerle doldurur (yer de seçili gelir, tekrar aramak gerekmez) */
+  /** Formu verilen bilgilerle doldurur (yer de seçili gelir, tekrar aramak gerekmez) */
   private fill(value: BirthFormValue): void {
     this.form.controls.birthDate.setValue(value.birthDate);
     if (value.birthTime) {
@@ -191,4 +190,4 @@ export class BirthForm {
     }
     this.selectPlace(value.place);
   }
-} 
+}
