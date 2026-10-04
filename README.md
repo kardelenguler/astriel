@@ -13,7 +13,7 @@ yaz saati kuralları dahil doğru şekilde UTC'ye çevrilir.
 ## Özellikler
 
 - **Doğum haritası hesaplama:** 10 gezegen, Kuzey Ay Düğümü, Chiron, yükselen, MC ve 12 ev
-- **6 ev sistemi:** Placidus, Koch, Whole Sign, Equal, Porphyry, Regiomontanus
+- **6 ev sistemi:** Placidus, Koch, Whole Sign, Equal, Porphyry, Regiomontanus (API'den seçilebilir; site Placidus kullanır)
 - **Açılar:** kavuşum, karşıt, üçgen, kare, altmışlık; yaklaşan/ayrılan bilgisiyle
 - **Doğum saati bilinmiyorsa:** gezegenler öğle saatine göre hesaplanır, Ay o gün burç
   değiştiriyorsa kullanıcı uyarılır
@@ -26,6 +26,8 @@ yaz saati kuralları dahil doğru şekilde UTC'ye çevrilir.
   silebilir ve silmeyi geri alabilir
 - **Harita çarkı:** SVG ile çizilen, birbirine yakın gezegenleri otomatik ayıran burç çarkı
 - **Yorumlar:** Güneş, Ay, Yükselen, gezegenler ve 12 ev için açıklamalar
+- **Güvenlik:** şifre değişince diğer oturumlar kapanır; giriş ve yer aramada istek sınırı vardır
+- **Gizlilik:** doğum bilgileri loglara ve ziyaretçi sayacına gitmez; silinen haritalar 30 gün sonra kalıcı olarak silinir
 
 ## Kullanılan Teknolojiler
 
@@ -36,7 +38,7 @@ yaz saati kuralları dahil doğru şekilde UTC'ye çevrilir.
 - Swiss Ephemeris (`pysweph`): gezegen ve ev hesapları
 - timezonefinder + zoneinfo: koordinattan saat dilimi ve tarihsel yaz saati kuralları
 - Argon2 (`pwdlib`) ile şifre hash'leme, JWT (`PyJWT`) ile oturum
-- pytest: unit ve integration testleri
+- pytest: unit ve integration testleri (`requirements-dev.txt`)
 
 **Frontend**
 - Angular 22 (standalone bileşenler, signals)
@@ -136,3 +138,8 @@ Bu değer tanımlı değilse o testler atlanır.
 - [ ] Gezegen + burç + ev kombinasyonlarından kural tabanlı yorum motoru
 - [ ] Yapay zekâ ile kişiye özel harita yorumları
 - [ ] Günlük ve haftalık burç yorumları
+
+## Lisans
+
+[GNU AGPL-3.0](LICENSE). Astriel, AGPL lisanslı Swiss Ephemeris'i (Astrodienst AG) kullandığı
+için kaynak kodu da aynı lisansla açıktır.
