@@ -27,7 +27,10 @@ class User(Base, TimestampMixin):
     is_active: Mapped[bool] = mapped_column(default=True)
 
     # Kullanıcının kayıtlı haritaları. Kullanıcı silinirse haritaları da silinir.
+    # passive_deletes: haritaları tek tek yükleyip silmek yerine silmeyi veritabanına
+    # bırakır (birth_charts tablosundaki ondelete="CASCADE"). Hesap silme hızlı kalır.
     charts: Mapped[list[BirthChart]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
+        passive_deletes=True,
     )
