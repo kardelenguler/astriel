@@ -5,19 +5,41 @@
 """
 
 import logging
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from sqlalchemy.exc import SQLAlchemyError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.api.exception_handlers import register_exception_handlers
 from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.logging_config import setup_logging
+from app.db.session import SessionLocal
+from app.services.saved_chart_service import purge_old_deleted_charts
 
 logger = logging.getLogger(__name__)
+
+
+def run_startup_maintenance() -> None:
+    """Uygulama açılırken bakım işleri. Hata olsa bile uygulama yine de açılır."""
+    try:
+        with SessionLocal() as db:
+            purge_old_deleted_charts(db)
+    except SQLAlchemyError:
+        logger.exception("Açılış bakımı başarısız (silinmiş haritalar temizlenemedi)")
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    # Testlerde çalışmaz: testler kendi veritabanını kendisi yönetir
+    if settings.environment != "test":
+        run_startup_maintenance()
+    yield
 
 
 def mount_frontend(app: FastAPI, dist: Path) -> None:
@@ -39,7 +61,7 @@ def mount_frontend(app: FastAPI, dist: Path) -> None:
 
         requested = (dist / path).resolve()
         # Güvenlik: "../.env" gibi istekler site klasörünün dışına çıkamaz
-        if path and requested.is_file() and requested.is_relative_to(dist):
+        if path and requested.is_relative_to(dist) and requested.is_file():
             return FileResponse(requested)
         return FileResponse(index)
 
@@ -51,6 +73,7 @@ def create_app() -> FastAPI:
         title=settings.app_name,
         version="0.1.0",
         description="Swiss Ephemeris tabanlı doğum haritası API'si",
+        lifespan=lifespan,
     )
 
     # SIRA ÖNEMLİ: son eklenen middleware en dışta çalışır.
@@ -82,4 +105,4 @@ def create_app() -> FastAPI:
     return app
 
 
-app = create_app() 
+app = create_app()

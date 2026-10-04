@@ -12,7 +12,7 @@ get_for_user kullanılır.
 import uuid
 from datetime import datetime, timezone 
 
-from sqlalchemy import Select, func, select
+from sqlalchemy import Select, delete, func, select
 
 from app.models.birth_chart import BirthChart
 from app.repositories.base_repository import BaseRepository
@@ -69,4 +69,17 @@ class ChartRepository(BaseRepository[BirthChart]):
     def restore(self, chart: BirthChart) -> None:
         """Silinmiş haritayı geri getirir."""
         chart.deleted_at = None
-        self.db.flush() 
+        self.db.flush()
+
+    def purge_deleted_before(self, cutoff: datetime) -> int:
+        """cutoff'tan önce silinmiş haritaları KALICI olarak siler; silinen sayıyı döndürür.
+
+        Kullanıcıya göre filtrelenmez: bu bir bakım işidir, tüm kullanıcılar için çalışır.
+        """
+        result = self.db.execute(
+            delete(BirthChart).where(
+                BirthChart.deleted_at.is_not(None),
+                BirthChart.deleted_at < cutoff,
+            )
+        )
+        return result.rowcount or 0    

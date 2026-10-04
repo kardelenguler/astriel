@@ -8,6 +8,7 @@ harita olduğunu ele verirdi.
 """
 
 import logging
+from datetime import datetime, timedelta, timezone
 import uuid
 
 from sqlalchemy.orm import Session
@@ -29,6 +30,8 @@ from app.services.chart_service import ENGINE_VERSION, ChartService
 logger = logging.getLogger(__name__)
 
 CHART_NOT_FOUND = "Harita bulunamadı."
+# Silinen harita bu kadar gün "Geri al" için saklanır, sonra kalıcı olarak silinir
+DELETED_RETENTION_DAYS = 30
 
 
 class SavedChartService:
@@ -155,4 +158,16 @@ class SavedChartService:
             moon_sign=planets["moon"].sign,
             ascendant_sign=data.ascendant.sign if data.ascendant else None,
             created_at=chart.created_at,
-        ) 
+        )
+def purge_old_deleted_charts(db: Session, *, now: datetime | None = None) -> int:
+    """DELETED_RETENTION_DAYS günden önce silinmiş haritaları kalıcı olarak siler.
+
+    Uygulama her başladığında çalışır (main.py). now: testlerde zamanı vermek için.
+    """
+    cutoff = (now or datetime.now(timezone.utc)) - timedelta(days=DELETED_RETENTION_DAYS)
+    count = ChartRepository(db).purge_deleted_before(cutoff)
+    db.commit()
+    if count:
+        logger.info("Süresi dolan %d silinmiş harita kalıcı olarak silindi.", count)
+    return count
+ 

@@ -1,8 +1,7 @@
 """SavedChartService testleri (gerçek test veritabanında, gerçek hesaplamayla)."""
 
 import uuid
-from datetime import date, time
-
+from datetime import date, datetime, time, timedelta, timezone
 import pytest
 
 from app.core.exceptions import NotFoundError
@@ -10,8 +9,13 @@ from app.models.user import User
 from app.repositories.user_repository import UserRepository
 from app.schemas.chart import ChartCreateRequest
 from app.services.chart_service import ENGINE_VERSION, ChartService
-from app.services.saved_chart_service import SavedChartService
 
+from app.repositories.chart_repository import ChartRepository
+from app.services.saved_chart_service import (
+    DELETED_RETENTION_DAYS,
+    SavedChartService,
+    purge_old_deleted_charts,
+)
 pytestmark = pytest.mark.db
 
 
@@ -112,3 +116,30 @@ def test_outdated_chart_is_recalculated(service, owner, db_session):
 
     service.get(owner, saved.id)
     assert chart.engine_version == ENGINE_VERSION  # yeniden hesaplanıp güncellendi 
+
+# =============================== KALICI TEMİZLİK ===============================
+def test_purge_removes_only_charts_deleted_long_ago(service, owner, db_session):
+    old = service.save(owner, _request(name="Çoktan silinen"))
+    recent = service.save(owner, _request(name="Yeni silinen"))
+    kept = service.save(owner, _request(name="Silinmemiş"))
+    service.delete(owner, old.id)
+    service.delete(owner, recent.id)
+
+    # İlk harita saklama süresinden 1 gün önce silinmiş gibi yap
+    now = datetime.now(timezone.utc)
+    charts = ChartRepository(db_session)
+    old_row = charts.get_for_user(old.id, owner.id, include_deleted=True)
+    old_row.deleted_at = now - timedelta(days=DELETED_RETENTION_DAYS + 1)
+    db_session.flush()
+
+    assert purge_old_deleted_charts(db_session, now=now) == 1
+
+    # Eski olan kalıcı olarak gitti, artık geri alınamaz
+    assert charts.get_for_user(old.id, owner.id, include_deleted=True) is None
+    with pytest.raises(NotFoundError):
+        service.restore(owner, old.id)
+
+    # Yeni silinen hâlâ geri alınabilir, silinmemiş olana dokunulmadı
+    assert service.restore(owner, recent.id).name == "Yeni silinen"
+    assert service.get(owner, kept.id).name == "Silinmemiş"
+    
