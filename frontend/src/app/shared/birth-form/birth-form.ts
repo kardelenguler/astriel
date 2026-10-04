@@ -150,6 +150,19 @@ export class BirthForm {
     this.searchPlaces();
   }
 
+  /**
+   * Takvim/saat seçiciyi açar. showPicker() bazı tarayıcılarda desteklenmez ya da hata
+   * fırlatır; o durumda kutuya odaklanılır, kullanıcı elle yazabilir.
+   */
+  openPicker(input: HTMLInputElement): void {
+    try {
+      input.showPicker();
+    } catch {
+      input.focus();
+    }
+  }
+  
+
   onSubmit(): void {
     const place = this.selectedPlace();
     if (this.form.invalid || !place) {

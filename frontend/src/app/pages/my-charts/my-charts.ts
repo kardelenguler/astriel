@@ -10,6 +10,15 @@ const UNDO_SECONDS = 8;
 const PAGE_SIZE = 20; // her istekte gelen harita sayısı (backend en fazla 50'ye izin veriyor) 
 const NAME_MAX_LENGTH = 100; // YENİ (adlandırma): backend'deki sınırın aynısı
 
+
+/** Backend'deki sıralamanın aynısı: en yeni üstte, aynı anda oluşturulanlar id'ye göre */
+function newestFirst(a: ChartSummary, b: ChartSummary): number {
+  if (a.created_at !== b.created_at) {
+    return a.created_at < b.created_at ? 1 : -1;
+  }
+  return a.id < b.id ? 1 : -1;
+} 
+
 @Component({
   selector: 'app-my-charts',
   imports: [RouterLink],
@@ -140,10 +149,16 @@ export class MyCharts {
       .restore(item.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => this.load(), // doğru sırada görünsün diye listeyi yeniden al
+        // Listeyi baştan yüklemek yerine haritayı eski yerine geri koy:
+        // "Daha fazla yükle" ile açılmış haritalar kaybolmasın
+        next: () => {
+          this.charts.update((list) => [...list, item].sort(newestFirst));
+          this.total.update((t) => t + 1);
+        },
         error: (error) => this.actionError.set(getErrorMessage(error)),
       });
   }
+
 
   // ================= YENİ (adlandırma) =================
 

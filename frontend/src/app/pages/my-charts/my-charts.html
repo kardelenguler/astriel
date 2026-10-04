@@ -64,7 +64,7 @@
           @if (editingId() !== item.id) {
             <div class="card-actions">
               <button type="button" class="open-btn" (click)="open(item)" [disabled]="busyId() !== null">
-                {{ busyId() === item.id ? 'Açılıyor…' : 'Aç' }}
+                Aç
               </button>
               <button
                 type="button"

@@ -42,7 +42,7 @@ export class Register {
       password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(128)]],
       passwordConfirm: ['', Validators.required],
       email: ['', [Validators.email, Validators.maxLength(255)]],
-      displayName: ['', Validators.maxLength(50)],
+      displayName: ['', Validators.maxLength(100)],
     },
     { validators: passwordsMatch },
   );

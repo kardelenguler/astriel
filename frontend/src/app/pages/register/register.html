@@ -9,7 +9,7 @@
 
     <!-- Kullanıcı adı -->
     <div class="auth-field">
-      <label for="username">Kullanıcı adı</label>
+      <label for="username">Kullanıcı Adı</label>
       <input
         id="username"
         type="text"
@@ -59,7 +59,7 @@
 
     <!-- Şifre tekrar -->
     <div class="auth-field">
-      <label for="passwordConfirm">Şifre tekrar</label>
+      <label for="passwordConfirm">Şifre Tekrar</label>
       <input
         id="passwordConfirm"
         [type]="showPassword() ? 'text' : 'password'"
@@ -85,10 +85,10 @@
 
     <!-- Görünen ad (isteğe bağlı) -->
     <div class="auth-field">
-      <label for="displayName">Görünen ad <span class="optional">(isteğe bağlı)</span></label>
+      <label for="displayName">Görünen Ad <span class="optional">(isteğe bağlı)</span></label>
       <input id="displayName" type="text" formControlName="displayName" autocomplete="nickname" />
       @if (hasError('displayName')) {
-        <p class="auth-error">Görünen ad en fazla 50 karakter olabilir.</p>
+        <p class="auth-error">Görünen ad en fazla 100 karakter olabilir.</p>
       }
     </div>
 
@@ -100,4 +100,4 @@
       Zaten hesabın var mı? <a routerLink="/giris">Giriş yap</a>
     </p>
   </form>
-</section> 
+</section>

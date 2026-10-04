@@ -2,10 +2,10 @@
   <div class="fields">
     <!-- ---------- Doğum tarihi ---------- -->
     <div class="field">
-      <label for="birthDate">Doğum tarihi</label>
+      <label for="birthDate">Doğum Tarihi</label>
       <div class="input-box">
         <button type="button" class="picker-btn" aria-label="Takvimi aç"
-                (click)="birthDateInput.showPicker()">
+                (click)="openPicker(birthDateInput)">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <rect x="3" y="5" width="18" height="16" rx="2" />
             <path d="M3 10h18M8 3v4M16 3v4" />
@@ -24,11 +24,11 @@
 
     <!-- ---------- Doğum saati ---------- -->
     <div class="field">
-      <label for="birthTime">Doğum saati</label>
+      <label for="birthTime">Doğum Saati</label>
       <div class="input-box">
         <button type="button" class="picker-btn" aria-label="Saat seçiciyi aç"
                 [disabled]="form.controls.unknownTime.value"
-                (click)="birthTimeInput.showPicker()">
+                (click)="openPicker(birthTimeInput)">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="12" cy="12" r="9" />
             <path d="M12 7v5l3 2" />
@@ -43,7 +43,7 @@
 
     <!-- ---------- Doğum yeri ---------- -->
     <div class="field">
-      <label for="placeQuery">Doğum yeri</label>
+      <label for="placeQuery">Doğum Yeri</label>
       <div class="place-row">
         <div class="input-box">
           <svg viewBox="0 0 24 24" aria-hidden="true">

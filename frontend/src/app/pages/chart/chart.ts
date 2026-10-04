@@ -159,7 +159,9 @@ export class Chart {
 
   /** "Haritayı kaydet" düğmesi */
   startSave(): void {
-    if (!this.auth.isLoggedIn()) {
+    // isLoggedIn() yerine token'a bakılır: sayfa yeni açıldığında kullanıcı bilgisi
+    // birkaç an sonra yüklenir; o arada "giriş yapmamış" sanılıp harita kaybolmasın.
+    if (!this.auth.token) { 
       // Giriş yapınca bu haritaya geri dönülsün
       this.router.navigate(['/giris'], { queryParams: { donus: this.router.url } });
       return;
@@ -309,7 +311,7 @@ export class Chart {
 
     if (!dateOk || !timeOk || !latitudeOk || !longitudeOk) {
       return null;
-    }
+    } 
     return { birth_date: date, birth_time: time, latitude, longitude };
   }
 
