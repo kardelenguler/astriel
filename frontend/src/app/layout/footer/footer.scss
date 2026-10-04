@@ -64,6 +64,14 @@
   border-top: 1px solid rgba(46, 38, 64, 0.6);
   font-size: 12px;
   color: var(--color-text-muted);
+
+  // Geliştiricinin adı: bir alt satırda, daha küçük ve soluk
+  .author {
+    display: block;
+    margin-top: 6px;
+    font-size: 11px;
+    opacity: 0.7;
+  }
 }
 
 // Dar ekran: her şey alt alta
