@@ -11,7 +11,7 @@
   @if (error(); as message) {
     <div class="state state-error" role="alert">
       <p>{{ message }}</p>
-      <a routerLink="/" class="btn">Ana sayfaya dön</a>
+      <a routerLink="/" class="btn">Ana Sayfaya Dön</a>
     </div>
   }
 
@@ -19,7 +19,7 @@
   @if (chart(); as c) {
     <!-- Başlık -->
     <header class="chart-header">
-      <p class="eyebrow">{{ savedName() ?? 'Doğum haritan' }}</p> 
+      <p class="eyebrow">{{ savedName() ?? 'Doğum Haritan' }}</p>
       <h1>{{ placeName() }}</h1>
       <p class="meta">
         {{ birthDateText() }}
@@ -27,17 +27,17 @@
         · {{ c.timezone }}
       </p>
       <div class="header-actions">
-        <a routerLink="/" [queryParams]="editParams()" class="change-link">Bilgileri değiştir</a> 
+        <a routerLink="/" [queryParams]="editParams()" class="change-link">Bilgileri Değiştir</a>
         @switch (saveState()) {
           <!-- Başta: sadece düğme -->
           @case ('idle') {
-            <button type="button" class="save-btn" (click)="startSave()">Haritayı kaydet</button>
+            <button type="button" class="save-btn" (click)="startSave()">Haritayı Kaydet</button>
           }
 
           <!-- Kaydedildikten sonra -->
           @case ('saved') {
             <p class="save-done" role="status">
-              Kaydedildi ✓ <a routerLink="/haritalarim">Haritalarım'da gör</a>
+              Kaydedildi ✓ <a routerLink="/haritalarim">Haritalarım'da Gör</a>
             </p>
           }
 
@@ -67,7 +67,7 @@
     </header>
 
     <!-- Büyük üçlü: Güneş, Ay, Yükselen (tıklanınca açıklama açılır) -->
-    <div class="big-three"> 
+    <div class="big-three">
       @if (sun(); as s) {
         <button
           type="button"
@@ -125,18 +125,18 @@
 
     <!-- Doğum haritası çarkı -->
     <section class="panel wheel-panel">
-      <h2>Doğum haritası</h2>
+      <h2>Doğum Haritası</h2>
       <app-chart-wheel [chart]="c" />
       <ul class="wheel-legend">
-        <li><span class="swatch harmonious"></span>Uyumlu açılar (üçgen, altmışlık)</li>
-        <li><span class="swatch hard"></span>Zorlayıcı açılar (kare, karşıt)</li>
+        <li><span class="swatch harmonious"></span>Uyumlu Açılar (üçgen, altmışlık)</li>
+        <li><span class="swatch hard"></span>Zorlayıcı Açılar (kare, karşıt)</li>
       </ul>
     </section>
 
     <!-- Uyarılar (saat bilinmiyor, kutup yedeği, Ay burç değiştiriyor...) -->
     @if (c.warnings.length > 0) {
       <div class="warnings">
-        @for (warning of c.warnings; track warning) {
+        @for (warning of c.warnings; track $index) {
           <p>{{ warning }}</p>
         }
       </div>
@@ -145,12 +145,12 @@
     <!-- Gezegenler (adlarına tıklanınca açıklama açılır) -->
     <section class="panel">
       <h2>Gezegenler</h2>
-      <p class="panel-hint">Gezegen adlarına dokunarak açıklamalarını görebilirsin.</p> 
+      <p class="panel-hint">Gezegen adlarına dokunarak açıklamalarını görebilirsin.</p>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th scope="col">Gök cismi</th>
+              <th scope="col">Gök Cismi</th>
               <th scope="col">Burç</th>
               <th scope="col">Konum</th>
               <th scope="col">Ev</th>
@@ -197,7 +197,7 @@
     @if (c.houses.length > 0) {
       <section class="panel">
         <h2>Evler <span class="muted small">· {{ c.house_system?.name }}</span></h2>
-        <p class="panel-hint">Evlere dokunarak açıklamalarını görebilirsin.</p> 
+        <p class="panel-hint">Evlere dokunarak açıklamalarını görebilirsin.</p>
         <div class="houses">
           @for (house of c.houses; track $index) {
             <button
@@ -207,7 +207,7 @@
               [attr.aria-expanded]="selected()?.id === 'house-' + ($index + 1)"
               (click)="selectHouse($index + 1)"
             >
-              <span class="house-no">{{ $index + 1 }}. ev</span>
+              <span class="house-no">{{ $index + 1 }}. Ev</span>
               <span>{{ house.formatted }}</span>
             </button>
           }
@@ -227,9 +227,9 @@
         <table>
           <thead>
             <tr>
-              <th scope="col">Gök cisimleri</th>
+              <th scope="col">Gök Cisimleri</th>
               <th scope="col">Açı</th>
-              <th scope="col">Sapma (orb)</th>
+              <th scope="col">Sapma (Orb)</th>
               <th scope="col">Durum</th>
             </tr>
           </thead>

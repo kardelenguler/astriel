@@ -6,13 +6,12 @@
     @if (sessionExpired && !error()) {
       <p class="auth-alert" role="status">Oturumunun süresi doldu. Devam etmek için tekrar giriş yap.</p>
     }
-        
     @if (error(); as message) {
       <p class="auth-alert" role="alert">{{ message }}</p>
     }
 
     <div class="auth-field">
-      <label for="username">Kullanıcı adı</label>
+      <label for="username">Kullanıcı Adı</label>
       <input
         id="username"
         type="text"
@@ -57,4 +56,4 @@
       Hesabın yok mu? <a routerLink="/kayit">Ücretsiz kayıt ol</a>
     </p>
   </form>
-</section> 
+</section>

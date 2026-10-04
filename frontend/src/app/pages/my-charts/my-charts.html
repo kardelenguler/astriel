@@ -19,7 +19,7 @@
   } @else if (loadError(); as message) {
     <div class="state" role="alert">
       <p>{{ message }}</p>
-      <button type="button" class="btn" (click)="load()">Tekrar dene</button>
+      <button type="button" class="btn" (click)="load()">Tekrar Dene</button>
     </div>
   } @else {
     <div class="list">
@@ -73,7 +73,7 @@
                 [disabled]="busyId() !== null"
                 [attr.aria-label]="item.name + ' haritasının adını değiştir'"
               >
-                Adı değiştir
+                Adı Değiştir
               </button>
               <button
                 type="button"
@@ -90,7 +90,7 @@
       } @empty {
         <div class="state">
           <p>Henüz kaydettiğin bir harita yok.</p>
-          <a routerLink="/" class="btn">İlk haritanı oluştur</a>
+          <a routerLink="/" class="btn">İlk Haritanı Oluştur</a>
         </div>
       }
     </div>
@@ -107,24 +107,23 @@
               [disabled]="loadingMore()"
               [attr.aria-busy]="loadingMore()"
             >
-              {{ loadingMore() ? 'Yükleniyor…' : 'Daha fazla yükle' }}
+              {{ loadingMore() ? 'Yükleniyor…' : 'Daha Fazla Yükle' }}
             </button>
           }
           @if (charts().length > PAGE_SIZE) {
-            <button type="button" class="btn btn-ghost" (click)="showLess()">Daha az göster</button>
+            <button type="button" class="btn btn-ghost" (click)="showLess()">Daha Az Göster</button>
           }
         </div>
         <p class="load-more-info">{{ charts().length }} / {{ total() }} harita gösteriliyor</p>
       </div>
-    } 
-  } 
-
+    }
+  }
 
   <!-- Silindikten sonra 8 saniye görünen "Geri al" çubuğu -->
   @if (lastDeleted(); as deleted) {
     <div class="undo-bar" role="status">
       <span>“{{ deleted.name }}” silindi.</span>
-      <button type="button" (click)="undoDelete()">Geri al</button>
+      <button type="button" (click)="undoDelete()">Geri Al</button>
     </div>
   }
-</section> 
+</section>

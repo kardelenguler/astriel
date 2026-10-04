@@ -10,11 +10,11 @@
       <h2>Profil</h2>
       <dl class="profile">
         <div>
-          <dt>Kullanıcı adı</dt>
+          <dt>Kullanıcı Adı</dt>
           <dd>{{ user.username }}</dd>
         </div>
         <div>
-          <dt>Görünen ad</dt>
+          <dt>Görünen Ad</dt>
           <dd>{{ user.display_name || '—' }}</dd>
         </div>
         <div>
@@ -29,14 +29,16 @@
       <h2>Şifre Değiştir</h2>
 
       @if (passwordSuccess()) {
-        <p class="success" role="status">Şifren değiştirildi.</p>
+        <p class="success" role="status">
+          Şifren değiştirildi. Başka cihazlardaki oturumların kapatıldı.
+        </p>
       }
       @if (passwordError(); as message) {
         <p class="auth-alert" role="alert">{{ message }}</p>
       }
 
       <div class="auth-field">
-        <label for="current-password">Mevcut şifre</label>
+        <label for="current-password">Mevcut Şifre</label>
         <input id="current-password" type="password" formControlName="currentPassword" autocomplete="current-password" />
         @if (passwordFieldError('currentPassword', 'required')) {
           <p class="auth-error">Mevcut şifreni yaz.</p>
@@ -44,7 +46,7 @@
       </div>
 
       <div class="auth-field">
-        <label for="new-password">Yeni şifre</label>
+        <label for="new-password">Yeni Şifre</label>
         <input id="new-password" type="password" formControlName="newPassword" autocomplete="new-password" />
         @if (passwordFieldError('newPassword', 'required')) {
           <p class="auth-error">Yeni bir şifre belirle.</p>
@@ -58,7 +60,7 @@
       </div>
 
       <div class="auth-field">
-        <label for="new-password-confirm">Yeni şifre tekrar</label>
+        <label for="new-password-confirm">Yeni Şifre Tekrar</label>
         <input
           id="new-password-confirm"
           type="password"
@@ -74,7 +76,7 @@
       </div>
 
       <button type="submit" class="auth-submit" [disabled]="passwordSaving()">
-        {{ passwordSaving() ? 'Kaydediliyor…' : 'Şifreyi değiştir' }}
+        {{ passwordSaving() ? 'Kaydediliyor…' : 'Şifreyi Değiştir' }}
       </button>
     </form>
 
@@ -88,7 +90,7 @@
 
       @if (!deleteOpen()) {
         <button type="button" class="danger-btn" (click)="deleteOpen.set(true)">
-          Hesabımı silmek istiyorum
+          Hesabımı Silmek İstiyorum
         </button>
       } @else {
         <form class="delete-form" [formGroup]="deleteForm" (ngSubmit)="deleteAccount()" novalidate>
@@ -124,7 +126,7 @@
               class="danger-btn filled"
               [disabled]="deleting() || !usernameConfirmed()"
             >
-              {{ deleting() ? 'Siliniyor…' : 'Hesabımı kalıcı olarak sil' }}
+              {{ deleting() ? 'Siliniyor…' : 'Hesabımı Kalıcı Olarak Sil' }}
             </button>
             <button type="button" class="cancel-btn" (click)="cancelDelete()">Vazgeç</button>
           </div>
@@ -140,5 +142,5 @@
     </div>
   } @else {
     <p class="loading" role="status">Hesap bilgilerin yükleniyor…</p>
-  } 
-</section> 
+  }
+</section>
