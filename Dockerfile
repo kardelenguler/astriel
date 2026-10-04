@@ -44,4 +44,5 @@ EXPOSE 8000
 # 1) Veritabanı tablolarını güncelle  2) Sunucuyu başlat
 # --proxy-headers: Render'ın önündeki ara sunucu yüzünden gerçek kullanıcı IP'si
 # başlıkta gelir; giriş denemesi sınırının doğru çalışması için bunu okuruz.
-CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"] 
+# --no-access-log: istek adresleri (/harita?tarih=...) doğum bilgisi içerdiği için loglanmaz. 
+CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --no-access-log --proxy-headers --forwarded-allow-ips='*'"] 

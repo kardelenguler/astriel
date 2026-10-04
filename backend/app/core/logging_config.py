@@ -42,4 +42,8 @@ def setup_logging() -> None:
             encoding="utf-8",  # Türkçe karakterler bozulmasın
         )
         file_handler.setFormatter(formatter)
-        root_logger.addHandler(file_handler) 
+        root_logger.addHandler(file_handler)
+
+    # 3) httpx2 her isteğin adresini INFO seviyesinde yazar; adreste kullanıcının
+    #    aradığı doğum yeri bulunduğu için sadece uyarı ve hatalar loglansın.
+    logging.getLogger("httpx2").setLevel(logging.WARNING) 
