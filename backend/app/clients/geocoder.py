@@ -6,7 +6,7 @@ Servis değişirse (ör. ücretli bir sağlayıcıya geçilirse) sadece bu dosya
 Nominatim kullanım kuralları (uyulmazsa IP engellenir):
   - Saniyede en fazla 1 istek
   - Uygulamayı tanıtan User-Agent
-  - Sonuçları önbelleğe alma
+  - Sonuçlar önbelleğe alınmalı (aynı arama tekrar gönderilmemeli)
   - Otomatik tamamlama (her tuşta arama) YASAK
   https://operations.osmfoundation.org/policies/nominatim/
 """
@@ -27,6 +27,13 @@ logger = logging.getLogger(__name__)
 MIN_SECONDS_BETWEEN_REQUESTS = 1.0  # Nominatim kuralı
 MAX_RESULTS = 5
 CACHE_SIZE = 500  # en fazla bu kadar farklı arama hatırlanır
+
+# Aynı anda en fazla bu kadar arama sırada bekleyebilir. Fazlası beklemeden 503 alır.
+# Sınır olmasaydı çok sayıda eşzamanlı arama sunucunun tüm iş parçacıklarını
+# kilitte bekletir ve SİTENİN TAMAMI (giriş, harita...) donardı.
+MAX_WAITING_SEARCHES = 5
+
+BUSY_MESSAGE = "Yer arama şu an çok yoğun. Lütfen birkaç saniye sonra tekrar deneyin."
 
 
 @dataclass(frozen=True)
@@ -54,23 +61,34 @@ class NominatimGeocoder:
         self._cache: OrderedDict[str, tuple[Place, ...]] = OrderedDict()
         # Aynı anda gelen istekler sıraya girer: hem hız sınırı hem önbellek güvende kalır
         self._lock = threading.Lock()
+        # Sıradaki istek sayısının üst sınırı (yukarıdaki MAX_WAITING_SEARCHES açıklaması)
+        self._queue = threading.BoundedSemaphore(MAX_WAITING_SEARCHES)
 
     def search(self, query: str) -> tuple[Place, ...]:
         """Yer adını arar. Sonuç yoksa boş tuple (hata değil).
 
-        Servise ulaşılamazsa veya yanıt bozuksa ExternalServiceError (503).
+        Servise ulaşılamazsa, yanıt bozuksa veya sıra doluysa ExternalServiceError (503).
         """
-        key = " ".join(query.split()).casefold()  # "  ANTALYA " ile "antalya" aynı arama
+        cleaned = " ".join(query.split())  # "  İzmir   Bornova " -> "İzmir Bornova"
+        # Önbellek anahtarı: "ANTALYA" ile "antalya" aynı arama sayılsın.
+        # Nominatim'e anahtar DEĞİL, temizlenmiş orijinal yazı gönderilir: casefold()
+        # Türkçe "İ" harfini "i" + birleşik nokta (U+0307) yapar ve aramayı bozabilir.
+        key = cleaned.casefold()
 
-        with self._lock:
-            if key in self._cache:
-                self._cache.move_to_end(key)  # yakın zamanda kullanıldı olarak işaretle
-                return self._cache[key]
+        if not self._queue.acquire(blocking=False):
+            raise ExternalServiceError(BUSY_MESSAGE, detail="geocoder sırası dolu")
+        try:
+            with self._lock:
+                if key in self._cache:
+                    self._cache.move_to_end(key)  # yakın zamanda kullanıldı olarak işaretle
+                    return self._cache[key]
 
-            self._wait_for_rate_limit()
-            places = self._fetch(key)
-            self._remember(key, places)  # sadece BAŞARILI sonuçlar önbelleğe girer
-            return places
+                self._wait_for_rate_limit()
+                places = self._fetch(cleaned)
+                self._remember(key, places)  # sadece BAŞARILI sonuçlar önbelleğe girer
+                return places
+        finally:
+            self._queue.release()
 
     # ------------------------------ Yardımcılar ------------------------------
     def _wait_for_rate_limit(self) -> None:
@@ -125,4 +143,5 @@ class NominatimGeocoder:
     def _remember(self, key: str, places: tuple[Place, ...]) -> None:
         self._cache[key] = places
         if len(self._cache) > CACHE_SIZE:
-            self._cache.popitem(last=False)  # en uzun süredir kullanılmayanı at 
+            self._cache.popitem(last=False)  # en uzun süredir kullanılmayanı at
+            

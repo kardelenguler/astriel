@@ -47,11 +47,18 @@ def test_parses_result():
 
 def test_sends_expected_parameters():
     geocoder, requests = _geocoder(_respond_json([]))
-    geocoder.search("  ANTALYA  ")
+    geocoder.search("  ANTALYA   Muratpaşa ")
     params = requests[0].url.params
-    assert params["q"] == "antalya"  # boşluk temizlendi, küçük harf
+    assert params["q"] == "ANTALYA Muratpaşa"  # boşluklar temizlendi, harfler aynen kaldı
     assert params["featureType"] == "settlement"
     assert params["accept-language"] == "tr"
+
+
+def test_turkish_dotted_i_is_sent_unchanged():
+    # casefold() "İ" harfini "i" + birleşik nokta yapar; Nominatim'e bu GİTMEMELİ
+    geocoder, requests = _geocoder(_respond_json([]))
+    geocoder.search("İzmir")
+    assert requests[0].url.params["q"] == "İzmir"
 
 
 def test_default_client_identifies_itself():
@@ -113,6 +120,18 @@ def test_service_problems_raise_external_service_error(handler):
         geocoder.search("Antalya")
 
 
+# =============================== YOĞUNLUK ===============================
+def test_full_queue_returns_busy_error_without_waiting():
+    # Sıra doluysa beklemeden 503 dönmeli; yoksa sitenin tüm iş parçacıkları kilitlenirdi
+    geocoder, requests = _geocoder(_respond_json([ANTALYA]))
+    for _ in range(geocoder_module.MAX_WAITING_SEARCHES):
+        geocoder._queue.acquire()  # sırayı başka isteklerle doldurmuş gibi yap
+
+    with pytest.raises(ExternalServiceError):
+        geocoder.search("Antalya")
+    assert requests == []  # Nominatim'e hiç istek gitmedi
+
+
 # =============================== HIZ SINIRI ===============================
 def test_rate_limit_waits_between_requests(monkeypatch):
     waits: list[float] = []
@@ -124,4 +143,5 @@ def test_rate_limit_waits_between_requests(monkeypatch):
     geocoder.search("ikinci")  # hemen ardından: beklemesi gerekir
 
     assert len(waits) == 1
-    assert 0 < waits[0] <= 1.0 
+    assert 0 < waits[0] <= 1.0
+    

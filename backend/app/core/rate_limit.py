@@ -1,9 +1,11 @@
-"""Giriş denemelerini sınırlar (kaba kuvvet saldırılarına karşı).
+"""İstek sınırlayıcılar (kaba kuvvet ve aşırı kullanıma karşı).
 
-Aynı kullanıcı adı + IP adresi için kısa sürede çok fazla hatalı deneme
-yapılırsa giriş geçici olarak engellenir. IP'nin anahtara katılması,
-başkasının kullanıcı adıyla bilerek hatalı deneme yapıp gerçek sahibini
-kilitlemesini önler.
+1) Giriş: Aynı kullanıcı adı + IP adresi için kısa sürede çok fazla hatalı deneme
+   yapılırsa giriş geçici olarak engellenir. IP'nin anahtara katılması,
+   başkasının kullanıcı adıyla bilerek hatalı deneme yapıp gerçek sahibini
+   kilitlemesini önler.
+2) Yer arama: Aynı IP dakikada en fazla SEARCH_LIMIT arama yapabilir. Nominatim'i
+   tek bir kişinin tüketmesini ve sıranın onunla dolmasını önler.
 
 Not: Sayaçlar bellekte tutulur. Uygulama tek bir süreçte çalıştığı sürece
 yeterlidir; birden fazla sunucuya ölçeklenirse Redis gibi ortak bir depoya
@@ -23,6 +25,10 @@ from app.core.exceptions import TooManyRequestsError
 MAX_FAILED_ATTEMPTS = 5
 WINDOW_SECONDS = 5 * 60  # 5 dakika
 _MAX_TRACKED_KEYS = 10_000  # bellek şişmesin diye üst sınır
+
+SEARCH_LIMIT = 20
+SEARCH_WINDOW_SECONDS = 60
+SEARCH_LIMIT_MESSAGE = "Çok fazla arama yaptın. Lütfen bir dakika sonra tekrar dene."
 
 # Render'da istek şu sırayla gelir: Cloudflare -> Render. Her biri X-Forwarded-For
 # başlığının SONUNA bir IP ekler. Kullanıcının gerçek IP'si bu yüzden sondan 3.'dür.
@@ -67,9 +73,17 @@ class LoginAttemptLimiter:
 
     def record_failure(self, key: str) -> None:
         with self._lock:
-            if len(self._failures) >= _MAX_TRACKED_KEYS:
-                self._prune_all()
-            self._failures.setdefault(key, deque()).append(self._clock())
+            self._record(key)
+
+    def hit(self, key: str, message: str | None = None) -> None:
+        """Her çağrıyı sayar (yer arama gibi). Sınır aşıldıysa TooManyRequestsError.
+
+        Kontrol ve sayma aynı kilit içinde: aynı anda gelen istekler sınırı aşamaz.
+        """
+        with self._lock:
+            if len(self._recent_failures(key)) >= self._max_attempts:
+                raise TooManyRequestsError(message)
+            self._record(key)
 
     def reset(self, key: str) -> None:
         """Başarılı girişten sonra sayacı sıfırla."""
@@ -80,6 +94,12 @@ class LoginAttemptLimiter:
         """Tüm sayaçları sil (testler için)."""
         with self._lock:
             self._failures.clear()
+
+    def _record(self, key: str) -> None:
+        """Kilit ZATEN alınmışken çağrılır."""
+        if len(self._failures) >= _MAX_TRACKED_KEYS:
+            self._prune_all()
+        self._failures.setdefault(key, deque()).append(self._clock())
 
     def _recent_failures(self, key: str) -> deque[float]:
         """Süresi dolmuş denemeleri atıp kalanları döndürür."""
@@ -98,12 +118,18 @@ class LoginAttemptLimiter:
             self._recent_failures(key)
 
 
-# Uygulama boyunca tek bir sayaç kullanılır
+# Uygulama boyunca her iş için tek bir sayaç kullanılır
 login_limiter = LoginAttemptLimiter()
+search_limiter = LoginAttemptLimiter(max_attempts=SEARCH_LIMIT, window_seconds=SEARCH_WINDOW_SECONDS)
 
 
 def get_login_limiter() -> LoginAttemptLimiter:
     return login_limiter
 
 
+def get_search_limiter() -> LoginAttemptLimiter:
+    return search_limiter
+
+
 LoginLimiterDep = Annotated[LoginAttemptLimiter, Depends(get_login_limiter)]
+SearchLimiterDep = Annotated[LoginAttemptLimiter, Depends(get_search_limiter)]
