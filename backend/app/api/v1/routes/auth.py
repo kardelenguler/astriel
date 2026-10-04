@@ -1,5 +1,6 @@
 """Kayıt, giriş ve "ben kimim" endpoint'leri."""
 
+import logging
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Request, status
@@ -12,6 +13,7 @@ from app.schemas.error import ErrorResponse
 from app.schemas.user import TokenResponse, UserCreate, UserOut
 
 router = APIRouter(prefix="/auth")
+logger = logging.getLogger(__name__)
 
 _UNAUTHORIZED = {401: {"model": ErrorResponse, "description": "Giriş gerekli veya bilgiler hatalı"}}
 
@@ -44,6 +46,14 @@ def login(
 ) -> TokenResponse:
     # OAuth2 standardı gereği JSON değil FORM verisi alır (username + password alanları).
     # Swagger'daki Authorize düğmesi de bu biçimde gönderir.
+
+    # GEÇİCİ: Render'ın IP başlığını görmek için, test bitince silinecek
+    logger.warning(
+        "DEBUG xff=%r client=%r",
+        request.headers.get("x-forwarded-for"),
+        request.client.host if request.client else None,
+    )
+
     key = attempt_key(form.username, request.client.host if request.client else None)
     limiter.check(key)  # sınır aşıldıysa şifre hiç kontrol edilmez
 
@@ -64,4 +74,4 @@ def login(
     responses=_UNAUTHORIZED,
 )
 def me(user: CurrentUser) -> UserOut:
-    return UserOut.model_validate(user) 
+    return UserOut.model_validate(user)
