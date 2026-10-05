@@ -12,8 +12,18 @@ import { MyCharts } from './pages/my-charts/my-charts';
 import { NotFound } from './pages/not-found/not-found';
 import { Register } from './pages/register/register';
 
+// data.description: Google arama sonucunda başlığın altında görünen açıklama
+// (DescriptionService yazar). Yazılmayan sayfalarda varsayılan açıklama kullanılır.
 export const routes: Routes = [
-  { path: '', component: Home, title: 'Astriel · Doğum Haritası' },
+  {
+    path: '',
+    component: Home,
+    title: 'Astriel · Doğum Haritası',
+    data: {
+      description:
+        'Doğum haritanı ücretsiz hesapla: yükselen burcunu, Ay burcunu, gezegen konumlarını, 12 evi ve açıları gerçek gök hesabıyla öğren. Kayıt gerekmez.',
+    },
+  },
   { path: 'harita', component: Chart, title: 'Doğum Haritan · Astriel' },
   // Kayıtlı harita (/harita/<id>), sadece sahibine açılır
   {
@@ -22,9 +32,29 @@ export const routes: Routes = [
     canActivate: [authGuard],
     title: 'Kayıtlı Haritan · Astriel',
   },
-  { path: 'hakkinda', component: About, title: 'Hakkında · Astriel' },
-  { path: 'gizlilik', component: Privacy, title: 'Gizlilik Politikası · Astriel' },
-  { path: 'kullanim-sartlari', component: Terms, title: 'Kullanım Şartları · Astriel' },
+  {
+    path: 'hakkinda',
+    component: About,
+    title: 'Hakkında · Astriel',
+    data: {
+      description:
+        'Astriel nedir, doğum haritası nasıl hesaplanır? Gezegen konumlarının Swiss Ephemeris ile nasıl bulunduğunu öğren.',
+    },
+  },
+  {
+    path: 'gizlilik',
+    component: Privacy,
+    title: 'Gizlilik Politikası · Astriel',
+    data: {
+      description: 'Astriel hangi bilgileri saklar, nasıl korur ve onları nasıl silebilirsin?',
+    },
+  },
+  {
+    path: 'kullanim-sartlari',
+    component: Terms,
+    title: 'Kullanım Şartları · Astriel',
+    data: { description: "Astriel'i kullanma koşulları." },
+  },
   { path: 'giris', component: Login, canActivate: [guestGuard], title: 'Giriş Yap · Astriel' },
   { path: 'kayit', component: Register, canActivate: [guestGuard], title: 'Kayıt Ol · Astriel' },
   {
