@@ -1,0 +1,42 @@
+@if (guide(); as guide) {
+  <article class="guide">
+    <nav class="breadcrumb" aria-label="Sayfa yolu">
+      <a routerLink="/">Ana Sayfa</a>
+      <span aria-hidden="true">/</span>
+      <a [routerLink]="['/', collection.path]">{{ collection.title }}</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{{ guide.name }}</span>
+    </nav>
+
+    <p class="eyebrow">{{ collection.eyebrow }}</p>
+    <h1>{{ guide.title }}</h1>
+    <p class="lead">{{ guide.intro }}</p>
+
+    @for (section of guide.sections; track section.heading) {
+      <section>
+        <h2>{{ section.heading }}</h2>
+        @for (paragraph of section.paragraphs; track $index) {
+          <p>{{ paragraph }}</p>
+        }
+      </section>
+    }
+
+    <aside class="cta">
+      <p>{{ collection.ctaText }}</p>
+      <a class="cta-btn" routerLink="/" fragment="dogum-formu">Ücretsiz Haritanı Hesapla</a>
+    </aside>
+
+    <nav class="pager" aria-label="Önceki ve sonraki sayfa">
+      @if (previous(); as previous) {
+        <a class="prev" [routerLink]="['/', collection.path, previous.slug]" rel="prev">
+          ← {{ previous.name }}
+        </a>
+      }
+      @if (next(); as next) {
+        <a class="next" [routerLink]="['/', collection.path, next.slug]" rel="next">
+          {{ next.name }} →
+        </a>
+      }
+    </nav>
+  </article>
+}

@@ -1,9 +1,12 @@
 import { Routes } from '@angular/router';
 
+import { HOUSE_GUIDES } from './core/content/guides/house-guides';
+import { SIGN_GUIDES } from './core/content/guides/sign-guides';
 import { authGuard, guestGuard } from './core/guards/auth.guard';
 import { About } from './pages/about/about';
 import { Account } from './pages/account/account';
 import { Chart } from './pages/chart/chart';
+import { guideRoutes } from './pages/guide/guide.routes';
 import { Home } from './pages/home/home';
 import { Privacy } from './pages/legal/privacy';
 import { Terms } from './pages/legal/terms';
@@ -55,6 +58,9 @@ export const routes: Routes = [
     title: 'Kullanım Şartları · Astriel',
     data: { description: "Astriel'i kullanma koşulları." },
   },
+  // Rehber: /evler, /evler/7-ev, /burclar, /burclar/akrep
+  ...guideRoutes(HOUSE_GUIDES),
+  ...guideRoutes(SIGN_GUIDES),
   { path: 'giris', component: Login, canActivate: [guestGuard], title: 'Giriş Yap · Astriel' },
   { path: 'kayit', component: Register, canActivate: [guestGuard], title: 'Kayıt Ol · Astriel' },
   {

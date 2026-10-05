@@ -9,6 +9,110 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://astriel.onrender.com/evler</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/evler/1-ev</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/evler/2-ev</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/evler/3-ev</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/evler/4-ev</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/evler/5-ev</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/evler/6-ev</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/evler/7-ev</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/evler/8-ev</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/evler/9-ev</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/evler/10-ev</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/evler/11-ev</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/evler/12-ev</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/burclar</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/burclar/koc</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/burclar/boga</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/burclar/ikizler</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/burclar/yengec</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/burclar/aslan</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/burclar/basak</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/burclar/terazi</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/burclar/akrep</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/burclar/yay</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/burclar/oglak</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/burclar/kova</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://astriel.onrender.com/burclar/balik</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://astriel.onrender.com/gizlilik</loc>
     <priority>0.3</priority>
   </url>
@@ -16,4 +120,4 @@
     <loc>https://astriel.onrender.com/kullanim-sartlari</loc>
     <priority>0.3</priority>
   </url>
-</urlset> 
+</urlset>

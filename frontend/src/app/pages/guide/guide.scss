@@ -1,0 +1,141 @@
+// Rehber sayfaları (liste + detay) ortak stili. Renkler styles.scss'teki değişkenlerden gelir.
+.guide {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 40px var(--page-padding) 110px;
+  line-height: 1.8;
+}
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 32px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+
+  a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-mauve);
+    }
+  }
+}
+
+.eyebrow {
+  margin: 0 0 14px;
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+}
+
+h1 {
+  margin: 0 0 18px;
+  font-size: clamp(34px, 4.5vw, 50px);
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.lead {
+  margin: 0 0 36px;
+  font-size: 18px;
+  color: var(--color-text);
+}
+
+section h2 {
+  margin: 40px 0 12px;
+  font-size: 28px;
+  font-weight: 500;
+}
+
+p {
+  color: var(--color-text-muted);
+}
+
+// ---------- Liste sayfası: kartlar ----------
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: block;
+  height: 100%;
+  padding: 22px 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.2s, transform 0.2s;
+
+  h2 {
+    margin: 0 0 6px;
+    font-size: 26px;
+    font-weight: 500;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--color-gold);
+    transform: translateY(-2px);
+  }
+}
+
+// ---------- Detay sayfası: haritanı hesapla kutusu ----------
+.cta {
+  margin: 56px 0 40px;
+  padding: 28px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  text-align: center;
+
+  p {
+    margin: 0 0 20px;
+    color: var(--color-text);
+  }
+}
+
+.cta-btn {
+  display: inline-block;
+  padding: 12px 26px;
+  border-radius: 999px;
+  background: var(--color-mauve);
+  color: var(--color-bg);
+  font-weight: 500;
+  text-decoration: none;
+
+  &:hover {
+    filter: brightness(1.08);
+  }
+}
+
+// ---------- Detay sayfası: önceki / sonraki ----------
+.pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+
+  a {
+    color: var(--color-mauve);
+    text-decoration: none;
+  }
+
+  .next {
+    margin-left: auto; // önceki yoksa (ilk sayfa) "sonraki" yine sağda dursun
+  }
+}
