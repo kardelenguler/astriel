@@ -5,6 +5,9 @@ import { filter } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
 
+/** Bu adreslerden biriyle başlayan sayfalarda menüdeki "Rehber" seçili görünür */
+const GUIDE_PATHS = ['/rehber', '/evler', '/burclar'];
+
 @Component({
   selector: 'app-navbar',
   imports: [RouterLink, RouterLinkActive],
@@ -19,15 +22,19 @@ export class Navbar {
   private readonly router = inject(Router);
 
   protected readonly menuOpen = signal(false);
+  protected readonly guideActive = signal(false);
 
   constructor() {
-    // Başka bir sayfaya geçilince mobil menü kapansın
+    // Başka bir sayfaya geçilince mobil menü kapansın; rehber sayfasındaysak "Rehber" seçili olsun
     this.router.events
       .pipe(
-        filter((event) => event instanceof NavigationEnd),
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
         takeUntilDestroyed(),
       )
-      .subscribe(() => this.menuOpen.set(false));
+      .subscribe((event) => {
+        this.menuOpen.set(false);
+        this.guideActive.set(GUIDE_PATHS.some((path) => event.urlAfterRedirects.startsWith(path)));
+      });
   }
 
   toggleMenu(): void {

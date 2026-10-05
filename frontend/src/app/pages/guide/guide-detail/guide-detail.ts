@@ -2,6 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
+import { GUIDE_FACTS, GUIDE_SYMBOLS } from '../../../core/content/guides/guide-facts';
 import { GuideCollection } from '../../../core/models/guide';
 import { findGuide } from '../find-guide';
 
@@ -28,6 +29,8 @@ export class GuideDetail {
   );
 
   protected readonly guide = computed(() => findGuide(this.collection, this.params().get('slug')));
+  protected readonly facts = computed(() => GUIDE_FACTS[this.params().get('slug') ?? ''] ?? []);
+  protected readonly symbol = computed(() => GUIDE_SYMBOLS[this.params().get('slug') ?? ''] ?? '');
   protected readonly previous = computed(() => this.collection.items[this.index() - 1]);
   protected readonly next = computed(() => this.collection.items[this.index() + 1]);
 }

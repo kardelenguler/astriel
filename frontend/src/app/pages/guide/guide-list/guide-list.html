@@ -1,18 +1,23 @@
-<section class="guide">
+<section class="guide guide-wide">
   <nav class="breadcrumb" aria-label="Sayfa yolu">
     <a routerLink="/">Ana Sayfa</a>
+    <span aria-hidden="true">/</span>
+    <a routerLink="/rehber">Astroloji Rehberi</a>
     <span aria-hidden="true">/</span>
     <span aria-current="page">{{ collection.title }}</span>
   </nav>
 
-  <p class="eyebrow">{{ collection.eyebrow }}</p>
-  <h1>{{ collection.title }}</h1>
-  <p class="lead">{{ collection.intro }}</p>
+  <header class="page-head">
+    <p class="eyebrow">{{ collection.eyebrow }}</p>
+    <h1>{{ collection.title }}</h1>
+    <p class="lead">{{ collection.intro }}</p>
+  </header>
 
   <ul class="cards">
     @for (item of collection.items; track item.slug) {
       <li>
         <a class="card" [routerLink]="['/', collection.path, item.slug]">
+          <span class="symbol" aria-hidden="true">{{ symbols[item.slug] }}</span>
           <h2>{{ item.name }}</h2>
           <p>{{ item.tagline }}</p>
         </a>

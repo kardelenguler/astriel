@@ -19,7 +19,11 @@ export interface Guide {
   intro: string; // başlığın altındaki giriş paragrafı
   sections: GuideSection[];
 }
-
+/** Sayfanın üstündeki bilgi kutusunda bir satır (ör. "Element: Ateş") */
+export interface GuideFact {
+  label: string;
+  value: string;
+}
 /** Bir rehber grubu (tüm evler / tüm burçlar) ve liste sayfasının metinleri */
 export interface GuideCollection {
   path: string; // "evler", "burclar"

@@ -6,6 +6,7 @@ import { authGuard, guestGuard } from './core/guards/auth.guard';
 import { About } from './pages/about/about';
 import { Account } from './pages/account/account';
 import { Chart } from './pages/chart/chart';
+import { GuideHub } from './pages/guide/guide-hub/guide-hub';
 import { guideRoutes } from './pages/guide/guide.routes';
 import { Home } from './pages/home/home';
 import { Privacy } from './pages/legal/privacy';
@@ -58,7 +59,16 @@ export const routes: Routes = [
     title: 'Kullanım Şartları · Astriel',
     data: { description: "Astriel'i kullanma koşulları." },
   },
-  // Rehber: /evler, /evler/7-ev, /burclar, /burclar/akrep
+  // Rehber: /rehber, /evler, /evler/7-ev, /burclar, /burclar/akrep
+  {
+    path: 'rehber',
+    component: GuideHub,
+    title: 'Astroloji Rehberi · Astriel',
+    data: {
+      description:
+        'Doğum haritasını okumayı öğren: 12 burcun ve 12 evin anlamı, elementleri, yönetici gezegenleri ve haritandaki yerleri.',
+    },
+  },
   ...guideRoutes(HOUSE_GUIDES),
   ...guideRoutes(SIGN_GUIDES),
   { path: 'giris', component: Login, canActivate: [guestGuard], title: 'Giriş Yap · Astriel' },

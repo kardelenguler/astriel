@@ -1,16 +1,23 @@
-// Rehber sayfaları (liste + detay) ortak stili. Renkler styles.scss'teki değişkenlerden gelir.
+// Rehber sayfaları (/rehber, /evler, /evler/7-ev ...) ortak stili.
+// Renkler ve yazı tipleri styles.scss'teki değişkenlerden gelir; kart görünümü ana sayfayla aynıdır.
+
+// ================= Sayfa iskeleti =================
 .guide {
-  max-width: 880px;
+  max-width: 820px; // detay sayfası: okunabilir satır uzunluğu
   margin: 0 auto;
   padding: 40px var(--page-padding) 110px;
   line-height: 1.8;
+}
+
+.guide-wide {
+  max-width: 1120px; // liste ve rehber ana sayfası: kartlar için daha geniş
 }
 
 .breadcrumb {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 32px;
+  margin-bottom: 40px;
   font-size: 14px;
   color: var(--color-text-muted);
 
@@ -34,74 +41,242 @@
 
 h1 {
   margin: 0 0 18px;
-  font-size: clamp(34px, 4.5vw, 50px);
+  font-size: clamp(34px, 4vw, 48px);
   font-weight: 500;
   line-height: 1.15;
 }
 
 .lead {
   margin: 0 0 36px;
-  font-size: 18px;
+  font-size: 17px;
+  font-weight: 300;
   color: var(--color-text);
-}
-
-section h2 {
-  margin: 40px 0 12px;
-  font-size: 28px;
-  font-weight: 500;
 }
 
 p {
   color: var(--color-text-muted);
 }
 
-// ---------- Liste sayfası: kartlar ----------
+// Liste ve rehber ana sayfasının başlığı: ortalı, ana sayfadaki bölüm başlıkları gibi
+.page-head {
+  max-width: 680px;
+  margin: 0 auto 48px;
+  text-align: center;
+
+  .lead {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+}
+
+// Ana sayfadaki kartlarla aynı cam görünüm
+%glass-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  background: rgba(23, 19, 34, 0.6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(10px);
+  color: inherit;
+  text-align: center;
+  text-decoration: none;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+
+  // Üstüne gelince hafifçe yukarı kalksın ve pembe ışık versin
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-4px);
+    border-color: rgba(197, 138, 168, 0.5);
+    box-shadow: 0 10px 40px rgba(139, 111, 181, 0.18);
+  }
+
+  h2 {
+    margin: 0;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  p {
+    margin: 0;
+    line-height: 1.6;
+  }
+}
+
+// ================= Rehber ana sayfası (/rehber) =================
+.hub-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hub-card {
+  @extend %glass-card;
+  gap: 16px;
+  padding: 44px 36px 36px;
+
+  svg {
+    width: 60px;
+    height: 60px;
+    fill: none;
+    stroke: var(--color-gold);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  h2 {
+    font-size: 32px;
+  }
+
+  p {
+    max-width: 360px;
+    font-size: 15px;
+  }
+
+  .symbols {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px 12px;
+    margin-top: 4px;
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: var(--color-gold);
+    opacity: 0.75;
+  }
+
+  .more {
+    margin-top: auto; // kartlar farklı uzunlukta olsa da "Keşfet" hep en altta
+    padding-top: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--color-mauve);
+  }
+}
+
+// ================= Liste sayfası (/evler, /burclar) =================
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .card {
-  display: block;
-  height: 100%;
-  padding: 22px 20px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  color: inherit;
-  text-decoration: none;
-  transition: border-color 0.2s, transform 0.2s;
+  @extend %glass-card;
+  gap: 8px;
+  padding: 28px 18px 24px;
+
+  .symbol {
+    margin-bottom: 6px;
+    font-family: var(--font-display);
+    font-size: 34px;
+    line-height: 1;
+    color: var(--color-gold);
+  }
 
   h2 {
-    margin: 0 0 6px;
     font-size: 26px;
-    font-weight: 500;
   }
 
   p {
-    margin: 0;
-    font-size: 14px;
-    line-height: 1.5;
-  }
-
-  &:hover,
-  &:focus-visible {
-    border-color: var(--color-gold);
-    transform: translateY(-2px);
+    font-size: 13px;
   }
 }
 
-// ---------- Detay sayfası: haritanı hesapla kutusu ----------
+// ================= Detay sayfası (/evler/7-ev, /burclar/akrep) =================
+// Üst kısım: büyük sembol + başlık + bilgi şeridi, ortalı
+.detail-head {
+  max-width: none;
+  margin-bottom: 40px;
+
+  h1 {
+    margin-bottom: 28px;
+    font-size: clamp(30px, 3.6vw, 42px);
+  }
+}
+
+.detail-symbol {
+  display: block;
+  margin-bottom: 14px;
+  font-family: var(--font-display);
+  font-size: 56px;
+  line-height: 1;
+  color: var(--color-gold);
+}
+
+// Bilgi şeridi: ince altın çizgiler arasında yan yana bilgiler
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 0;
+  padding: 18px 0;
+  border-top: 1px solid rgba(201, 164, 108, 0.35);
+  border-bottom: 1px solid rgba(201, 164, 108, 0.35);
+
+  div {
+    padding: 4px 22px;
+
+    // bilgiler arasında ince dikey çizgi
+    & + div {
+      border-left: 1px solid var(--color-border);
+    }
+  }
+
+  dt {
+    margin-bottom: 4px;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--color-text);
+  }
+}
+
+// Metin kısmı (sadece detay sayfasındaki article içinde; liste kartlarını etkilemesin)
+article section {
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 48px 0 14px;
+    font-size: 28px;
+    font-weight: 500;
+
+    // başlığın önünde küçük altın yıldız
+    &::before {
+      content: '✦';
+      font-size: 14px;
+      color: var(--color-gold);
+    }
+  }
+
+  p {
+    margin: 0 0 16px;
+  }
+}
+
+// "Kendi haritanı hesapla" kutusu
 .cta {
   margin: 56px 0 40px;
-  padding: 28px;
+  padding: 32px 28px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  background: var(--color-surface);
+  background: rgba(23, 19, 34, 0.6);
   text-align: center;
 
   p {
@@ -124,7 +299,7 @@ p {
   }
 }
 
-// ---------- Detay sayfası: önceki / sonraki ----------
+// Önceki / sonraki sayfa
 .pager {
   display: flex;
   justify-content: space-between;
@@ -137,5 +312,38 @@ p {
 
   .next {
     margin-left: auto; // önceki yoksa (ilk sayfa) "sonraki" yine sağda dursun
+  }
+}
+
+// ================= Dar ekranlar =================
+@media (max-width: 900px) {
+  .cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .facts div {
+    padding: 6px 14px;
+
+    & + div {
+      border-left: none; // dar ekranda alt alta düşünce çizgi gerekmez
+    }
+  }
+
+  .hub-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+// Hareket azaltma tercihi olanlarda kartlar zıplamasın
+@media (prefers-reduced-motion: reduce) {
+  .hub-card:hover,
+  .card:hover {
+    transform: none;
   }
 }

@@ -1,0 +1,48 @@
+<section class="guide guide-wide">
+  <nav class="breadcrumb" aria-label="Sayfa yolu">
+    <a routerLink="/">Ana Sayfa</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">Astroloji Rehberi</span>
+  </nav>
+
+  <header class="page-head">
+    <p class="eyebrow">Astroloji Rehberi</p>
+    <h1>Doğum Haritasını Okumayı Öğren</h1>
+    <p class="lead">
+      Doğum haritası burçlardan, gezegenlerden ve evlerden oluşur. Her burcun ve her evin neyle
+      ilişkilendirildiğini sade bir dille keşfet.
+    </p>
+  </header>
+
+  <ul class="hub-cards">
+    @for (card of cards; track card.collection.path) {
+      <li>
+        <a class="hub-card" [routerLink]="['/', card.collection.path]">
+          @if (card.icon === 'signs') {
+            <!-- Burç çarkı -->
+            <svg viewBox="0 0 48 48" aria-hidden="true">
+              <circle cx="24" cy="24" r="19" />
+              <circle cx="24" cy="24" r="11" />
+              <path d="M24 5v8M24 35v8M5 24h8M35 24h8M10.6 10.6l5.6 5.6M31.8 31.8l5.6 5.6M37.4 10.6l-5.6 5.6M16.2 31.8l-5.6 5.6" />
+            </svg>
+          } @else {
+            <!-- 12 eve bölünmüş daire -->
+            <svg viewBox="0 0 48 48" aria-hidden="true">
+              <circle cx="24" cy="24" r="19" />
+              <path d="M5 24h38M24 5v38M7.5 14.5l33 19M7.5 33.5l33-19M14.5 7.5l19 33M33.5 7.5l-19 33" />
+              <circle cx="24" cy="24" r="4" />
+            </svg>
+          }
+          <h2>{{ card.collection.title }}</h2>
+          <p>{{ card.summary }}</p>
+          <span class="symbols" aria-hidden="true">
+            @for (symbol of card.symbols; track $index) {
+              <span>{{ symbol }}</span>
+            }
+          </span>
+          <span class="more">Keşfet →</span>
+        </a>
+      </li>
+    }
+  </ul>
+</section>

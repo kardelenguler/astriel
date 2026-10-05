@@ -8,8 +8,24 @@
       <span aria-current="page">{{ guide.name }}</span>
     </nav>
 
-    <p class="eyebrow">{{ collection.eyebrow }}</p>
-    <h1>{{ guide.title }}</h1>
+    <header class="page-head detail-head">
+      <span class="detail-symbol" aria-hidden="true">{{ symbol() }}</span>
+      <p class="eyebrow">{{ collection.eyebrow }}</p>
+      <h1>{{ guide.title }}</h1>
+
+      <!-- Bilgi şeridi: tarih, element, yönetici gezegen... -->
+      @if (facts().length) {
+        <dl class="facts">
+          @for (fact of facts(); track fact.label) {
+            <div>
+              <dt>{{ fact.label }}</dt>
+              <dd>{{ fact.value }}</dd>
+            </div>
+          }
+        </dl>
+      }
+    </header>
+
     <p class="lead">{{ guide.intro }}</p>
 
     @for (section of guide.sections; track section.heading) {

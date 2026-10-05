@@ -3,10 +3,12 @@ import { Meta, Title } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 
+import { GUIDE_FACTS } from '../../core/content/guides/guide-facts';
 import { HOUSE_GUIDES } from '../../core/content/guides/house-guides';
 import { SIGN_GUIDES } from '../../core/content/guides/sign-guides';
 import { DescriptionService } from '../../core/services/description.service';
 import { NotFound } from '../not-found/not-found';
+import { GuideHub } from './guide-hub/guide-hub';
 import { guideRoutes } from './guide.routes';
 
 describe('Rehber sayfaları', () => {
@@ -16,6 +18,7 @@ describe('Rehber sayfaları', () => {
     TestBed.configureTestingModule({
       providers: [
         provideRouter([
+          { path: 'rehber', component: GuideHub },
           ...guideRoutes(HOUSE_GUIDES),
           ...guideRoutes(SIGN_GUIDES),
           { path: '**', component: NotFound },
@@ -28,6 +31,16 @@ describe('Rehber sayfaları', () => {
 
   const page = () => harness.routeNativeElement!;
   const text = (selector: string) => page().querySelector(selector)?.textContent?.trim();
+
+  it('rehber ana sayfası 12 Burç ve 12 Ev kartlarını göstermeli', async () => {
+    await harness.navigateByUrl('/rehber');
+
+    const cards = page().querySelectorAll('.hub-card h2');
+    expect(Array.from(cards, (card) => card.textContent?.trim())).toEqual([
+      SIGN_GUIDES.title,
+      HOUSE_GUIDES.title,
+    ]);
+  });
 
   it('liste sayfası 12 evi göstermeli', async () => {
     await harness.navigateByUrl('/evler');
@@ -45,6 +58,14 @@ describe('Rehber sayfaları', () => {
     expect(TestBed.inject(Meta).getTag('name="description"')?.content).toBe(
       HOUSE_GUIDES.items[6].description,
     );
+  });
+
+  it('burç sayfasında bilgi kutusu görünmeli', async () => {
+    await harness.navigateByUrl('/burclar/akrep');
+
+    expect(text('.facts')).toContain('Su');
+    expect(text('.facts')).toContain('Sabit');
+    expect(text('.facts')).toContain('Plüton');
   });
 
   it('önceki ve sonraki sayfaya bağlantı vermeli', async () => {
@@ -77,7 +98,7 @@ describe('Rehber sayfaları', () => {
 
 describe('Rehber içerikleri', () => {
   for (const collection of [HOUSE_GUIDES, SIGN_GUIDES]) {
-    it(`/${collection.path}: 12 sayfa, benzersiz adresler, kısa Google açıklamaları`, () => {
+    it(`/${collection.path}: 12 sayfa, benzersiz adresler, kısa açıklamalar, bilgi kutusu`, () => {
       const slugs = collection.items.map((item) => item.slug);
       expect(slugs.length).toBe(12);
       expect(new Set(slugs).size).toBe(12);
@@ -85,6 +106,7 @@ describe('Rehber içerikleri', () => {
       for (const item of collection.items) {
         expect(item.slug, item.slug).toMatch(/^[a-z0-9-]+$/); // adreste Türkçe karakter olmasın
         expect(item.description.length, item.slug).toBeLessThanOrEqual(160); // Google kesmesin
+        expect(GUIDE_FACTS[item.slug], item.slug).toBeDefined(); // her sayfanın bilgi kutusu olsun
       }
     });
   }

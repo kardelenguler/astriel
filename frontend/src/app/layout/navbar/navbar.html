@@ -11,6 +11,7 @@
       Ana Sayfa
     </a>
     <a routerLink="/haritalarim" routerLinkActive="active">Haritalarım</a>
+    <a routerLink="/rehber" [class.active]="guideActive()">Rehber</a>
     <a routerLink="/hakkinda" routerLinkActive="active">Hakkında</a>
   </nav>
 
@@ -47,6 +48,7 @@
       Ana Sayfa
     </a>
     <a routerLink="/haritalarim" routerLinkActive="active" (click)="closeMenu()">Haritalarım</a>
+    <a routerLink="/rehber" [class.active]="guideActive()" (click)="closeMenu()">Rehber</a>
     <a routerLink="/hakkinda" routerLinkActive="active" (click)="closeMenu()">Hakkında</a>
 
     <div class="mobile-actions">

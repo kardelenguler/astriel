@@ -1,7 +1,8 @@
+import { Component } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 
 import { Navbar } from './navbar';
 
@@ -25,5 +26,37 @@ describe('Navbar', () => {
 
     expect(text).toContain('Giriş Yap');
     expect(text).toContain('Kayıt Ol');
+  });
+});
+
+@Component({ template: '' })
+class EmptyPage {}
+
+describe('Navbar: Rehber bağlantısı', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([{ path: '**', component: EmptyPage }]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ],
+    });
+  });
+
+  /** Verilen adrese gidince menüdeki "Rehber" seçili mi? */
+  async function guideLinkActiveAt(url: string): Promise<boolean> {
+    const fixture = TestBed.createComponent(Navbar);
+    await TestBed.inject(Router).navigateByUrl(url);
+    fixture.detectChanges();
+    const link = (fixture.nativeElement as HTMLElement).querySelector('a[href="/rehber"]');
+    return link!.classList.contains('active');
+  }
+
+  it('ev ve burç sayfalarında seçili görünmeli', async () => {
+    expect(await guideLinkActiveAt('/burclar/akrep')).toBe(true);
+  });
+
+  it('diğer sayfalarda seçili görünmemeli', async () => {
+    expect(await guideLinkActiveAt('/hakkinda')).toBe(false);
   });
 });
