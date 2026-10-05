@@ -60,14 +60,22 @@ def run_migrations_offline() -> None:
     with context.begin_transaction():
         context.run_migrations()
 
+def _run_with_connection(connection) -> None:
+    context.configure(connection=connection, target_metadata=target_metadata)
+
+    with context.begin_transaction():
+        context.run_migrations()
+
 
 def run_migrations_online() -> None:
-    """Run migrations in 'online' mode.
+    """Run migrations in 'online' mode."""
+    # Testler kendi bağlantılarını verir (config.attributes["connection"]).
+    # Böylece migration testi gerçek veritabanına değil, test veritabanına çalışır.
+    connection = config.attributes.get("connection")
+    if connection is not None:
+        _run_with_connection(connection)
+        return
 
-    In this scenario we need to create an Engine
-    and associate a connection with the context.
-
-    """
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
@@ -75,12 +83,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
-
-        with context.begin_transaction():
-            context.run_migrations()
+        _run_with_connection(connection)
 
 
 if context.is_offline_mode():

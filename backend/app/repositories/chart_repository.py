@@ -11,11 +11,32 @@ get_for_user kullanılır.
 
 import uuid
 from datetime import datetime, timezone
+from typing import Any, NamedTuple
 
-from sqlalchemy import Select, delete, func, select
+from sqlalchemy import Select, cast, delete, func, select
+from sqlalchemy.dialects.postgresql import JSONB, JSONPATH
+from sqlalchemy.orm import defer
 
 from app.models.birth_chart import BirthChart
 from app.repositories.base_repository import BaseRepository
+
+
+def _from_chart_data(path: str):
+    """chart_data içinden tek bir parçayı VERİTABANINDA çıkarır (PostgreSQL JSONPath).
+
+    Böylece listede tüm harita verisi (gezegenler, evler, açılar) Python'a taşınmaz.
+    Yol bulunamazsa (ör. saat bilinmiyorsa yükselen yok) None döner.
+    """
+    return func.jsonb_path_query_first(BirthChart.chart_data, cast(path, JSONPATH), type_=JSONB)
+
+
+class ChartSummaryRow(NamedTuple):
+    """Listedeki bir satır: harita kaydı (chart_data hariç) + özet burçlar."""
+
+    chart: BirthChart
+    sun_sign: dict[str, Any] | None
+    moon_sign: dict[str, Any] | None
+    ascendant_sign: dict[str, Any] | None
 
 
 class ChartRepository(BaseRepository[BirthChart]):
@@ -44,22 +65,32 @@ class ChartRepository(BaseRepository[BirthChart]):
             query = query.where(BirthChart.deleted_at.is_(None))
         return self.db.scalar(query)
 
-    def list_for_user(self, user_id: uuid.UUID, *, limit: int, offset: int) -> list[BirthChart]:
-        """En yeni harita üstte. Aynı anda oluşturulanlar id'ye göre sıralanır
-        (sıralama sabit olmazsa sayfalar arasında kayıt atlanabilir/tekrarlanabilir)."""
+    def list_summaries_for_user(
+        self, user_id: uuid.UUID, *, limit: int, offset: int
+    ) -> list[ChartSummaryRow]:
+        """Liste sayfası için özet. chart_data'nın tamamı okunmaz, sadece 3 burç.
+
+        En yeni harita üstte. Aynı anda oluşturulanlar id'ye göre sıralanır
+        (sıralama sabit olmazsa sayfalar arasında kayıt atlanabilir/tekrarlanabilir).
+        """
         query = (
             self._active_charts_of(user_id)
+            .add_columns(
+                _from_chart_data('$.planets[*] ? (@.key == "sun").sign'),
+                _from_chart_data('$.planets[*] ? (@.key == "moon").sign'),
+                _from_chart_data("$.ascendant.sign"),
+            )
+            .options(defer(BirthChart.chart_data))  # büyük JSONB sütunu hiç okunmasın
             .order_by(BirthChart.created_at.desc(), BirthChart.id.desc())
             .limit(limit)
             .offset(offset)
         )
-        return list(self.db.scalars(query))
+        return [ChartSummaryRow(*row) for row in self.db.execute(query)]
 
     def count_for_user(self, user_id: uuid.UUID) -> int:
         """Toplam kayıt sayısı; frontend'de "3. sayfa / 5" göstermek için."""
         query = select(func.count()).select_from(self._active_charts_of(user_id).subquery())
         return self.db.scalar(query) or 0
-
 
     def soft_delete(self, chart: BirthChart) -> None:
         """Haritayı silinmiş olarak işaretler; satır silinmez, "Geri al" mümkün."""

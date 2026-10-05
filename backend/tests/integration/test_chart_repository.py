@@ -29,7 +29,9 @@ def stranger(db_session) -> User:
     return UserRepository(db_session).add(User(username="yabanci", hashed_password="x"))
 
 
-def _chart(user: User, name: str = "Harita", minutes: int = 0) -> BirthChart:
+def _chart(
+    user: User, name: str = "Harita", minutes: int = 0, chart_data: dict | None = None
+) -> BirthChart:
     """Test haritası. minutes: oluşturulma zamanını ayarlar (sıralama testleri için).
 
     created_at elle verilir: veritabanı now() değeri bir transaction içinde hep
@@ -45,7 +47,7 @@ def _chart(user: User, name: str = "Harita", minutes: int = 0) -> BirthChart:
         longitude=30.7133,
         timezone="Europe/Istanbul",
         house_system="P",
-        chart_data={},
+        chart_data=chart_data or {},
         engine_version="test",
         created_at=BASE_TIME + timedelta(minutes=minutes),
     )
@@ -69,8 +71,6 @@ def test_deleted_chart_hidden_unless_requested(repo, owner):
     assert repo.get_for_user(chart.id, owner.id, include_deleted=True) is chart
 
 
-
-
 def test_restore_makes_chart_visible_again(repo, owner):
     chart = repo.add(_chart(owner))
     repo.soft_delete(chart)
@@ -86,7 +86,7 @@ def test_list_newest_first_and_only_active_own_charts(repo, owner, stranger):
     repo.soft_delete(silinen)
     repo.add(_chart(stranger, "baskasinin", minutes=30))
 
-    names = [c.name for c in repo.list_for_user(owner.id, limit=10, offset=0)]
+    names = [c.chart.name for c in repo.list_summaries_for_user(owner.id, limit=10, offset=0)]
     assert names == ["yeni", "eski"]
 
 
@@ -94,10 +94,31 @@ def test_list_pagination(repo, owner):
     for i in range(5):
         repo.add(_chart(owner, f"h{i}", minutes=i))  # h4 en yeni
 
-    first_page = [c.name for c in repo.list_for_user(owner.id, limit=2, offset=0)]
-    second_page = [c.name for c in repo.list_for_user(owner.id, limit=2, offset=2)]
+    first_page = [c.chart.name for c in repo.list_summaries_for_user(owner.id, limit=2, offset=0)]
+    second_page = [c.chart.name for c in repo.list_summaries_for_user(owner.id, limit=2, offset=2)]
     assert first_page == ["h4", "h3"]
     assert second_page == ["h2", "h1"]
+
+
+def test_list_extracts_signs_from_chart_data(repo, owner):
+    """Güneş, Ay ve yükselen burç chart_data'nın içinden (veritabanında) bulunmalı."""
+    repo.add(
+        _chart(
+            owner,
+            chart_data={
+                "planets": [
+                    {"key": "moon", "sign": {"key": "leo"}},  # sıra önemli olmamalı
+                    {"key": "sun", "sign": {"key": "gemini"}},
+                ],
+                "ascendant": None,  # doğum saati bilinmiyor
+            },
+        )
+    )
+
+    [row] = repo.list_summaries_for_user(owner.id, limit=10, offset=0)
+    assert row.sun_sign == {"key": "gemini"}
+    assert row.moon_sign == {"key": "leo"}
+    assert row.ascendant_sign is None
 
 
 def test_count_ignores_deleted_and_others(repo, owner, stranger):

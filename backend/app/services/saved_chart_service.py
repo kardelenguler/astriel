@@ -8,15 +8,15 @@ harita olduğunu ele verirdi.
 """
 
 import logging
-from datetime import datetime, timedelta, timezone
 import uuid
+from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import NotFoundError
 from app.models.birth_chart import BirthChart
 from app.models.user import User
-from app.repositories.chart_repository import ChartRepository
+from app.repositories.chart_repository import ChartRepository, ChartSummaryRow
 from app.schemas.chart import (
     ChartCalculateRequest,
     ChartCreateRequest,
@@ -68,9 +68,9 @@ class SavedChartService:
         return self._to_out(chart, self._current_result(chart))
 
     def list(self, user: User, *, limit: int, offset: int) -> ChartListOut:
-        charts = self.charts.list_for_user(user.id, limit=limit, offset=offset)
+        rows = self.charts.list_summaries_for_user(user.id, limit=limit, offset=offset)
         return ChartListOut(
-            items=[self._to_summary(chart) for chart in charts],
+            items=[self._to_summary(row) for row in rows],
             total=self.charts.count_for_user(user.id),
             limit=limit,
             offset=offset,
@@ -145,20 +145,21 @@ class SavedChartService:
         )
 
     @staticmethod
-    def _to_summary(chart: BirthChart) -> ChartSummaryOut:
-        data = ChartResponse.model_validate(chart.chart_data)
-        planets = {planet.key: planet for planet in data.planets}
+    def _to_summary(row: ChartSummaryRow) -> ChartSummaryOut:
+        chart = row.chart
         return ChartSummaryOut(
             id=chart.id,
             name=chart.name,
             birth_date=chart.birth_date,
             birth_time=chart.birth_time,
             place_name=chart.place_name,
-            sun_sign=planets["sun"].sign,
-            moon_sign=planets["moon"].sign,
-            ascendant_sign=data.ascendant.sign if data.ascendant else None,
+            sun_sign=row.sun_sign,
+            moon_sign=row.moon_sign,
+            ascendant_sign=row.ascendant_sign,  # saat bilinmiyorsa None
             created_at=chart.created_at,
         )
+
+
 def purge_old_deleted_charts(db: Session, *, now: datetime | None = None) -> int:
     """DELETED_RETENTION_DAYS günden önce silinmiş haritaları kalıcı olarak siler.
 
