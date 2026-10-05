@@ -2,10 +2,13 @@ import { SIGN_GUIDES } from './sign-guides';
 import {
   ELEMENTS,
   MODALITIES,
+  PLANETS,
   SIGN_PROFILES,
   elementText,
   findSignProfile,
   modalityText,
+  rulerName,
+  rulerText,
 } from './sign-profiles';
 
 describe('Burç profilleri', () => {
@@ -23,10 +26,24 @@ describe('Burç profilleri', () => {
     );
   });
 
-  it('aynı elementteki burçlar aynı genel cümleyle başlamalı', () => {
+  it('aynı element, nitelik ve gezegendeki burçlar aynı genel cümleyle başlamalı', () => {
     for (const sign of SIGN_PROFILES) {
       expect(elementText(sign).startsWith(ELEMENTS[sign.element].base), sign.slug).toBe(true);
       expect(modalityText(sign).startsWith(MODALITIES[sign.modality].base), sign.slug).toBe(true);
+      expect(rulerText(sign).startsWith(PLANETS[sign.ruler].base!), sign.slug).toBe(true);
+    }
+  });
+
+  it('modern yöneticisi olan burçlarda ikisi birlikte yazılmalı', () => {
+    expect(rulerName(findSignProfile('akrep')!)).toBe('Mars (Modern: Plüton)');
+    expect(rulerName(findSignProfile('boga')!)).toBe('Venüs');
+  });
+
+  it('her burçta 6 güçlü yön ve 6 dikkat edilmesi gereken, tekrarsız olmalı', () => {
+    for (const sign of SIGN_PROFILES) {
+      expect(sign.strengths.length, sign.slug).toBe(6);
+      expect(sign.cautions.length, sign.slug).toBe(6);
+      expect(new Set([...sign.strengths, ...sign.cautions]).size, sign.slug).toBe(12);
     }
   });
 
@@ -36,9 +53,15 @@ describe('Burç profilleri', () => {
         expect(text.startsWith(sign.name), sign.slug).toBe(true); // "Boğa'da bu enerji..."
         expect(text, sign.slug).toContain('ortaya çıkabilir'); // kesin hüküm yok
       }
+      expect(sign.rulerInSign.startsWith(sign.name), sign.slug).toBe(true);
     }
 
-    const texts = SIGN_PROFILES.flatMap((sign) => [sign.elementInSign, sign.modalityInSign]);
+    const texts = SIGN_PROFILES.flatMap((sign) => [
+      sign.elementInSign,
+      sign.modalityInSign,
+      sign.rulerInSign,
+      ...Object.values(sign.inChart),
+    ]);
     expect(new Set(texts).size).toBe(texts.length); // kopya metin yok
   });
 });

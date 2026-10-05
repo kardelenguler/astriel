@@ -15,4 +15,6 @@ export class GuideList {
   protected readonly collection: GuideCollection =
     inject(ActivatedRoute).snapshot.data['collection'];
   protected readonly symbols = GUIDE_SYMBOLS;
+  // Burç kartlarında "21 Mart – 19 Nisan · Ateş" iki satıra bölünür: üstte tarih, altta element
+  protected readonly splitTagline = this.collection.path === 'burclar';
 }

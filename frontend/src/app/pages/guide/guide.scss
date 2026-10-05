@@ -189,6 +189,13 @@ p {
   p {
     font-size: 13px;
   }
+
+  // Burç kartının ikinci satırı (element): küçük, altın renkli
+  .tagline-line + .tagline-line {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--color-gold);
+  }
 }
 
 // ================= Detay sayfası (/evler/7-ev, /burclar/akrep) =================

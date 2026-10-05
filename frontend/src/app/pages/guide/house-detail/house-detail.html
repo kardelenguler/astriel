@@ -1,0 +1,151 @@
+@if (house(); as house) {
+  <article class="sign house">
+    <nav class="breadcrumb" aria-label="Sayfa yolu">
+      <a routerLink="/">Ana Sayfa</a>
+      <span aria-hidden="true">/</span>
+      <a routerLink="/evler">Doğum Haritasında 12 Ev</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{{ house.number }}. Ev</span>
+    </nav>
+
+    <!-- ================= Üst kısım ================= -->
+    <header class="hero">
+      <span class="hero-glyph roman" aria-hidden="true">{{ house.roman }}</span>
+      <h1>{{ house.number }}. Ev</h1>
+      <p class="hero-dates">{{ guide()?.tagline }}</p>
+      <span class="hero-rule" aria-hidden="true"></span>
+      <p class="hero-intro">{{ guide()?.intro }}</p>
+    </header>
+
+    <!-- ================= Bilgi şeridi ================= -->
+    <dl class="facts-bar">
+      @for (fact of facts(); track fact.title) {
+        <div class="fact">
+          <span class="icon-circle">
+            @if (fact.icon) {
+              <app-guide-icon [name]="fact.icon" />
+            } @else {
+              <span class="planet-glyph">{{ fact.glyph }}</span>
+            }
+          </span>
+          <div>
+            <dt>{{ fact.title }}</dt>
+            <dd>{{ fact.text }}</dd>
+          </div>
+        </div>
+      }
+    </dl>
+
+    <!-- ================= Neyi temsil eder ================= -->
+    <section class="block">
+      <h2>{{ house.number }}. Ev Neyi Temsil Eder?</h2>
+      @for (paragraph of guide()?.sections?.[0]?.paragraphs ?? []; track $index) {
+        <p class="block-text">{{ paragraph }}</p>
+      }
+
+      <div class="traits">
+        <div class="trait-card">
+          <h3><app-guide-icon name="spark" /> Temel Temalar</h3>
+          <ul class="chips">
+            @for (theme of house.themes; track theme) {
+              <li><app-guide-icon name="spark" />{{ theme }}</li>
+            }
+          </ul>
+        </div>
+
+        <div class="trait-card caution">
+          <h3><app-guide-icon name="house" /> Hayatta Karşılığı</h3>
+          <ul class="chips">
+            @for (area of house.areas; track area) {
+              <li><app-guide-icon name="house" />{{ area }}</li>
+            }
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Burç ve gezegenler ================= -->
+    <section class="block">
+      <h2>{{ house.number }}. Evdeki Burç ve Gezegenler</h2>
+      <div class="quality-grid">
+        <div class="quality-card">
+          <div class="quality-head">
+            <span class="icon-circle large"><app-guide-icon name="rising" /></span>
+            <h3>Başladığı Burç</h3>
+          </div>
+          <p>{{ house.cuspText }}</p>
+          <ul class="examples">
+            @for (example of house.cuspExamples; track example.when) {
+              <li><span class="when">{{ example.when }}</span>{{ capitalize(example.meaning) }}</li>
+            }
+          </ul>
+        </div>
+
+        <div class="quality-card">
+          <div class="quality-head">
+            <span class="icon-circle large"><app-guide-icon name="planet" /></span>
+            <h3>İçindeki Gezegenler</h3>
+          </div>
+          <p>{{ house.planetsText }}</p>
+          <ul class="examples">
+            @for (example of house.planetExamples; track example.when) {
+              <li><span class="when">{{ example.when }}</span>{{ capitalize(example.meaning) }}</li>
+            }
+          </ul>
+        </div>
+
+        @if (opposite(); as other) {
+          <div class="quality-card">
+            <div class="quality-head">
+              <span class="icon-circle large"><app-guide-icon name="opposite" /></span>
+              <h3>Karşıt Ev: {{ other.number }}. Ev</h3>
+            </div>
+            <p>{{ oppositeText() }}</p>
+            <ul class="examples">
+              <li><span class="when">{{ house.number }}. Ev</span>{{ tagline(house) }}</li>
+              <li><span class="when">{{ other.number }}. Ev</span>{{ tagline(other) }}</li>
+            </ul>
+            <a class="card-link" [routerLink]="['/evler', other.slug]">{{ other.number }}. Evi İncele →</a>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- ================= Haritanı hesapla ================= -->
+    <aside class="cta">
+      <h2>Kendi haritanda {{ house.number }}. ev hangi burçta?</h2>
+      <p>Doğum haritanı hesaplayarak {{ house.number }}. evinin hangi burçta başladığını ve içinde hangi gezegenler olduğunu keşfet.</p>
+      <a class="cta-btn" routerLink="/" fragment="dogum-formu">Ücretsiz Haritanı Hesapla →</a>
+    </aside>
+
+    <!-- ================= Diğer evler ================= -->
+    <section class="block">
+      <h2>Diğer Evleri Keşfet</h2>
+      @let around = explore();
+      @if (around.length === 3) {
+        <nav class="explore" aria-label="Diğer evler">
+          <a class="arrow" [routerLink]="['/evler', around[0].slug]" [attr.aria-label]="'Önceki ev: ' + around[0].number + '. Ev'">
+            <app-guide-icon name="arrowLeft" />
+          </a>
+          @for (item of around; track item.slug) {
+            <a
+              class="explore-chip"
+              [class.current]="item.slug === house.slug"
+              [routerLink]="['/evler', item.slug]"
+              [attr.aria-current]="item.slug === house.slug ? 'page' : null"
+            >
+              <span class="chip-glyph roman" aria-hidden="true">{{ item.roman }}</span>
+              <span>
+                <strong>{{ item.number }}. Ev</strong>
+                <small>{{ keyword(item) }}</small>
+              </span>
+            </a>
+          }
+          <a class="arrow" [routerLink]="['/evler', around[2].slug]" [attr.aria-label]="'Sonraki ev: ' + around[2].number + '. Ev'">
+            <app-guide-icon name="arrowRight" />
+          </a>
+        </nav>
+      }
+    </section>
+  </article>
+}

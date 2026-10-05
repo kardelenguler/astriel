@@ -8,6 +8,8 @@ import { Account } from './pages/account/account';
 import { Chart } from './pages/chart/chart';
 import { GuideHub } from './pages/guide/guide-hub/guide-hub';
 import { guideRoutes } from './pages/guide/guide.routes';
+import { HouseDetail } from './pages/guide/house-detail/house-detail';
+import { SignDetail } from './pages/guide/sign-detail/sign-detail';
 import { Home } from './pages/home/home';
 import { Privacy } from './pages/legal/privacy';
 import { Terms } from './pages/legal/terms';
@@ -69,8 +71,8 @@ export const routes: Routes = [
         'Doğum haritasını okumayı öğren: 12 burcun ve 12 evin anlamı, elementleri, yönetici gezegenleri ve haritandaki yerleri.',
     },
   },
-  ...guideRoutes(HOUSE_GUIDES),
-  ...guideRoutes(SIGN_GUIDES),
+  ...guideRoutes(HOUSE_GUIDES, HouseDetail),
+  ...guideRoutes(SIGN_GUIDES, SignDetail),
   { path: 'giris', component: Login, canActivate: [guestGuard], title: 'Giriş Yap · Astriel' },
   { path: 'kayit', component: Register, canActivate: [guestGuard], title: 'Kayıt Ol · Astriel' },
   {

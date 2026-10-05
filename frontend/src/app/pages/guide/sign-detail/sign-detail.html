@@ -1,0 +1,146 @@
+@if (sign(); as sign) {
+  <article class="sign">
+    <nav class="breadcrumb" aria-label="Sayfa yolu">
+      <a routerLink="/">Ana Sayfa</a>
+      <span aria-hidden="true">/</span>
+      <a routerLink="/burclar">12 Burç ve Özellikleri</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{{ sign.name }}</span>
+    </nav>
+
+    <!-- ================= Üst kısım ================= -->
+    <header class="hero">
+      <span class="hero-glyph" aria-hidden="true">{{ glyph(sign) }}</span>
+      <h1>{{ sign.name }}</h1>
+      <p class="hero-dates">{{ sign.dates }}</p>
+      <span class="hero-rule" aria-hidden="true"></span>
+      <p class="hero-intro">{{ guide()?.intro }}</p>
+    </header>
+
+    <!-- ================= Bilgi şeridi ================= -->
+    <dl class="facts-bar">
+      @for (fact of facts(); track fact.title) {
+        <div class="fact">
+          <span class="icon-circle">
+            @if (fact.icon) {
+              <app-guide-icon [name]="fact.icon" />
+            } @else {
+              <span class="planet-glyph">{{ fact.glyph }}</span>
+            }
+          </span>
+          <div>
+            <dt>{{ fact.title }}</dt>
+            <dd>{{ fact.text }}</dd>
+          </div>
+        </div>
+      }
+    </dl>
+
+    <!-- ================= Genel özellikler ================= -->
+    <section class="block">
+      <h2>{{ sign.name }} Burcunun Genel Özellikleri</h2>
+      @for (paragraph of guide()?.sections?.[0]?.paragraphs ?? []; track $index) {
+        <p class="block-text">{{ paragraph }}</p>
+      }
+
+      <div class="traits">
+        <div class="trait-card">
+          <h3><app-guide-icon name="sun" /> Güçlü Yönleri</h3>
+          <ul class="chips">
+            @for (trait of sign.strengths; track trait) {
+              <li><app-guide-icon name="leaf" />{{ trait }}</li>
+            }
+          </ul>
+        </div>
+
+        <div class="trait-card caution">
+          <h3><app-guide-icon name="cloud" /> Dikkat Edilmesi Gerekenler</h3>
+          <ul class="chips">
+            @for (trait of sign.cautions; track trait) {
+              <li><app-guide-icon name="cloud" />{{ trait }}</li>
+            }
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Element, nitelik, yönetici ================= -->
+    <section class="block">
+      <h2>Element, Nitelik ve Yönetici Gezegen</h2>
+      <div class="quality-grid">
+        @for (card of qualities(); track card.title) {
+          <div class="quality-card">
+            <div class="quality-head">
+              <span class="icon-circle large">
+                @if (card.icon) {
+                  <app-guide-icon [name]="card.icon" />
+                } @else {
+                  <span class="planet-glyph">{{ card.glyph }}</span>
+                }
+              </span>
+              <h3>{{ card.title }}</h3>
+            </div>
+            <p>{{ card.text }}</p>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- ================= Doğum haritanda ================= -->
+    <section class="block">
+      <h2>Doğum Haritanda {{ sign.name }}</h2>
+      <p class="block-lead">
+        Haritanda {{ sign.name }} burcunun nerede olduğu, bu enerjinin hayatında hangi alanda öne
+        çıkabileceğini gösterir.
+      </p>
+      <div class="chart-grid">
+        @for (card of inChart(); track card.title) {
+          <div class="chart-card">
+            <span class="icon-circle"><app-guide-icon [name]="card.icon!" /></span>
+            <div>
+              <h3>{{ card.title }}</h3>
+              <p>{{ card.text }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- ================= Haritanı hesapla ================= -->
+    <aside class="cta">
+      <h2>Kendi haritanda {{ sign.name }} nerede?</h2>
+      <p>Doğum haritanı hesaplayarak {{ sign.name }} enerjisinin hayatında hangi alanda öne çıktığını keşfet.</p>
+      <a class="cta-btn" routerLink="/" fragment="dogum-formu">Ücretsiz Haritanı Hesapla →</a>
+    </aside>
+
+    <!-- ================= Diğer burçlar ================= -->
+    <section class="block">
+      <h2>Diğer Burçları Keşfet</h2>
+      @let around = explore();
+      @if (around.length === 3) {
+        <nav class="explore" aria-label="Diğer burçlar">
+          <a class="arrow" [routerLink]="['/burclar', around[0].slug]" [attr.aria-label]="'Önceki burç: ' + around[0].name">
+            <app-guide-icon name="arrowLeft" />
+          </a>
+          @for (item of around; track item.slug) {
+            <a
+              class="explore-chip"
+              [class.current]="item.slug === sign.slug"
+              [routerLink]="['/burclar', item.slug]"
+              [attr.aria-current]="item.slug === sign.slug ? 'page' : null"
+            >
+              <span class="chip-glyph" aria-hidden="true">{{ glyph(item) }}</span>
+              <span>
+                <strong>{{ item.name }}</strong>
+                <small>{{ item.dates }}</small>
+              </span>
+            </a>
+          }
+          <a class="arrow" [routerLink]="['/burclar', around[2].slug]" [attr.aria-label]="'Sonraki burç: ' + around[2].name">
+            <app-guide-icon name="arrowRight" />
+          </a>
+        </nav>
+      }
+    </section>
+  </article>
+}

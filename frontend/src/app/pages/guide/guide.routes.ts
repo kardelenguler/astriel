@@ -1,3 +1,4 @@
+import { Type } from '@angular/core';
 import { ActivatedRouteSnapshot, Route, Routes, UrlSegment } from '@angular/router';
 
 import { Guide, GuideCollection } from '../../core/models/guide';
@@ -10,8 +11,9 @@ import { GuideList } from './guide-list/guide-list';
  *   /evler         -> liste sayfası
  *   /evler/7-ev    -> tek ev sayfası
  * Başlık ve Google açıklaması her sayfa için içerikten alınır.
+ * detail: tek sayfayı gösterecek component (burçların kendi tasarımı var: SignDetail)
  */
-export function guideRoutes(collection: GuideCollection): Routes {
+export function guideRoutes(collection: GuideCollection, detail: Type<unknown> = GuideDetail): Routes {
   const guideOf = (route: ActivatedRouteSnapshot): Guide =>
     findGuide(collection, route.paramMap.get('slug'))!; // canMatch sayesinde her zaman bulunur
 
@@ -24,7 +26,7 @@ export function guideRoutes(collection: GuideCollection): Routes {
     },
     {
       path: `${collection.path}/:slug`,
-      component: GuideDetail,
+      component: detail,
       // Olmayan bir adres (/evler/99-ev) bu rotaya hiç girmesin, "Sayfa bulunamadı"ya düşsün
       canMatch: [(_route: Route, segments: UrlSegment[]) => !!findGuide(collection, segments[1]?.path)],
       title: (route: ActivatedRouteSnapshot) => `${guideOf(route).title} · Astriel`,

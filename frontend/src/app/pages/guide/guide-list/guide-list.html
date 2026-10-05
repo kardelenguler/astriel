@@ -19,7 +19,13 @@
         <a class="card" [routerLink]="['/', collection.path, item.slug]">
           <span class="symbol" aria-hidden="true">{{ symbols[item.slug] }}</span>
           <h2>{{ item.name }}</h2>
-          <p>{{ item.tagline }}</p>
+          @if (splitTagline) {
+            @for (line of item.tagline.split(' · '); track $index) {
+              <p class="tagline-line">{{ line }}</p>
+            }
+          } @else {
+            <p>{{ item.tagline }}</p>
+          }
         </a>
       </li>
     }

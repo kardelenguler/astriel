@@ -1,5 +1,5 @@
 import { GuideFact } from '../../models/guide';
-import { ELEMENTS, MODALITIES, SIGN_PROFILES } from './sign-profiles';
+import { ELEMENTS, MODALITIES, SIGN_PROFILES, rulerName } from './sign-profiles';
 
 /**
  * Rehber sayfalarının bilgi şeridi (adres -> satırlar) ve liste kartlarındaki semboller.
@@ -52,7 +52,7 @@ const SIGN_FACTS: Record<string, GuideFact[]> = Object.fromEntries(
       { label: 'Tarih', value: `${sign.dates} (yaklaşık)` },
       { label: 'Element', value: ELEMENTS[sign.element].name },
       { label: 'Nitelik', value: MODALITIES[sign.modality].name },
-      { label: 'Yönetici Gezegen', value: sign.ruler },
+      { label: 'Yönetici Gezegen', value: rulerName(sign) },
     ],
   ]),
 );
