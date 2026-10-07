@@ -431,3 +431,27 @@ h3 {
     display: none; // dar ekranda sadece oklar ve şu anki burç
   }
 }
+
+// ================= Telefon: bilgi şeridi alt alta =================
+@media (max-width: 600px) {
+  .facts-bar {
+    grid-template-columns: 1fr;
+    row-gap: 0;
+    padding: 6px 18px;
+  }
+
+  .fact {
+    justify-content: flex-start;
+    padding: 14px 4px;
+
+    & + .fact {
+      border-left: none;
+      border-top: 1px solid var(--color-border);
+    }
+
+    dd {
+      font-size: 20px;
+      white-space: normal;
+    }
+  }
+}
