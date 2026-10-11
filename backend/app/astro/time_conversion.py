@@ -45,8 +45,6 @@ def timezone_at(latitude: float, longitude: float) -> str:
     return name
 
 
-
-
 @dataclass(frozen=True)
 class UtcConversion:
     utc: datetime

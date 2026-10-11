@@ -59,8 +59,9 @@ class NominatimGeocoder:
         self._min_interval = min_interval
         self._last_request_at = 0.0
         self._cache: OrderedDict[str, tuple[Place, ...]] = OrderedDict()
-        # Aynı anda gelen istekler sıraya girer: hem hız sınırı hem önbellek güvende kalır
-        self._lock = threading.Lock()
+        # İki ayrı kilit: Nominatim isteği sürerken önbellek okumaları beklemesin
+        self._request_lock = threading.Lock()  # Nominatim'e aynı anda tek istek
+        self._cache_lock = threading.Lock()  # önbelleğe aynı anda tek erişim (çok kısa sürer)
         # Sıradaki istek sayısının üst sınırı (yukarıdaki MAX_WAITING_SEARCHES açıklaması)
         self._queue = threading.BoundedSemaphore(MAX_WAITING_SEARCHES)
 
@@ -75,18 +76,25 @@ class NominatimGeocoder:
         # Türkçe "İ" harfini "i" + birleşik nokta (U+0307) yapar ve aramayı bozabilir.
         key = cleaned.casefold()
 
+        # Önbellekteki aramalar sıra beklemez: yavaş bir Nominatim isteği onları bekletmesin
+        cached = self._cached(key)
+        if cached is not None:
+            return cached
+
         if not self._queue.acquire(blocking=False):
             raise ExternalServiceError(BUSY_MESSAGE, detail="geocoder sırası dolu")
         try:
-            with self._lock:
-                if key in self._cache:
-                    self._cache.move_to_end(key)  # yakın zamanda kullanıldı olarak işaretle
-                    return self._cache[key]
+            # Nominatim'e aynı anda tek istek gider (saniyede 1 kuralı)
+            with self._request_lock:
+                # Biz sırada beklerken başka bir istek aynı yeri aramış olabilir
+                cached = self._cached(key)
+                if cached is not None:
+                    return cached
 
                 self._wait_for_rate_limit()
                 places = self._fetch(cleaned)
-                self._remember(key, places)  # sadece BAŞARILI sonuçlar önbelleğe girer
-                return places
+            self._remember(key, places)  # sadece BAŞARILI sonuçlar önbelleğe girer
+            return places
         finally:
             self._queue.release()
 
@@ -140,7 +148,16 @@ class NominatimGeocoder:
                 logger.warning("Nominatim sonucu atlandı (eksik/bozuk alan): %r", item)
         return tuple(places)
 
+    def _cached(self, key: str) -> tuple[Place, ...] | None:
+        """Önbellekte varsa sonucu döndürür (boş sonuç da geçerli bir sonuçtur); yoksa None."""
+        with self._cache_lock:
+            places = self._cache.get(key)
+            if places is not None:
+                self._cache.move_to_end(key)  # yakın zamanda kullanıldı olarak işaretle
+            return places
+
     def _remember(self, key: str, places: tuple[Place, ...]) -> None:
-        self._cache[key] = places
-        if len(self._cache) > CACHE_SIZE:
-            self._cache.popitem(last=False)  # en uzun süredir kullanılmayanı at
+        with self._cache_lock:
+            self._cache[key] = places
+            if len(self._cache) > CACHE_SIZE:
+                self._cache.popitem(last=False)  # en uzun süredir kullanılmayanı at

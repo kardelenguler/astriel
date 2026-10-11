@@ -2,6 +2,7 @@
 
 import pytest
 
+from app.schemas.user import PASSWORD_MAX_LENGTH
 from app.services.auth_service import INVALID_CREDENTIALS
 
 pytestmark = pytest.mark.db
@@ -44,6 +45,7 @@ def test_register_short_password_returns_field_error(db_client):
     assert response.status_code == 422
     assert response.json()["error"]["fields"][0]["field"] == "password"
 
+
 def test_register_invalid_email_returns_turkish_field_error(db_client):
     # Angular'ın kontrolünden geçen ama gerçek bir alan adı olmayan e-posta
     response = db_client.post(REGISTER, json={**USER, "email": "ali@mail"})
@@ -66,6 +68,20 @@ def test_login_wrong_password(db_client):
     response = db_client.post(LOGIN, data={**USER, "password": "yanlis-sifre"})
     assert response.status_code == 401
     assert response.json()["error"] == {"code": "unauthorized", "message": INVALID_CREDENTIALS}
+
+
+def test_login_too_long_password_rejected_without_hashing(db_client, monkeypatch):
+    db_client.post(REGISTER, json=USER)
+    calls = []
+    # Şifre kontrolü (Argon2) HİÇ çalışmamalı
+    monkeypatch.setattr(
+        "app.services.auth_service.verify_password",
+        lambda *args: calls.append(args) or False,
+    )
+    response = db_client.post(LOGIN, data={**USER, "password": "a" * (PASSWORD_MAX_LENGTH + 1)})
+    assert response.status_code == 401
+    assert response.json()["error"]["message"] == INVALID_CREDENTIALS
+    assert calls == []
 
 
 # =============================== BEN KİMİM ===============================

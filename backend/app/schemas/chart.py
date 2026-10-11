@@ -58,14 +58,12 @@ class ChartCalculateRequest(BaseModel):
         return value
 
 
-
-
-
 class ChartCreateRequest(ChartCalculateRequest):
     """Haritayı kaydetmek için: hesaplama bilgilerine ek olarak ad ve yer adı."""
 
     name: str = Field(min_length=1, max_length=100, examples=["Benim haritam"])
     place_name: str = Field(min_length=1, max_length=200, examples=["Antalya, Türkiye"])
+
 
 # =============================== YANIT ===============================
 class FromAttributesModel(BaseModel):
@@ -133,8 +131,6 @@ class ChartResponse(BaseModel):
     aspects: list[AspectOut]
     warnings: list[str]
     engine_version: str
-
-
 
 
 # =========================== KAYITLI HARİTALAR ===========================

@@ -19,7 +19,6 @@ import swisseph as swe
 from app.core.config import settings
 from app.core.exceptions import CalculationError
 
-
 logger = logging.getLogger(__name__)
 
 # Swiss Ephemeris ayarları iş parçacığına (thread) özeldir. FastAPI 'def' route'larını
@@ -31,6 +30,7 @@ def _ensure_ephe_path() -> None:
     if not getattr(_thread_state, "ephe_path_set", False):
         swe.set_ephe_path(str(settings.ephe_dir))
         _thread_state.ephe_path_set = True
+
 
 EPHEMERIS_VERSION: str = swe.version
 

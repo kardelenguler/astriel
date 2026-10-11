@@ -2,7 +2,6 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, map, switchMap, tap } from 'rxjs';
 
-
 import { environment } from '../../../environments/environment';
 import { RegisterRequest, TokenResponse, User } from '../models/user';
 
@@ -54,11 +53,10 @@ export class AuthService {
     return readToken();
   }
 
-  // Kayıt ol, ardından aynı bilgilerle otomatik giriş yap
+  // Sadece hesabı açar. Ardından giriş yapmak kayıt sayfasının işidir:
+  // giriş başarısız olursa hesap yine de açılmış olur, kullanıcı tekrar kayıt denememeli.
   register(data: RegisterRequest): Observable<User> {
-    return this.http
-      .post<User>(`${this.baseUrl}/register`, data)
-      .pipe(switchMap(() => this.login(data.username, data.password)));
+    return this.http.post<User>(`${this.baseUrl}/register`, data);
   }
 
   // Backend giriş için JSON değil form verisi bekliyor (OAuth2 standardı).

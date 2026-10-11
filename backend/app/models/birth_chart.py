@@ -50,7 +50,6 @@ class BirthChart(Base, TimestampMixin):
     chart_data: Mapped[dict[str, Any]] = mapped_column(JSONB)
     engine_version: Mapped[str] = mapped_column(String(50))
 
-
     # ---------- Yumuşak silme ----------
     # Dolu ise harita "silinmiş" sayılır ve listelerde görünmez;
     # kullanıcı "Geri al" derse tekrar None yapılır.

@@ -6,6 +6,7 @@ Route fonksiyonlarında parametre olarak yazmak yeterlidir:
 
 FastAPI her istek için gerekeni üretir; oturum istek bitince kapatılır.
 """
+
 from functools import lru_cache
 from typing import Annotated
 
@@ -32,8 +33,6 @@ def get_chart_service() -> ChartService:
 ChartServiceDep = Annotated[ChartService, Depends(get_chart_service)]
 
 
-
-
 def get_saved_chart_service(db: DbSession, calculator: ChartServiceDep) -> SavedChartService:
     return SavedChartService(db, calculator)
 
@@ -54,6 +53,7 @@ def get_geocoder() -> NominatimGeocoder:
 
 
 GeocoderDep = Annotated[NominatimGeocoder, Depends(get_geocoder)]
+
 
 def get_auth_service(db: DbSession) -> AuthService:
     return AuthService(db)

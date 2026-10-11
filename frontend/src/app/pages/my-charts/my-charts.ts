@@ -150,7 +150,15 @@ export class MyCharts {
         // Listeyi baştan yüklemek yerine haritayı eski yerine geri koy:
         // "Daha fazla yükle" ile açılmış haritalar kaybolmasın
         next: () => {
-          this.charts.update((list) => [...list, item].sort(newestFirst));
+          this.charts.update((list) => {
+            const last = list.at(-1);
+            // Haritanın yeri henüz yüklenmemiş kısımdaysa eklenmez; "Daha Fazla Yükle"
+            // ile zaten gelecek (eklenseydi listede iki kez görünürdü)
+            if (last && this.hasMore() && newestFirst(item, last) > 0) {
+              return list;
+            }
+            return [...list, item].sort(newestFirst);
+          });
           this.total.update((t) => t + 1);
         },
         error: (error) => this.actionError.set(getErrorMessage(error)),

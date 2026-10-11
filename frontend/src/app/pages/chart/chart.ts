@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, ParamMap, Params, Router, RouterLink } from '@angular/router';
@@ -162,8 +163,7 @@ export class Chart {
     // isLoggedIn() yerine token'a bakılır: sayfa yeni açıldığında kullanıcı bilgisi
     // birkaç an sonra yüklenir; o arada "giriş yapmamış" sanılıp harita kaybolmasın.
     if (!this.auth.token) {
-      // Giriş yapınca bu haritaya geri dönülsün
-      this.router.navigate(['/giris'], { queryParams: { donus: this.router.url } });
+      this.goToLogin();
       return;
     }
     this.saveError.set(null);
@@ -208,10 +208,21 @@ export class Chart {
       .subscribe({
         next: () => this.saveState.set('saved'),
         error: (error) => {
+          // Oturum süresi dolduysa (interceptor çıkış yaptırdı) giriş sayfasına git;
+          // giriş yapınca bu haritaya geri dönülür, harita kaybolmaz.
+          if (error instanceof HttpErrorResponse && error.status === 401) {
+            this.goToLogin({ oturum: 'doldu' });
+            return;
+          }
           this.saveError.set(getErrorMessage(error));
           this.saveState.set('editing');
         },
       });
+  }
+
+  /** Giriş sayfasına gönderir; giriş yapınca bu haritaya geri dönülsün */
+  private goToLogin(extra: Params = {}): void {
+    this.router.navigate(['/giris'], { queryParams: { donus: this.router.url, ...extra } });
   }
 
   // ================= Hesaplama =================

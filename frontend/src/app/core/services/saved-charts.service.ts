@@ -28,11 +28,13 @@ export class SavedChartsService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
-  restore(id: string): Observable<unknown> {
-    return this.http.post(`${this.baseUrl}/${id}/restore`, null);
+  /** Silinen haritayı geri getirir; backend haritanın son halini döndürür */
+  restore(id: string): Observable<SavedChart> {
+    return this.http.post<SavedChart>(`${this.baseUrl}/${id}/restore`, null);
   }
 
-  rename(id: string, name: string): Observable<unknown> {
-    return this.http.patch(`${this.baseUrl}/${id}`, { name });
+  /** Haritanın adını değiştirir; backend haritanın son halini döndürür */
+  rename(id: string, name: string): Observable<SavedChart> {
+    return this.http.patch<SavedChart>(`${this.baseUrl}/${id}`, { name });
   }
 }

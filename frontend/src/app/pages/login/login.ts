@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { getErrorMessage } from '../../core/http/error-message';
+import { safeReturnUrl } from '../../core/navigation/return-url';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
@@ -29,6 +30,10 @@ export class Login {
   /** Oturum süresi dolduğu için buraya yönlendirildiyse (?oturum=doldu) bilgi gösterilir */
   protected readonly sessionExpired =
     this.route.snapshot.queryParamMap.get('oturum') === 'doldu';
+
+  /** Kayıt oldu ama otomatik giriş yapılamadıysa (?kayit=tamam) bilgi gösterilir */
+  protected readonly justRegistered =
+    this.route.snapshot.queryParamMap.get('kayit') === 'tamam';
 
   hasError(name: 'username' | 'password'): boolean {
     const control = this.form.controls[name];
@@ -57,10 +62,8 @@ export class Login {
     });
   }
 
-  // Giriş sayfasına başka bir sayfadan yönlendirildiyse (?donus=/haritalarim)
-  // giriş sonrası oraya dön. Sadece site içi adreslere izin ver.
+  // Giriş sayfasına başka bir sayfadan yönlendirildiyse giriş sonrası oraya dön
   private returnUrl(): string {
-    const url = this.route.snapshot.queryParamMap.get('donus');
-    return url && url.startsWith('/') && !url.startsWith('//') ? url : '/';
+    return safeReturnUrl(this.route);
   }
 }

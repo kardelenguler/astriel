@@ -6,6 +6,9 @@
     @if (sessionExpired && !error()) {
       <p class="auth-alert" role="status">Oturumunun süresi doldu. Devam etmek için tekrar giriş yap.</p>
     }
+    @if (justRegistered && !error()) {
+      <p class="auth-alert" role="status">Hesabın oluşturuldu. Devam etmek için giriş yap.</p>
+    }
     @if (error(); as message) {
       <p class="auth-alert" role="alert">{{ message }}</p>
     }
@@ -53,7 +56,7 @@
     </button>
 
     <p class="auth-switch">
-      Hesabın yok mu? <a routerLink="/kayit">Ücretsiz kayıt ol</a>
+      Hesabın yok mu? <a routerLink="/kayit" queryParamsHandling="preserve">Ücretsiz kayıt ol</a>
     </p>
   </form>
 </section>

@@ -12,6 +12,10 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 # (I -> ı / i) karışıklık çıkarır ve iki farklı görünen ad aynı hesabı gösterebilir.
 USERNAME_PATTERN = re.compile(r"[a-z0-9_]{3,30}")
 
+# Şifre en fazla bu kadar karakter olabilir. Kayıtta, şifre değiştirmede ve girişte
+# aynı sınır kullanılır (Argon2 çok uzun şifrelerde sunucuyu yavaşlatır).
+PASSWORD_MAX_LENGTH = 128
+
 
 # =============================== İSTEK ===============================
 class UserCreate(BaseModel):
@@ -19,7 +23,7 @@ class UserCreate(BaseModel):
 
     # NOT: str_strip_whitespace burada KULLANILMAZ; şifredeki boşluklar şifrenin parçasıdır.
     username: str = Field(examples=["kardelen"])
-    password: str = Field(min_length=8, max_length=128, examples=["gizli-sifre-123"])
+    password: str = Field(min_length=8, max_length=PASSWORD_MAX_LENGTH, examples=["gizli-sifre-123"])
     email: EmailStr | None = Field(default=None, examples=["ornek@mail.com"])
     display_name: str | None = Field(default=None, max_length=100, examples=["Kardelen"])
 

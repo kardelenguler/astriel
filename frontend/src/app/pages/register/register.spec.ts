@@ -14,10 +14,15 @@ const USER: User = { id: '1', username: 'kardelen', email: null, display_name: n
 class FakeAuthService {
   readonly requests: RegisterRequest[] = [];
   result: Observable<User> = of(USER);
+  loginResult: Observable<User> = of(USER);
 
   register(request: RegisterRequest): Observable<User> {
     this.requests.push(request);
     return this.result;
+  }
+
+  login(): Observable<User> {
+    return this.loginResult;
   }
 }
 
@@ -155,5 +160,16 @@ describe('Register', () => {
     );
     expect(page.querySelector<HTMLButtonElement>('.auth-submit')!.disabled).toBe(false);
     expect(redirects).toEqual([]);
+  });
+
+  it('hesap açılıp otomatik giriş başarısız olursa giriş sayfasına göndermeli', () => {
+    auth.loginResult = throwError(() => new HttpErrorResponse({ status: 0 }));
+    fillRequired();
+    submit();
+
+    expect(redirects.length).toBe(1);
+    expect(redirects[0]).toContain('/giris');
+    expect(redirects[0]).toContain('kayit=tamam');
+    expect(page.querySelector('[role="alert"]')).toBeNull(); // kayıt hatası gösterilmemeli
   });
 });

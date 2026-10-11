@@ -29,6 +29,16 @@ class InvalidInputError(AppError):
     default_message = "Girilen bilgiler geçersiz."
 
 
+class WrongPasswordError(InvalidInputError):
+    """Hesap ayarlarında girilen mevcut şifre yanlış.
+
+    401 DEĞİL 422 döner: frontend 401 görünce kullanıcıyı çıkışa atar,
+    oysa burada sadece bir uyarı gösterilmeli.
+    """
+
+    default_message = "Mevcut şifre hatalı."
+
+
 class NotFoundError(AppError):
     status_code = 404
     code = "not_found"

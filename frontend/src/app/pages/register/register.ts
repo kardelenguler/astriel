@@ -6,11 +6,12 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { EMPTY, catchError, switchMap } from 'rxjs';
 import { getErrorMessage } from '../../core/http/error-message';
 import { RegisterRequest } from '../../core/models/user';
 import { AuthService } from '../../core/services/auth.service';
+import { safeReturnUrl } from '../../core/navigation/return-url';
 
 // Backend'deki kuralın aynısı: 3–30 karakter, harf/rakam/alt çizgi.
 // Büyük harfe izin veriyoruz, göndermeden önce küçük harfe çeviriyoruz.
@@ -34,6 +35,7 @@ type FieldName = 'username' | 'password' | 'passwordConfirm' | 'email' | 'displa
 export class Register {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly fb = inject(FormBuilder);
 
   protected readonly form = this.fb.nonNullable.group(
@@ -93,12 +95,29 @@ export class Register {
       request.display_name = value.displayName.trim();
     }
 
-    this.auth.register(request).subscribe({
-      next: () => this.router.navigateByUrl('/'),
-      error: (err) => {
-        this.error.set(getErrorMessage(err));
-        this.loading.set(false);
-      },
-    });
+    this.auth
+      .register(request)
+      .pipe(
+        // Hesap açıldı: aynı bilgilerle otomatik giriş yap
+        switchMap(() =>
+          this.auth.login(request.username, request.password).pipe(
+            // Giriş başarısız olsa da hesap AÇILDI: giriş sayfasına gönder, tekrar kayıt denenmesin
+            catchError(() => {
+              this.router.navigate(['/giris'], {
+                queryParams: { donus: safeReturnUrl(this.route), kayit: 'tamam' },
+              });
+              return EMPTY;
+            }),
+          ),
+        ),
+      )
+      .subscribe({
+        next: () => this.router.navigateByUrl(safeReturnUrl(this.route)),
+        // Buraya sadece KAYIT hataları gelir (ör. kullanıcı adı alınmış)
+        error: (err) => {
+          this.error.set(getErrorMessage(err));
+          this.loading.set(false);
+        },
+      });
   }
 }

@@ -1,5 +1,6 @@
 import pytest
 
+from app.core.rate_limit import MAX_FAILED_ATTEMPTS
 from app.models.birth_chart import BirthChart
 
 pytestmark = pytest.mark.db
@@ -48,6 +49,7 @@ def test_change_password_success(db_client):
     me = db_client.get(ME, headers={"Authorization": f"Bearer {new_token}"})
     assert me.status_code == 200
 
+
 def test_change_password_with_wrong_current_password(db_client):
     headers = _register_and_login(db_client)
     response = db_client.post(
@@ -60,6 +62,19 @@ def test_change_password_with_wrong_current_password(db_client):
     assert response.status_code == 422
     assert response.json()["error"]["message"] == "Mevcut şifre hatalı."
     assert _login_status(db_client, PASSWORD) == 200  # şifre değişmedi
+
+
+def test_change_password_is_locked_after_too_many_wrong_attempts(db_client):
+    headers = _register_and_login(db_client)
+    wrong = {"current_password": "yanlis", "new_password": "yeni-sifre-456"}
+    for _ in range(MAX_FAILED_ATTEMPTS):
+        assert db_client.post(PASSWORD_URL, json=wrong, headers=headers).status_code == 422
+
+    # Sınır aşıldı: doğru şifre bile kabul edilmez, şifre değişmez
+    right = {"current_password": PASSWORD, "new_password": "yeni-sifre-456"}
+    response = db_client.post(PASSWORD_URL, json=right, headers=headers)
+    assert response.status_code == 429
+    assert response.json()["error"]["code"] == "too_many_requests"
 
 
 def test_change_password_rejects_short_new_password(db_client):
@@ -96,6 +111,17 @@ def test_delete_account_with_wrong_password_keeps_account(db_client):
 
     assert response.status_code == 422
     assert _login_status(db_client, PASSWORD) == 200
+
+
+def test_delete_account_is_locked_after_too_many_wrong_attempts(db_client):
+    headers = _register_and_login(db_client)
+    for _ in range(MAX_FAILED_ATTEMPTS):
+        response = db_client.request("DELETE", ACCOUNT_URL, json={"password": "yanlis"}, headers=headers)
+        assert response.status_code == 422
+
+    response = db_client.request("DELETE", ACCOUNT_URL, json={"password": PASSWORD}, headers=headers)
+    assert response.status_code == 429
+    assert db_client.get(ME, headers=headers).status_code == 200  # hesap silinmedi
 
 
 def test_delete_account_removes_user_and_all_charts(db_client, db_session):

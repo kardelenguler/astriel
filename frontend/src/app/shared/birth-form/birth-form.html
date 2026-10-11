@@ -93,7 +93,7 @@
           <p class="status" role="status">Sonuç bulunamadı. İlçe ve şehri birlikte yazmayı dene (ör. “Bucak, Burdur”).</p>
         } @else {
           <ul class="results" aria-label="Arama sonuçları">
-            @for (place of results; track place.display_name) {
+            @for (place of results; track $index) {
               <li>
                 <button type="button" (click)="selectPlace(place)">
                   <span class="result-name">{{ place.name }}</span>

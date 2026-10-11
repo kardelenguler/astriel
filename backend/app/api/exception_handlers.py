@@ -15,6 +15,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, Response
 from starlette.exceptions import HTTPException as StarletteHTTPException
+
 from app.core.exceptions import AppError
 
 logger = logging.getLogger(__name__)
@@ -55,11 +56,13 @@ def format_field_path(location: Sequence[Any]) -> str:
         parts = parts[1:]
     return ".".join(str(part) for part in parts)
 
+
 def _display_value(value: Any) -> Any:
     """90.0 -> 90 (kullanıcıya '90.0' yerine '90' gösterilsin); diğerleri aynen kalır."""
     if isinstance(value, float) and value.is_integer():
         return int(value)
     return value
+
 
 def translate_message(error: dict[str, Any]) -> str:
     """Pydantic hatasını Türkçe mesaja çevirir.
@@ -82,7 +85,6 @@ def translate_message(error: dict[str, Any]) -> str:
         return error["msg"].removeprefix("Value error, ")
 
 
-
 def _error_response(
     status_code: int,
     code: str,
@@ -103,7 +105,6 @@ async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
     return _error_response(exc.status_code, exc.code, exc.message)
 
 
-
 # Starlette'in kendi fırlattığı HTTP hataları (olmayan adres, yanlış metot...) -> kod ve Türkçe mesaj
 _HTTP_ERRORS: dict[int, tuple[str, str]] = {
     401: ("unauthorized", "Lütfen giriş yapın."),
@@ -118,8 +119,6 @@ async def http_error_handler(request: Request, exc: StarletteHTTPException) -> J
     logger.warning("%s %s -> %s", request.method, request.url.path, exc.status_code)
     # exc.headers: ör. 405'teki 'Allow' başlığı korunur
     return _error_response(exc.status_code, code, message, headers=exc.headers)
-
-
 
 
 async def validation_error_handler(request: Request, exc: RequestValidationError) -> JSONResponse:

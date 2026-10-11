@@ -132,6 +132,17 @@ def test_full_queue_returns_busy_error_without_waiting():
     assert requests == []  # Nominatim'e hiç istek gitmedi
 
 
+def test_cached_search_answers_even_when_queue_is_full():
+    # Önbellekteki arama sıra beklemez; yavaş bir Nominatim isteği onu bekletmemeli
+    geocoder, requests = _geocoder(_respond_json([ANTALYA]))
+    geocoder.search("Antalya")
+    for _ in range(geocoder_module.MAX_WAITING_SEARCHES):
+        geocoder._queue.acquire()  # sıra dolu
+
+    assert geocoder.search("antalya")[0].name == "Antalya"
+    assert len(requests) == 1  # Nominatim'e yeni istek gitmedi
+
+
 # =============================== HIZ SINIRI ===============================
 def test_rate_limit_waits_between_requests(monkeypatch):
     waits: list[float] = []

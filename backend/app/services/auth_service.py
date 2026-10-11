@@ -8,7 +8,12 @@ import logging
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.core.exceptions import AuthenticationError, ConflictError, InvalidInputError
+from app.core.exceptions import (
+    AuthenticationError,
+    ConflictError,
+    InvalidInputError,
+    WrongPasswordError,
+)
 from app.core.security import (
     create_access_token,
     hash_password,
@@ -18,17 +23,13 @@ from app.core.security import (
 )
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
-from app.schemas.user import UserCreate
+from app.schemas.user import PASSWORD_MAX_LENGTH, UserCreate
 
 logger = logging.getLogger(__name__)
 
 # Yanlış kullanıcı adı ile yanlış şifre AYNI mesajı alır;
 # aksi halde hangi kullanıcı adlarının kayıtlı olduğu öğrenilebilir.
 INVALID_CREDENTIALS = "Kullanıcı adı veya şifre hatalı."
-
-# Hesap ayarlarında şifre yanlışsa 401 DEĞİL 422 döner: frontend 401 görünce
-# kullanıcıyı çıkışa atar, oysa burada sadece bir uyarı gösterilmeli.
-WRONG_CURRENT_PASSWORD = "Mevcut şifre hatalı."
 
 PASSWORD_CHANGED = "Şifren değiştirildiği için oturumun kapandı. Lütfen yeni şifrenle giriş yap."
 
@@ -78,6 +79,11 @@ class AuthService:
 
     # ------------------------------ Giriş ------------------------------
     def authenticate(self, username: str, password: str) -> User:
+        # Sınırdan uzun bir şifre hiçbir hesaba ait olamaz: hash'lenmeden reddedilir.
+        # Yoksa çok uzun bir şifre Argon2'yi saniyelerce meşgul edip sunucuyu yavaşlatırdı.
+        if len(password) > PASSWORD_MAX_LENGTH:
+            raise AuthenticationError(INVALID_CREDENTIALS)
+
         # Giriş formunda da "Kardelen" ile "kardelen" aynı hesap sayılsın
         user = self.users.get_by_username(username.strip().lower())
 
@@ -116,7 +122,7 @@ class AuthService:
         değiştiren kişi yeni token'la devam eder.
         """
         if not verify_password(current_password, user.hashed_password):
-            raise InvalidInputError(WRONG_CURRENT_PASSWORD)
+            raise WrongPasswordError()
         if current_password == new_password:
             raise InvalidInputError("Yeni şifre mevcut şifreyle aynı olamaz.")
 
@@ -128,7 +134,7 @@ class AuthService:
     def delete_account(self, user: User, password: str) -> None:
         """Şifre doğruysa kullanıcıyı ve TÜM haritalarını kalıcı olarak siler."""
         if not verify_password(password, user.hashed_password):
-            raise InvalidInputError(WRONG_CURRENT_PASSWORD)
+            raise WrongPasswordError()
 
         user_id = user.id
         self.db.delete(user)  # haritalar da silinir (modeldeki cascade)
