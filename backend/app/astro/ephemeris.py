@@ -12,7 +12,7 @@ pysweph dönüş biçimleri:
 import logging
 import threading
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import swisseph as swe
 
@@ -87,6 +87,12 @@ def julian_day(moment: datetime) -> float:
     return swe.julday(utc.year, utc.month, utc.day, hour, swe.GREG_CAL)
 
 
+def utc_from_julian_day(jd: float) -> datetime:
+    """Jülyen günü UTC'li bir datetime'a çevirir (julian_day'in tersi)."""
+    year, month, day, hour = swe.revjul(jd, swe.GREG_CAL)
+    return datetime(year, month, day, tzinfo=timezone.utc) + timedelta(hours=hour)
+
+
 def calc_body(jd: float, body_key: str) -> RawBodyPosition:
     """Bir gök cisminin konumunu hesaplar."""
     _ensure_ephe_path()
@@ -121,4 +127,4 @@ def calc_houses(jd: float, latitude: float, longitude: float, system: str) -> Ra
     # pysweph 13 eleman döndürür ve 0. eleman boştur; farklı sürümlere karşı iki durumu da ele al
     twelve = cusps[1:13] if len(cusps) == 13 else cusps[:12]
 
-    return RawHouses(cusps=tuple(twelve), ascendant=points[0], midheaven=points[1]) 
+    return RawHouses(cusps=tuple(twelve), ascendant=points[0], midheaven=points[1])

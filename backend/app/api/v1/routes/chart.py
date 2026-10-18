@@ -1,7 +1,8 @@
 """Harita endpoint'leri.
 
-- POST /charts/calculate : HERKESE AÇIK (misafir de hesaplar), kaydetmez.
-- Diğerleri              : giriş gerekli; kullanıcının kendi kayıtlı haritaları.
+- POST /charts/calculate    : HERKESE AÇIK (misafir de hesaplar), kaydetmez.
+- POST /charts/solar-return : HERKESE AÇIK, Güneş dönüşü haritasını hesaplar, kaydetmez.
+- Diğerleri                 : giriş gerekli; kullanıcının kendi kayıtlı haritaları.
 """
 
 import uuid
@@ -17,6 +18,8 @@ from app.schemas.chart import (
     ChartRenameRequest,
     ChartResponse,
     SavedChartOut,
+    SolarReturnRequest,
+    SolarReturnResponse,
 )
 from app.schemas.error import ErrorResponse
 
@@ -41,6 +44,17 @@ CHART_PATH = "/{chart_id:uuid}"
 )
 def calculate_chart(request: ChartCalculateRequest, service: ChartServiceDep) -> ChartResponse:
     return service.calculate(request)
+
+
+@router.post(
+    "/solar-return",
+    response_model=SolarReturnResponse,
+    summary="Solar Return (Güneş dönüşü) haritası hesapla (kaydetmeden)",
+)
+def calculate_solar_return(
+    request: SolarReturnRequest, service: ChartServiceDep
+) -> SolarReturnResponse:
+    return service.solar_return(request)
 
 
 # =============================== KAYITLI HARİTALAR ===============================

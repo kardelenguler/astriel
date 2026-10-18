@@ -8,7 +8,7 @@
 import uuid
 from datetime import date, datetime, time
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
 
 from app.astro.ephemeris import MAX_YEAR, MIN_YEAR
 from app.astro.houses import DEFAULT_HOUSE_SYSTEM, HOUSE_SYSTEMS
@@ -65,6 +65,44 @@ class ChartCreateRequest(ChartCalculateRequest):
     place_name: str = Field(min_length=1, max_length=200, examples=["Antalya, Türkiye"])
 
 
+class SolarReturnRequest(ChartCalculateRequest):
+    """Solar Return (Güneş dönüşü) için: doğum bilgileri + hangi yıl + (isteğe bağlı) bulunulan yer."""
+
+    year: int = Field(examples=[2026], description="Güneş dönüşü hesaplanacak yıl.")
+    return_latitude: float | None = Field(
+        default=None,
+        ge=-90,
+        le=90,
+        description="O yıl bulunulan yerin enlemi. Boşsa doğum yeri kullanılır.",
+    )
+    # validate_default: boş bırakılsa bile doğrulayıcı çalışsın (enlem tek başına verilmişse hata ver)
+    return_longitude: float | None = Field(
+        default=None,
+        ge=-180,
+        le=180,
+        description="O yıl bulunulan yerin boylamı. Boşsa doğum yeri kullanılır.",
+        validate_default=True,
+    )
+
+    @field_validator("year")
+    @classmethod
+    def year_must_follow_birth_year(cls, value: int, info: ValidationInfo) -> int:
+        birth_date = info.data.get("birth_date")
+        if birth_date is not None and value <= birth_date.year:
+            raise ValueError("Güneş dönüşü yılı doğum yılından sonra olmalıdır.")
+        if value > MAX_YEAR:
+            raise ValueError(f"Yıl en fazla {MAX_YEAR} olabilir.")
+        return value
+
+    @field_validator("return_longitude")
+    @classmethod
+    def coordinates_come_together(cls, value: float | None, info: ValidationInfo) -> float | None:
+        latitude = info.data.get("return_latitude")
+        if (latitude is None) != (value is None):
+            raise ValueError("Bulunulan yerin enlemi ve boylamı birlikte verilmelidir.")
+        return value
+
+
 # =============================== YANIT ===============================
 class FromAttributesModel(BaseModel):
     """Astro motorunun dataclass'larından doğrudan oluşturulabilen modellerin temeli."""
@@ -98,7 +136,7 @@ class PlanetOut(FromAttributesModel):
 
 
 class SpecialPointOut(FromAttributesModel):
-    """Güney Ay Düğümü, Lilit, Juno, Şans Noktası (Kuzey Düğüm ve Chiron planets içinde)."""
+    """Güney Düğüm, Lilit, Juno, Şans Noktası (Kuzey Düğüm ve Kiron planets içinde)."""
 
     key: str
     name: str
@@ -145,6 +183,18 @@ class ChartResponse(BaseModel):
     aspects: list[AspectOut]
     warnings: list[str]
     engine_version: str
+
+
+class SolarReturnResponse(BaseModel):
+    """Solar Return: yıl + haritanın hesaplandığı yer + Güneş dönüşü anının haritası.
+
+    Güneş dönüşü anı `chart.utc_datetime` alanındadır; yerel saati için
+    `chart.utc_offset_hours` eklenir.
+    """
+
+    year: int
+    used_birth_place: bool  # True: harita doğum yerine göre, False: bulunulan yere göre
+    chart: ChartResponse
 
 
 # =========================== KAYITLI HARİTALAR ===========================

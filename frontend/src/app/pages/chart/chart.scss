@@ -117,6 +117,42 @@ h1 {
   }
 }
 
+// ================= SEKMELER =================
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--color-border);
+  overflow-x: auto; // dar ekranda sekmeler taşarsa yana kaysın
+  overflow-y: hidden; // dikey kaydırma çubuğu çıkmasın
+  scrollbar-width: none; // yatay kaydırma çubuğunu gizle (parmakla kayar)
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.tab {
+  flex: 0 0 auto;
+  padding: 10px 18px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font: inherit;
+  font-size: 15px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    color: var(--color-mauve);
+  }
+
+  &.active {
+    color: var(--color-gold);
+    border-bottom-color: var(--color-gold);
+  }
+}
+
 // ================= BÜYÜK ÜÇLÜ =================
 .big-three {
   display: grid;
@@ -330,6 +366,11 @@ tbody tr:hover {
   // Saat dilimi telefonda gizli: tarih ve saat tek satıra sığar
   .meta .tz {
     display: none;
+  }
+
+  .tab {
+    padding: 10px 14px;
+    font-size: 14px;
   }
 
   .panel {

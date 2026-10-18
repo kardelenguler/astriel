@@ -1,0 +1,173 @@
+<section class="sr">
+  <!-- ================= Kontroller: yıl ve yer ================= -->
+  <div class="box controls">
+    <div class="year-stepper">
+      <button
+        type="button"
+        class="step"
+        aria-label="Önceki yıl"
+        [disabled]="!canPrev()"
+        (click)="shiftYear(-1)"
+      >
+        ◀
+      </button>
+      <span class="year" aria-live="polite">{{ year() }}</span>
+      <button
+        type="button"
+        class="step"
+        aria-label="Sonraki yıl"
+        [disabled]="!canNext()"
+        (click)="shiftYear(1)"
+      >
+        ▶
+      </button>
+    </div>
+
+    <p class="intro">
+      Güneş her yıl doğum gününün civarında, doğduğun andaki konumuna geri döner. O anın haritası,
+      yeni yaşında öne çıkan temaları gösterir.
+    </p>
+
+    <div class="mode" role="group" aria-label="Haritanın hesaplanacağı yer">
+      <button
+        type="button"
+        [class.active]="mode() === 'birth'"
+        [attr.aria-pressed]="mode() === 'birth'"
+        (click)="setMode('birth')"
+      >
+        Doğum yerim
+      </button>
+      <button
+        type="button"
+        [class.active]="mode() === 'other'"
+        [attr.aria-pressed]="mode() === 'other'"
+        (click)="setMode('other')"
+      >
+        Başka bir yer
+      </button>
+    </div>
+
+    @if (mode() === 'other') {
+      <p class="hint">O yıl doğum günümde nerede olacağımı seçiyorum.</p>
+      <div class="place-search">
+        <input
+          type="text"
+          aria-label="Bulunulan yer"
+          placeholder="Şehir ara (ör. Berlin)"
+          maxlength="100"
+          [value]="query()"
+          (input)="onQueryInput($event)"
+          (keydown.enter)="searchPlaces()"
+        />
+        <button type="button" class="search-btn" [disabled]="searching()" (click)="searchPlaces()">
+          {{ searching() ? 'Aranıyor…' : 'Ara' }}
+        </button>
+      </div>
+
+      @if (searchError(); as message) {
+        <p class="error" role="alert">{{ message }}</p>
+      }
+
+      @if (results(); as places) {
+        @if (places.length === 0) {
+          <p class="hint">Yer bulunamadı. Başka bir yazımla dene.</p>
+        } @else {
+          <ul class="results">
+            @for (place of places; track $index) {
+              <li>
+                <button type="button" (click)="choosePlace(place)">{{ place.display_name }}</button>
+              </li>
+            }
+          </ul>
+        }
+      }
+
+      @if (!otherPlace()) {
+        <p class="hint">Haritayı görmek için bir yer ara ve listeden seç.</p>
+      }
+    }
+  </div>
+
+  <!-- ================= Yükleniyor / hata ================= -->
+  @if (loading()) {
+    <div class="state" role="status">
+      <div class="spinner" aria-hidden="true"></div>
+      <p>Güneş dönüşü hesaplanıyor…</p>
+    </div>
+  }
+
+  @if (error(); as message) {
+    <p class="error state" role="alert">{{ message }}</p>
+  }
+
+  <!-- ================= Sonuç ================= -->
+  @if (chart(); as c) {
+    <div class="box moment">
+      <p class="moment-label">{{ year() }} Güneş dönüşün</p>
+      <p class="moment-time">{{ momentText() }}</p>
+      <p class="moment-place">{{ placeLabel() }} · {{ c.timezone }}</p>
+    </div>
+
+    <!-- Yükselen, Güneş'in evi, Ay (tıklanınca açıklama açılır) -->
+    <div class="key-cards">
+      @if (c.ascendant; as asc) {
+        <button
+          type="button"
+          class="key-card clickable"
+          [class.selected]="selected()?.id === 'solar-ascendant'"
+          [attr.aria-expanded]="selected()?.id === 'solar-ascendant'"
+          (click)="select('ascendant')"
+        >
+          <span class="key-label">Yükselen</span>
+          <span class="key-sign">{{ asc.sign.name }}</span>
+          <span class="key-detail">{{ asc.formatted }}</span>
+        </button>
+      }
+      @if (sun(); as s) {
+        <button
+          type="button"
+          class="key-card clickable"
+          [class.selected]="selected()?.id === 'solar-sun'"
+          [attr.aria-expanded]="selected()?.id === 'solar-sun'"
+          (click)="select('sun')"
+        >
+          <span class="key-label">Güneş'in Evi</span>
+          <span class="key-sign">{{ s.house ? s.house + '. Ev' : '—' }}</span>
+          <span class="key-detail">{{ s.formatted }}</span>
+        </button>
+      }
+      @if (moon(); as m) {
+        <button
+          type="button"
+          class="key-card clickable"
+          [class.selected]="selected()?.id === 'solar-moon'"
+          [attr.aria-expanded]="selected()?.id === 'solar-moon'"
+          (click)="select('moon')"
+        >
+          <span class="key-label">Ay</span>
+          <span class="key-sign">{{ m.sign.name }}</span>
+          <span class="key-detail">{{ m.house ? m.house + '. Ev' : m.formatted }}</span>
+        </button>
+      }
+    </div>
+
+    @if (selected(); as detail) {
+      <app-interpretation-panel [interpretation]="detail" (closed)="closeDetail()" />
+    } @else {
+      <p class="card-hint">Kartlara dokunarak yılının açıklamasını görebilirsin.</p>
+    }
+
+    <section class="box wheel-box">
+      <h2>{{ year() }} Solar Return Haritası</h2>
+      <app-chart-wheel [chart]="c" />
+    </section>
+
+    @if (c.warnings.length > 0) {
+      <div class="warnings">
+        @for (warning of c.warnings; track $index) {
+          <p>{{ warning }}</p>
+        }
+      </div>
+    }
+  }
+</section>

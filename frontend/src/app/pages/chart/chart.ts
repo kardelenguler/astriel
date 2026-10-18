@@ -23,6 +23,7 @@ import { InterpretationService } from '../../core/services/interpretation.servic
 import { SavedChartsService } from '../../core/services/saved-charts.service';
 import { ChartWheel } from '../../shared/chart-wheel/chart-wheel';
 import { InterpretationPanel } from '../../shared/interpretation-panel/interpretation-panel';
+import { SolarReturn } from '../../shared/solar-return/solar-return';
 import { SpecialPoints } from '../../shared/special-points/special-points';
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/; // 1995-06-15
@@ -32,6 +33,9 @@ const NAME_MAX_LENGTH = 100; // backend'deki sınırın aynısı
 // Kaydetme kutusunun durumları
 type SaveState = 'idle' | 'editing' | 'saving' | 'saved';
 
+// Sayfadaki sekmeler (ileride 'progressed' eklenecek)
+type Tab = 'natal' | 'solar';
+
 /**
  * Harita sonuç sayfası. İki şekilde açılır:
  * 1) /harita?tarih=...&saat=...&enlem=...&boylam=...&yer=...  -> bilgiler adresten okunur, harita hesaplanır
@@ -39,7 +43,7 @@ type SaveState = 'idle' | 'editing' | 'saving' | 'saved';
  */
 @Component({
   selector: 'app-chart',
-  imports: [RouterLink, ChartWheel, InterpretationPanel, SpecialPoints],
+  imports: [RouterLink, ChartWheel, InterpretationPanel, SpecialPoints, SolarReturn],
   templateUrl: './chart.html',
   styleUrl: './chart.scss',
 })
@@ -63,6 +67,11 @@ export class Chart {
   readonly birthTimeText = signal<string | null>(null); // "14:15" veya null
   readonly savedName = signal<string | null>(null); // kayıtlı haritanın adı (sadece /harita/<id>)
   readonly editParams = signal<Params>({}); // "Bilgileri değiştir" bağlantısı formu bu bilgilerle doldurur
+
+  // ---------- Sekmeler ----------
+  readonly tab = signal<Tab>('natal');
+  /** Solar Return gibi sekmelerin kullandığı doğum bilgileri (hem adresten hem kayıtlıdan gelir) */
+  readonly birthRequest = signal<ChartCalculateRequest | null>(null);
 
   // ---------- Kaydetme durumu ----------
   private request: ChartCalculateRequest | null = null; // kaydederken tekrar lazım
@@ -114,6 +123,16 @@ export class Chart {
           this.load(queryParams);
         }
       });
+  }
+
+  // ================= Sekmeler =================
+
+  setTab(tab: Tab): void {
+    if (this.tab() === tab) {
+      return;
+    }
+    this.closeDetail(); // başka sekmeye geçince açık açıklama kapansın
+    this.tab.set(tab);
   }
 
   // ================= Yorumlar =================
@@ -259,11 +278,13 @@ export class Chart {
 
   // ================= Hesaplama =================
 
-  /** Başka bir haritaya geçilince kaydetme kutusu ve açık açıklama sıfırlansın */
+  /** Başka bir haritaya geçilince kaydetme kutusu, açık açıklama ve sekme sıfırlansın */
   private resetPage(): void {
     this.saveState.set('idle');
     this.saveError.set(null);
     this.savedName.set(null);
+    this.tab.set('natal');
+    this.birthRequest.set(null);
     this.closeDetail();
   }
 
@@ -294,6 +315,12 @@ export class Chart {
             boylam: saved.longitude,
             yer: saved.place_name,
           });
+          this.birthRequest.set({
+            birth_date: saved.birth_date,
+            birth_time: time,
+            latitude: saved.latitude,
+            longitude: saved.longitude,
+          });
           this.chart.set(saved.chart);
           this.loading.set(false);
         },
@@ -320,6 +347,7 @@ export class Chart {
     this.editParams.set(Object.fromEntries(params.keys.map((key) => [key, params.get(key)])));
     this.birthDateText.set(this.formatDate(request.birth_date));
     this.birthTimeText.set(request.birth_time);
+    this.birthRequest.set(request);
 
     this.loading.set(true);
     this.error.set(null);

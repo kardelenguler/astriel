@@ -73,190 +73,223 @@
       }
     </header>
 
-    <!-- Büyük üçlü: Güneş, Ay, Yükselen (tıklanınca açıklama açılır) -->
-    <div class="big-three">
-      @if (sun(); as s) {
-        <button
-          type="button"
-          class="big-card clickable"
-          [class.selected]="selected()?.id === 'point-sun'"
-          [attr.aria-expanded]="selected()?.id === 'point-sun'"
-          (click)="selectPoint('sun')"
-        >
-          <span class="big-label">Güneş</span>
-          <span class="big-sign">{{ s.sign.name }}</span>
-          <span class="big-detail">{{ s.formatted }}</span>
-        </button>
-      }
-      @if (moon(); as m) {
-        <button
-          type="button"
-          class="big-card clickable"
-          [class.selected]="selected()?.id === 'point-moon'"
-          [attr.aria-expanded]="selected()?.id === 'point-moon'"
-          (click)="selectPoint('moon')"
-        >
-          <span class="big-label">Ay</span>
-          <span class="big-sign">{{ m.sign.name }}</span>
-          <span class="big-detail">{{ m.formatted }}</span>
-        </button>
-      }
-      @if (c.ascendant; as asc) {
-        <button
-          type="button"
-          class="big-card clickable"
-          [class.selected]="selected()?.id === 'point-ascendant'"
-          [attr.aria-expanded]="selected()?.id === 'point-ascendant'"
-          (click)="selectPoint('ascendant')"
-        >
-          <span class="big-label">Yükselen</span>
-          <span class="big-sign">{{ asc.sign.name }}</span>
-          <span class="big-detail">{{ asc.formatted }}</span>
-        </button>
-      } @else {
-        <article class="big-card">
-          <p class="big-label">Yükselen</p>
-          <p class="big-sign muted">—</p>
-          <p class="big-detail">Doğum saati gerekli</p>
-        </article>
-      }
-    </div>
+    <!-- Sekmeler -->
+    <nav class="tabs" role="tablist" aria-label="Harita türü">
+      <button
+        type="button"
+        role="tab"
+        class="tab"
+        [class.active]="tab() === 'natal'"
+        [attr.aria-selected]="tab() === 'natal'"
+        (click)="setTab('natal')"
+      >
+        Doğum Haritası
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="tab"
+        [class.active]="tab() === 'solar'"
+        [attr.aria-selected]="tab() === 'solar'"
+        (click)="setTab('solar')"
+      >
+        Solar Return
+      </button>
+    </nav>
 
-    <!-- Seçilen kartın açıklaması -->
-    @if (pointDetail(); as detail) {
-      <app-interpretation-panel [interpretation]="detail" (closed)="closeDetail()" />
-    }
-    @if (detailError(); as message) {
-      <p class="detail-error" role="alert">{{ message }}</p>
-    }
+    @if (tab() === 'solar') {
+      <!-- ================= SOLAR RETURN ================= -->
+      @if (birthRequest(); as request) {
+        <app-solar-return [request]="request" [birthPlaceName]="placeName()" />
+      }
+    } @else {
+      <!-- ================= DOĞUM HARİTASI ================= -->
 
-    <!-- Doğum haritası çarkı (bir gezegene tıklanınca yorumuna gidilir) -->
-    <section class="panel wheel-panel">
-      <h2>Doğum Haritası</h2>
-      <app-chart-wheel [chart]="c" (planetSelected)="showPlanet($event)" />
-      <ul class="wheel-legend">
-        <li><span class="swatch harmonious"></span>Uyumlu Açılar (üçgen, altmışlık)</li>
-        <li><span class="swatch hard"></span>Zorlayıcı Açılar (kare, karşıt)</li>
-      </ul>
-    </section>
-
-    <!-- Uyarılar (saat bilinmiyor, kutup yedeği, Ay burç değiştiriyor...) -->
-    @if (c.warnings.length > 0) {
-      <div class="warnings">
-        @for (warning of c.warnings; track $index) {
-          <p>{{ warning }}</p>
+      <!-- Büyük üçlü: Güneş, Ay, Yükselen (tıklanınca açıklama açılır) -->
+      <div class="big-three">
+        @if (sun(); as s) {
+          <button
+            type="button"
+            class="big-card clickable"
+            [class.selected]="selected()?.id === 'point-sun'"
+            [attr.aria-expanded]="selected()?.id === 'point-sun'"
+            (click)="selectPoint('sun')"
+          >
+            <span class="big-label">Güneş</span>
+            <span class="big-sign">{{ s.sign.name }}</span>
+            <span class="big-detail">{{ s.formatted }}</span>
+          </button>
+        }
+        @if (moon(); as m) {
+          <button
+            type="button"
+            class="big-card clickable"
+            [class.selected]="selected()?.id === 'point-moon'"
+            [attr.aria-expanded]="selected()?.id === 'point-moon'"
+            (click)="selectPoint('moon')"
+          >
+            <span class="big-label">Ay</span>
+            <span class="big-sign">{{ m.sign.name }}</span>
+            <span class="big-detail">{{ m.formatted }}</span>
+          </button>
+        }
+        @if (c.ascendant; as asc) {
+          <button
+            type="button"
+            class="big-card clickable"
+            [class.selected]="selected()?.id === 'point-ascendant'"
+            [attr.aria-expanded]="selected()?.id === 'point-ascendant'"
+            (click)="selectPoint('ascendant')"
+          >
+            <span class="big-label">Yükselen</span>
+            <span class="big-sign">{{ asc.sign.name }}</span>
+            <span class="big-detail">{{ asc.formatted }}</span>
+          </button>
+        } @else {
+          <article class="big-card">
+            <p class="big-label">Yükselen</p>
+            <p class="big-sign muted">—</p>
+            <p class="big-detail">Doğum saati gerekli</p>
+          </article>
         }
       </div>
-    }
 
-    <!-- Özel noktalar (Kuzey Düğüm, Lilit, Şans Noktası, Kiron, Juno...) -->
-    <app-special-points [chart]="c" />
-
-    <!-- Gezegenler (adlarına tıklanınca açıklama açılır) -->
-    <section class="panel">
-      <h2>Gezegenler</h2>
-      <p class="panel-hint">Gezegen adlarına dokunarak açıklamalarını görebilirsin.</p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Gök Cismi</th>
-              <th scope="col">Burç</th>
-              <th scope="col">Konum</th>
-              <th scope="col">Ev</th>
-              <th scope="col">Hareket</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (planet of c.planets; track planet.key) {
-              <tr>
-                <th scope="row">
-                  <button
-                    type="button"
-                    class="planet-btn"
-                    [class.selected]="selected()?.id === 'planet-' + planet.key"
-                    [attr.aria-expanded]="selected()?.id === 'planet-' + planet.key"
-                    (click)="selectPlanet(planet.key)"
-                  >
-                    {{ planet.name }}
-                  </button>
-                </th>
-                <td>{{ planet.sign.name }}</td>
-                <td>{{ planet.formatted }}</td>
-                <td>{{ planet.house ?? '—' }}</td>
-                <td>
-                  @if (planet.retrograde) {
-                    <span class="retro" title="Geri hareket (retro)">℞ Retro</span>
-                  } @else {
-                    <span class="muted">İleri</span>
-                  }
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Seçilen gezegenin açıklaması -->
-      @if (planetDetail(); as detail) {
+      <!-- Seçilen kartın açıklaması -->
+      @if (pointDetail(); as detail) {
         <app-interpretation-panel [interpretation]="detail" (closed)="closeDetail()" />
       }
-    </section>
+      @if (detailError(); as message) {
+        <p class="detail-error" role="alert">{{ message }}</p>
+      }
 
-    <!-- Evler (sadece saat biliniyorsa; tıklanınca açıklama açılır) -->
-    @if (c.houses.length > 0) {
-      <section class="panel">
-        <h2>Evler <span class="muted small">· {{ c.house_system?.name }}</span></h2>
-        <p class="panel-hint">Evlere dokunarak açıklamalarını görebilirsin.</p>
-        <div class="houses">
-          @for (house of c.houses; track $index) {
-            <button
-              type="button"
-              class="house clickable"
-              [class.selected]="selected()?.id === 'house-' + ($index + 1)"
-              [attr.aria-expanded]="selected()?.id === 'house-' + ($index + 1)"
-              (click)="selectHouse($index + 1)"
-            >
-              <span class="house-no">{{ $index + 1 }}. Ev</span>
-              <span>{{ house.formatted }}</span>
-            </button>
+      <!-- Doğum haritası çarkı (bir gezegene tıklanınca yorumuna gidilir) -->
+      <section class="panel wheel-panel">
+        <h2>Doğum Haritası</h2>
+        <app-chart-wheel [chart]="c" (planetSelected)="showPlanet($event)" />
+        <ul class="wheel-legend">
+          <li><span class="swatch harmonious"></span>Uyumlu Açılar (üçgen, altmışlık)</li>
+          <li><span class="swatch hard"></span>Zorlayıcı Açılar (kare, karşıt)</li>
+        </ul>
+      </section>
+
+      <!-- Uyarılar (saat bilinmiyor, kutup yedeği, Ay burç değiştiriyor...) -->
+      @if (c.warnings.length > 0) {
+        <div class="warnings">
+          @for (warning of c.warnings; track $index) {
+            <p>{{ warning }}</p>
           }
         </div>
+      }
 
-        <!-- Seçilen evin açıklaması -->
-        @if (houseDetail(); as detail) {
+      <!-- Özel noktalar (Kuzey Düğüm, Lilit, Şans Noktası, Kiron, Juno...) -->
+      <app-special-points [chart]="c" />
+
+      <!-- Gezegenler (adlarına tıklanınca açıklama açılır) -->
+      <section class="panel">
+        <h2>Gezegenler</h2>
+        <p class="panel-hint">Gezegen adlarına dokunarak açıklamalarını görebilirsin.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Gök Cismi</th>
+                <th scope="col">Burç</th>
+                <th scope="col">Konum</th>
+                <th scope="col">Ev</th>
+                <th scope="col">Hareket</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (planet of c.planets; track planet.key) {
+                <tr>
+                  <th scope="row">
+                    <button
+                      type="button"
+                      class="planet-btn"
+                      [class.selected]="selected()?.id === 'planet-' + planet.key"
+                      [attr.aria-expanded]="selected()?.id === 'planet-' + planet.key"
+                      (click)="selectPlanet(planet.key)"
+                    >
+                      {{ planet.name }}
+                    </button>
+                  </th>
+                  <td>{{ planet.sign.name }}</td>
+                  <td>{{ planet.formatted }}</td>
+                  <td>{{ planet.house ?? '—' }}</td>
+                  <td>
+                    @if (planet.retrograde) {
+                      <span class="retro" title="Geri hareket (retro)">℞ Retro</span>
+                    } @else {
+                      <span class="muted">İleri</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Seçilen gezegenin açıklaması -->
+        @if (planetDetail(); as detail) {
           <app-interpretation-panel [interpretation]="detail" (closed)="closeDetail()" />
         }
       </section>
-    }
 
-    <!-- Açılar -->
-    <section class="panel">
-      <h2>Açılar</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Gök Cisimleri</th>
-              <th scope="col">Açı</th>
-              <th scope="col">Sapma (Orb)</th>
-              <th scope="col">Durum</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (aspect of c.aspects; track $index) {
-              <tr>
-                <th scope="row">
-                  {{ planetNames().get(aspect.first) }} – {{ planetNames().get(aspect.second) }}
-                </th>
-                <td>{{ aspect.type.name }}</td>
-                <td>{{ aspect.orb.toFixed(1) }}°</td>
-                <td class="muted">{{ aspect.applying ? 'Yaklaşıyor' : 'Uzaklaşıyor' }}</td>
-              </tr>
+      <!-- Evler (sadece saat biliniyorsa; tıklanınca açıklama açılır) -->
+      @if (c.houses.length > 0) {
+        <section class="panel">
+          <h2>Evler <span class="muted small">· {{ c.house_system?.name }}</span></h2>
+          <p class="panel-hint">Evlere dokunarak açıklamalarını görebilirsin.</p>
+          <div class="houses">
+            @for (house of c.houses; track $index) {
+              <button
+                type="button"
+                class="house clickable"
+                [class.selected]="selected()?.id === 'house-' + ($index + 1)"
+                [attr.aria-expanded]="selected()?.id === 'house-' + ($index + 1)"
+                (click)="selectHouse($index + 1)"
+              >
+                <span class="house-no">{{ $index + 1 }}. Ev</span>
+                <span>{{ house.formatted }}</span>
+              </button>
             }
-          </tbody>
-        </table>
-      </div>
-    </section>
+          </div>
+
+          <!-- Seçilen evin açıklaması -->
+          @if (houseDetail(); as detail) {
+            <app-interpretation-panel [interpretation]="detail" (closed)="closeDetail()" />
+          }
+        </section>
+      }
+
+      <!-- Açılar -->
+      <section class="panel">
+        <h2>Açılar</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Gök Cisimleri</th>
+                <th scope="col">Açı</th>
+                <th scope="col">Sapma (Orb)</th>
+                <th scope="col">Durum</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (aspect of c.aspects; track $index) {
+                <tr>
+                  <th scope="row">
+                    {{ planetNames().get(aspect.first) }} – {{ planetNames().get(aspect.second) }}
+                  </th>
+                  <td>{{ aspect.type.name }}</td>
+                  <td>{{ aspect.orb.toFixed(1) }}°</td>
+                  <td class="muted">{{ aspect.applying ? 'Yaklaşıyor' : 'Uzaklaşıyor' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
   }
 </section>

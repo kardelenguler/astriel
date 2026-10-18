@@ -1,6 +1,7 @@
 """Harita iş mantığı.
 
 calculate(): astro motorunun parçalarını doğru sırayla çağırıp tek bir harita üretir.
+solar_return(): Güneş dönüşü anını bulur ve o an için aynı hesabı yapar.
 Kayıtlı haritalarla ilgili işlemler (kaydet, listele, sil) SavedChartService'tedir.
 """
 
@@ -11,8 +12,9 @@ from app.astro import ephemeris
 from app.astro.aspects import find_aspects
 from app.astro.houses import calculate_houses
 from app.astro.planets import calculate_planets
+from app.astro.solar_return import find_solar_return
 from app.astro.special_points import calculate_special_points
-from app.astro.time_conversion import local_to_utc, timezone_at
+from app.astro.time_conversion import get_zone, local_to_utc, timezone_at
 from app.astro.zodiac import sign_of
 from app.schemas.chart import (
     AspectOut,
@@ -21,6 +23,8 @@ from app.schemas.chart import (
     HouseSystemOut,
     PlanetOut,
     PointOut,
+    SolarReturnRequest,
+    SolarReturnResponse,
     SpecialPointOut,
 )
 
@@ -45,22 +49,91 @@ class ChartService:
         # Saat dilimi kullanıcıdan alınmaz; koordinattan bulunur (uyuşmazlık imkânsız olsun)
         tz_name = timezone_at(request.latitude, request.longitude)
         conversion = local_to_utc(request.birth_date, local_time, tz_name)
-        jd = ephemeris.julian_day(conversion.utc)
-        warnings: list[str] = list(conversion.warnings)
+
+        return self._chart_at(
+            utc=conversion.utc,
+            utc_offset_hours=conversion.utc_offset_hours,
+            tz_name=tz_name,
+            latitude=request.latitude,
+            longitude=request.longitude,
+            house_system=request.house_system,
+            time_known=time_known,
+            warnings=list(conversion.warnings),
+        )
+
+    def solar_return(self, request: SolarReturnRequest) -> SolarReturnResponse:
+        """Verilen yılın Güneş dönüşü haritası (doğum yerine ya da bulunulan yere göre)."""
+        time_known = request.birth_time is not None
+        local_time = request.birth_time or UNKNOWN_TIME_DEFAULT
+
+        # Doğumdaki Güneş boylamı: Güneş dönüşünün hedefi
+        birth_tz = timezone_at(request.latitude, request.longitude)
+        birth = local_to_utc(request.birth_date, local_time, birth_tz)
+        natal_sun = ephemeris.calc_body(ephemeris.julian_day(birth.utc), "sun").longitude
+
+        jd = find_solar_return(
+            natal_sun, request.year, request.birth_date.month, request.birth_date.day
+        )
+        moment = ephemeris.utc_from_julian_day(jd)
+
+        # Harita hangi yere göre çıkarılacak: bulunulan yer verilmişse o, yoksa doğum yeri
+        used_birth_place = request.return_latitude is None
+        latitude = request.latitude if request.return_latitude is None else request.return_latitude
+        longitude = (
+            request.longitude if request.return_longitude is None else request.return_longitude
+        )
+        return_tz = timezone_at(latitude, longitude)
+        offset = moment.astimezone(get_zone(return_tz)).utcoffset()
+        offset_hours = offset.total_seconds() / 3600 if offset is not None else 0.0
+
+        warnings = list(birth.warnings)
+        if not time_known:
+            warnings.append(
+                "Doğum saati bilinmediği için Güneş dönüşü anı yaklaşık hesaplandı; "
+                "gerçek an birkaç saat kayabilir."
+            )
+
+        # Güneş dönüşünün anı kesin olduğundan, bu harita için saat "biliniyor" sayılır
+        chart = self._chart_at(
+            utc=moment,
+            utc_offset_hours=offset_hours,
+            tz_name=return_tz,
+            latitude=latitude,
+            longitude=longitude,
+            house_system=request.house_system,
+            time_known=True,
+            warnings=warnings,
+        )
+        return SolarReturnResponse(
+            year=request.year, used_birth_place=used_birth_place, chart=chart
+        )
+
+    def _chart_at(
+        self,
+        *,
+        utc: datetime,
+        utc_offset_hours: float,
+        tz_name: str,
+        latitude: float,
+        longitude: float,
+        house_system: str,
+        time_known: bool,
+        warnings: list[str],
+    ) -> ChartResponse:
+        """Belirli bir an ve yer için haritayı üretir (doğum haritası ve Solar Return ortak kullanır)."""
+        jd = ephemeris.julian_day(utc)
 
         # ---------- Evler (sadece saat biliniyorsa) ----------
         houses = None
         if time_known:
-            houses = calculate_houses(
-                jd, request.latitude, request.longitude, request.house_system
-            )
+            houses = calculate_houses(jd, latitude, longitude, house_system)
             warnings.extend(houses.warnings)
         else:
             warnings.append(
                 "Doğum saati bilinmediği için yükselen burç ve evler hesaplanmadı; "
                 "gezegenler öğle saatine göre gösteriliyor."
             )
-            moon_warning = self._moon_sign_change_warning(conversion.utc)
+            moon_warning = self._moon_sign_change_warning(utc)
             if moon_warning:
                 warnings.append(moon_warning)
 
@@ -80,8 +153,8 @@ class ChartService:
         )
 
         return ChartResponse(
-            utc_datetime=conversion.utc,
-            utc_offset_hours=conversion.utc_offset_hours,
+            utc_datetime=utc,
+            utc_offset_hours=utc_offset_hours,
             timezone=tz_name,
             time_known=time_known,
             house_system=(

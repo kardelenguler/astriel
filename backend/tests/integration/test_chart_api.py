@@ -3,6 +3,7 @@
 import pytest
 
 URL = "/api/v1/charts/calculate"
+SOLAR_RETURN_URL = "/api/v1/charts/solar-return"
 
 VALID = {
     "birth_date": "1995-06-15",
@@ -86,3 +87,47 @@ def test_calculate_returns_special_points(client):
     keys = [p["key"] for p in data["special_points"]]
     assert keys == ["south_node", "lilith", "juno", "part_of_fortune"]
     assert all(p["sign"]["key"] and 1 <= p["house"] <= 12 for p in data["special_points"])
+
+
+# =============================== SOLAR RETURN ===============================
+def test_solar_return_success(client):
+    natal = client.post(URL, json=VALID).json()
+    natal_sun = next(p["longitude"] for p in natal["planets"] if p["key"] == "sun")
+
+    response = client.post(SOLAR_RETURN_URL, json={**VALID, "year": 2026})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["year"] == 2026
+    assert data["used_birth_place"] is True
+    assert data["chart"]["time_known"] is True
+    assert len(data["chart"]["houses"]) == 12
+    assert data["chart"]["utc_datetime"].startswith("2026-06-1")  # doğum gününe yakın
+
+    sun = next(p["longitude"] for p in data["chart"]["planets"] if p["key"] == "sun")
+    assert sun == pytest.approx(natal_sun, abs=1e-4)
+
+
+def test_solar_return_for_another_place(client):
+    response = client.post(
+        SOLAR_RETURN_URL,
+        json={**VALID, "year": 2026, "return_latitude": 52.52, "return_longitude": 13.40},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["used_birth_place"] is False
+    assert data["chart"]["timezone"] == "Europe/Berlin"
+
+
+def test_solar_return_year_must_be_after_birth_year(client):
+    response = client.post(SOLAR_RETURN_URL, json={**VALID, "year": 1995})
+    assert response.status_code == 422
+    field_error = response.json()["error"]["fields"][0]
+    assert field_error["field"] == "year"
+    assert "doğum yılından sonra" in field_error["message"]
+
+
+def test_solar_return_requires_both_coordinates(client):
+    response = client.post(SOLAR_RETURN_URL, json={**VALID, "year": 2026, "return_latitude": 52.52})
+    assert response.status_code == 422
+    field_error = response.json()["error"]["fields"][0]
+    assert field_error["field"] == "return_longitude"
