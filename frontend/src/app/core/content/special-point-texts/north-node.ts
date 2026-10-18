@@ -16,7 +16,7 @@ export const NORTH_NODE_TEXTS: PointTexts = {
     gemini:
       "Her şeyin büyük bir anlamı olmak zorunda olduğunu düşünüp kendini ağır sorular altında bulmuş olabilirsin. Kesin cevaplar aramak yerine bazen sadece merak etmek, sormak ve karşındakini dinlemek yeter. Hafif bir sohbetin ya da küçük bir öğrenme anının sana ne kadar iyi geldiğine şaşırabilirsin. Her şeyi bilmek zorunda olmadığını kabul ettikçe öğrenmenin keyfi geri gelir.",
     cancer:
-      "Güçlü ve başarılı görünmek, bir yerde sana zırh gibi gelmiş olabilir. Hep sağlam durmak, sorumluluğu üstlenmek ve duygularını ikinci plana atmak sana tanıdık gelir. Oysa en çok iyi hissettiren an, birinin yanında zırhını çıkarıp saklamadığın andır. Kendine ve sevdiklerine şefkatle baktıkça içindeki sert sesin yumuşadığını görebilirsin.",
+      "Güçlü ve başarılı görünmek, bir yerde sana zırh gibi gelmiş olabilir. Hep sağlam durmak, sorumluluğu üstlenmek ve duygularını ikinci plana atmak sana tanıdık gelir. Oysa seni en çok rahatlatan an, birinin yanında zırhını çıkarıp olduğun gibi durabildiğin andır. Kendine ve sevdiklerine şefkatle baktıkça içindeki sert sesin yumuşadığını görebilirsin.",
     leo:
       "Dikkat çekmemeyi, kalabalığın içinde uyumlu ve sessiz kalmayı belki erken öğrenmişsindir. Gruba karışmak sana güvenli gelir. Oysa içinde sahneye çıkmak, yaratmak ve gülmek isteyen bir taraf var. Kalbinden gelen bir şeyi cesaretle paylaştığında nasıl ışıldadığını görmek seni şaşırtabilir.",
     virgo:

@@ -29,7 +29,8 @@ logger = logging.getLogger(__name__)
 # Hesaplama kuralları değişirse ilk kısmı artır; kayıtlı haritaların hangi sürümle
 # hesaplandığı birth_charts.engine_version sütununda tutulur.
 # astriel-2: özel noktalar (Güney Düğüm, Lilit, Juno, Şans Noktası) eklendi.
-ENGINE_VERSION = f"astriel-2/swe-{ephemeris.EPHEMERIS_VERSION}"
+# astriel-3: "Kuzey Ay Düğümü" -> "Kuzey Düğüm", "Chiron" -> "Kiron" olarak yeniden adlandırıldı.
+ENGINE_VERSION = f"astriel-3/swe-{ephemeris.EPHEMERIS_VERSION}"
 
 # Doğum saati bilinmiyorsa gezegenler öğle vaktine göre hesaplanır:
 # gün içindeki en büyük olası hata böylece en küçük olur (±12 saat).

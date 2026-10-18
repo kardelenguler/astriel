@@ -21,7 +21,7 @@ export const CHIRON_TEXTS: PointTexts = {
     leo:
       "Görülmediğini, takdir edilmediğini ya da parlamana izin verilmediğini hissetmiş olabilirsin. Kendini ifade etmek konusunda hassas bir yanın olabilir. Bu deneyim, başkalarının ışığını görmeni ve desteklemeni sağlar. Kendi değerini kimsenin onayına bağlamadığında iyileşirsin.",
     virgo:
-      "Yeterince iyi olmadığını, hep bir şeylerin eksik kaldığını düşündüğün zamanlar yaşamış olabilirsin. Kendine karşı sert eleştirel bir sesin olabilir. Bu deneyim, başkalarının kusurlarına şefkatle bakmanı sağlar. Mükemmel olmak yerine kendine “yeterince iyisin” demek seni iyileştirir.",
+      "Yeterince iyi olmadığını, hep bir şeylerin eksik kaldığını düşündüğün zamanlar yaşamış olabilirsin. Kendine karşı sert ve eleştirel bir sesin olabilir. Bu deneyim, başkalarının kusurlarına şefkatle bakmanı sağlar. Mükemmel olmak yerine kendine “yeterince iyisin” demek seni iyileştirir.",
     libra:
       "İlişkilerde yeterince görülmediğin, dengenin hep senin aleyhine kurulduğu anlar yaşamış olabilirsin. Adalet ve karşılıklılık konusunda hassas bir yanın olabilir. Bu deneyim, başkalarının ilişki yaralarını anlamanı sağlar. Kendi ihtiyaçlarını da ilişkinin parçası saydıkça iyileşirsin.",
     scorpio:
@@ -37,9 +37,9 @@ export const CHIRON_TEXTS: PointTexts = {
   },
   houses: {
     1: "Bu hassas nokta en çok kendini gösterdiğin, kim olduğunu ortaya koyduğun anlarda hissediliyor olabilir. Kendini olduğu gibi kabul etmek zaman alabilir. Kendine nazik davrandıkça başkalarına da yol gösterirsin.",
-    2: "Bu hassas nokta para, değer ve kendi kaynaklarınla ilişkinde hissediliyor olabilir. Yeterince sahip olmadığını ya da hak etmediğini düşünmek zaman zaman gelebilir. Kendi değerini sahip olduklarından bağımsız görmek seni rahatlatır.",
+    2: "Bu hassas nokta para, değer ve kendi kaynaklarınla ilişkinde hissediliyor olabilir. Yeterince sahip olmadığını ya da hak etmediğini düşündüğün anlar olabilir. Kendi değerini sahip olduklarından bağımsız görmek seni rahatlatır.",
     3: "Bu hassas nokta iletişimde, öğrenmede ve çevrendekilerle kurduğun bağlarda hissediliyor olabilir. Kendini ifade etmek ya da anlaşılmak bazen zor gelebilir. Kendi sözlerine değer verdikçe bu alan şifa bulur.",
-    4: "Bu hassas nokta ev, aile ve geçmişinle ilişkinde hissediliyor olabilir. Kökenlerinden kalan eski duygular zaman zaman yüzeye çıkabilir. Kendine bir güvenli alan kurmak seni iyileştirir.",
+    4: "Bu hassas nokta ev, aile ve geçmişinle ilişkinde hissediliyor olabilir. Kökenlerinden kalan eski duygular zaman zaman yüzeye çıkabilir. Kendine güvenli bir alan kurmak seni iyileştirir.",
     5: "Bu hassas nokta aşkta, yaratıcılıkta ve kendini serbestçe ifade etmede hissediliyor olabilir. Yaptıklarının değer görmeyeceği korkusu seni durdurabilir. Sonuçtan çok sürecin tadını çıkardıkça bu alan açılır.",
     6: "Bu hassas nokta günlük düzende, iş yaşamında ve bedeninle ilişkinde hissediliyor olabilir. Hep yetersiz ya da yorgun hissetmek bir döngüye dönüşebilir. Kendine merhametli bir rutin kurmak bu alanı yumuşatır.",
     7: "Bu hassas nokta yakın ilişkilerde ve ortaklıklarda hissediliyor olabilir. Tekrar eden bir kalıp seni zorlamış olabilir. Kendi sınırlarını ve ihtiyaçlarını açıkça söylemek ilişkilerini dönüştürür.",

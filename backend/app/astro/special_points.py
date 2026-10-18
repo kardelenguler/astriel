@@ -1,6 +1,6 @@
-"""Özel noktalar: Güney Ay Düğümü, Lilit, Juno ve Şans Noktası.
+"""Özel noktalar: Güney Düğüm, Lilit, Juno ve Şans Noktası.
 
-Kuzey Ay Düğümü ve Chiron zaten planets.py içinde hesaplanır; burada tekrarlanmaz.
+Kuzey Düğüm ve Kiron (Chiron) zaten planets.py içinde hesaplanır; burada tekrarlanmaz.
 Bu noktalar açı (aspect) hesabına katılmaz, ayrı bir liste olarak döner.
 """
 
@@ -77,11 +77,11 @@ def calculate_special_points(
     points: list[SpecialPoint] = []
     warnings: list[str] = []
 
-    # ---------- Güney Ay Düğümü: Kuzey Düğüm'ün tam karşısı ----------
+    # ---------- Güney Düğüm: Kuzey Düğüm'ün tam karşısı ----------
     north_node = by_key.get("north_node")
     if north_node is not None:
         points.append(
-            _make_point("south_node", "Güney Ay Düğümü", north_node.longitude + 180.0, cusps)
+            _make_point("south_node", "Güney Düğüm", north_node.longitude + 180.0, cusps)
         )
 
     # ---------- Lilit (ortalama Ay apojesi) ----------

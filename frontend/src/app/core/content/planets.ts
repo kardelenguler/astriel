@@ -97,19 +97,19 @@ export const PLANET_MEANINGS: Record<string, PlanetMeaning> = {
     themes: 'dönüşüm ve yenilenme',
   },
   north_node: {
-    title: 'Kuzey Ay Düğümü',
+    title: 'Kuzey Düğüm',
     keywords: 'Gelişim yönü · Hayat yolu',
     description:
-      "Kuzey Ay Düğümü; kişinin gelişmeye ve büyümeye yöneldiği alanla ilişkilendirilir. " +
+      "Kuzey Düğüm; kişinin gelişmeye ve büyümeye yöneldiği alanla ilişkilendirilir. " +
       "Bir gezegen değil, Ay'ın yörüngesine göre hesaplanan bir noktadır.",
     area: 'kendini geliştirmeye yöneldiğinde',
     themes: 'gelişim ve yönelim',
   },
   chiron: {
-    title: 'Chiron',
+    title: 'Kiron',
     keywords: 'Hassasiyet · İyileşme',
     description:
-      'Chiron; kişinin hassas noktaları ve bu noktalardan doğan iyileştirme gücüyle ilişkilendirilir.',
+      'Kiron; kişinin hassas noktaları ve bu noktalardan doğan iyileştirme gücüyle ilişkilendirilir.',
     area: 'hassas noktalarıyla yüzleştiğinde',
     themes: 'iyileşme ve hassasiyet',
   },

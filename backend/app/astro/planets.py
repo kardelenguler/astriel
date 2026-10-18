@@ -37,9 +37,9 @@ BODIES: tuple[BodyInfo, ...] = (
     BodyInfo("neptune", "Neptün"),
     BodyInfo("pluto", "Plüton"),
     # Ay düğümü neredeyse hep geri gider; "retro" etiketi anlamsız olduğundan gösterilmez
-    BodyInfo("north_node", "Kuzey Ay Düğümü", can_be_retrograde=False),
-    # Chiron sadece seas_18.se1 dosyası varsa hesaplanabilir
-    BodyInfo("chiron", "Chiron", optional=True),
+    BodyInfo("north_node", "Kuzey Düğüm", can_be_retrograde=False),
+    # Kiron (Chiron) sadece seas_18.se1 dosyası varsa hesaplanabilir
+    BodyInfo("chiron", "Kiron", optional=True),
 )
 
 

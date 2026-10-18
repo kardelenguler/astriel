@@ -23,7 +23,7 @@ export interface SpecialPointInfo {
   /** Kartın italik tanıtım satırı ("Bu nedir"), 2 tam cümle */
   intro: string;
   source: 'planet' | 'special';
-  /** true: doğum saati olmadan hesaplanamaz, kart hiç gösterilmez */
+  /** true: doğum saati olmadan hesaplanamaz, kart kilitli (soluk) görünür */
   needsBirthTime: boolean;
 }
 
