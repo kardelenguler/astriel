@@ -2,6 +2,7 @@
 
 - POST /charts/calculate    : HERKESE AÇIK (misafir de hesaplar), kaydetmez.
 - POST /charts/solar-return : HERKESE AÇIK, Güneş dönüşü haritasını hesaplar, kaydetmez.
+- POST /charts/progressed   : HERKESE AÇIK, ilerletilmiş haritayı hesaplar, kaydetmez.
 - Diğerleri                 : giriş gerekli; kullanıcının kendi kayıtlı haritaları.
 """
 
@@ -17,6 +18,8 @@ from app.schemas.chart import (
     ChartListOut,
     ChartRenameRequest,
     ChartResponse,
+    ProgressedRequest,
+    ProgressedResponse,
     SavedChartOut,
     SolarReturnRequest,
     SolarReturnResponse,
@@ -55,6 +58,17 @@ def calculate_solar_return(
     request: SolarReturnRequest, service: ChartServiceDep
 ) -> SolarReturnResponse:
     return service.solar_return(request)
+
+
+@router.post(
+    "/progressed",
+    response_model=ProgressedResponse,
+    summary="İlerletilmiş harita hesapla (kaydetmeden)",
+)
+def calculate_progressed(
+    request: ProgressedRequest, service: ChartServiceDep
+) -> ProgressedResponse:
+    return service.progressed(request)
 
 
 # =============================== KAYITLI HARİTALAR ===============================

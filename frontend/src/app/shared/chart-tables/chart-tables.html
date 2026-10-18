@@ -1,0 +1,113 @@
+<section class="box">
+  @if (!only()) {
+    <div class="views" role="tablist" aria-label="Harita tabloları">
+      <button
+        type="button"
+        role="tab"
+        [class.active]="view() === 'planets'"
+        [attr.aria-selected]="view() === 'planets'"
+        (click)="setView('planets')"
+      >
+        Gezegenler
+      </button>
+      @if (hasHouses()) {
+        <button
+          type="button"
+          role="tab"
+          [class.active]="view() === 'houses'"
+          [attr.aria-selected]="view() === 'houses'"
+          (click)="setView('houses')"
+        >
+          Evler
+        </button>
+      }
+      <button
+        type="button"
+        role="tab"
+        [class.active]="view() === 'aspects'"
+        [attr.aria-selected]="view() === 'aspects'"
+        (click)="setView('aspects')"
+      >
+        Açılar
+      </button>
+    </div>
+  }
+
+  @switch (view()) {
+    @case ('planets') {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Gök Cismi</th>
+              <th scope="col">Burç</th>
+              <th scope="col">Konum</th>
+              <th scope="col">Ev</th>
+              <th scope="col">Hareket</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (planet of chart().planets; track planet.key) {
+              <tr>
+                <th scope="row">{{ planet.name }}</th>
+                <td>{{ planet.sign.name }}</td>
+                <td>{{ planet.formatted }}</td>
+                <td>{{ planet.house ?? '—' }}</td>
+                <td>
+                  @if (planet.retrograde) {
+                    <span class="retro" title="Geri hareket (retro)">℞ Retro</span>
+                  } @else {
+                    <span class="muted">İleri</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    @case ('houses') {
+      <p class="hint">Yöntem: {{ chart().house_system?.name }}</p>
+      <div class="houses">
+        @for (house of chart().houses; track $index) {
+          <div class="house">
+            <span class="house-no">{{ $index + 1 }}. Ev</span>
+            <span>{{ house.formatted }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    @case ('aspects') {
+      @if (chart().aspects.length === 0) {
+        <p class="hint">Bu haritada belirgin bir açı yok.</p>
+      } @else {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Gök Cisimleri</th>
+                <th scope="col">Açı</th>
+                <th scope="col">Sapma (Orb)</th>
+                <th scope="col">Durum</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (aspect of chart().aspects; track $index) {
+                <tr>
+                  <th scope="row">
+                    {{ planetNames().get(aspect.first) }} – {{ planetNames().get(aspect.second) }}
+                  </th>
+                  <td>{{ aspect.type.name }}</td>
+                  <td>{{ aspect.orb.toFixed(1) }}°</td>
+                  <td class="muted">{{ aspect.applying ? 'Yaklaşıyor' : 'Uzaklaşıyor' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  }
+</section>

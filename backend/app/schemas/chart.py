@@ -103,6 +103,25 @@ class SolarReturnRequest(ChartCalculateRequest):
         return value
 
 
+class ProgressedRequest(ChartCalculateRequest):
+    """İlerletilmiş harita için: doğum bilgileri + haritanın hesaplanacağı hedef tarih."""
+
+    target_date: date = Field(
+        examples=["2026-10-18"],
+        description="İlerletilmiş haritanın hesaplanacağı tarih (ör. bugün).",
+    )
+
+    @field_validator("target_date")
+    @classmethod
+    def target_must_follow_birth(cls, value: date, info: ValidationInfo) -> date:
+        birth_date = info.data.get("birth_date")
+        if birth_date is not None and value <= birth_date:
+            raise ValueError("Hedef tarih doğum tarihinden sonra olmalıdır.")
+        if value.year > MAX_YEAR:
+            raise ValueError(f"Hedef yıl en fazla {MAX_YEAR} olabilir.")
+        return value
+
+
 # =============================== YANIT ===============================
 class FromAttributesModel(BaseModel):
     """Astro motorunun dataclass'larından doğrudan oluşturulabilen modellerin temeli."""
@@ -195,6 +214,26 @@ class SolarReturnResponse(BaseModel):
     year: int
     used_birth_place: bool  # True: harita doğum yerine göre, False: bulunulan yere göre
     chart: ChartResponse
+
+
+class MoonSignChangeOut(BaseModel):
+    """İlerletilmiş Ay'ın bir sonraki burç değişimi."""
+
+    change_date: date  # gerçek takvimde hangi tarihte
+    sign: SignOut  # geçeceği burç
+
+
+class ProgressedResponse(BaseModel):
+    """İlerletilmiş harita: hedef tarih + yaş + o tarihe ilerletilmiş gökyüzü.
+
+    `chart.utc_datetime` ilerletilmiş ANI gösterir (doğumdan yaş kadar gün sonrası);
+    gerçek takvim tarihi değildir.
+    """
+
+    target_date: date
+    age_years: float
+    chart: ChartResponse
+    next_moon_sign_change: MoonSignChangeOut
 
 
 # =========================== KAYITLI HARİTALAR ===========================

@@ -1,0 +1,38 @@
+@if (only() === 'theme') {
+  @if (theme(); as t) {
+    <section class="theme">
+      <p class="eyebrow">Yılın Ana Teması</p>
+      <h2>{{ t.headline }}</h2>
+      <p class="theme-text">{{ t.text }}</p>
+      <ul class="tags">
+        @for (tag of t.tags; track $index) {
+          <li>{{ tag }}</li>
+        }
+      </ul>
+    </section>
+  }
+} @else {
+  <section class="areas">
+    <header class="areas-head">
+      <h2>Yıllık Yorumlar</h2>
+      <p>Bu yıl enerjinin hangi yaşam alanlarında yoğunlaştığına dair genel bir bakış.</p>
+    </header>
+
+    @if (areas().length === 0) {
+      <p class="empty">Bu harita için yaşam alanı yorumu hazırlanamadı.</p>
+    } @else {
+      <div class="grid">
+        @for (a of areas(); track a.key) {
+          <article class="area">
+            <h3 class="area-title">{{ a.title }}</h3>
+            <p class="area-sub">{{ a.subtitle }}</p>
+            <p class="area-text">{{ a.text }}</p>
+          </article>
+        }
+      </div>
+      <p class="note">
+        Astrolojik geleneğe dayanan genel açıklamalardır; kesin bir öngörü değildir.
+      </p>
+    }
+  </section>
+}

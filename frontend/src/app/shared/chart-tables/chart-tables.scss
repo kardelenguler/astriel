@@ -1,0 +1,130 @@
+:host {
+  display: block;
+}
+
+.box {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg, 16px);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+// ---------- Alt sekmeler ----------
+.views {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  button {
+    flex-shrink: 0;
+    padding: 8px 18px;
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    color: var(--color-text-muted);
+    font-family: var(--font-body);
+    font-size: 14px;
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--color-mauve);
+      color: var(--color-text);
+    }
+
+    &.active {
+      border-color: var(--color-gold);
+      color: var(--color-gold);
+    }
+  }
+}
+
+.hint {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+// ---------- Tablolar ----------
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th,
+td {
+  padding: 11px 12px;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--color-border);
+}
+
+thead th {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+tbody th {
+  font-weight: 500;
+}
+
+tbody tr:last-child th,
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.retro {
+  color: var(--color-mauve);
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+// ---------- Evler ----------
+.houses {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.house {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  background: var(--color-input);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.house-no {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--color-mauve);
+}
+
+@media (max-width: 600px) {
+  .box {
+    padding: 16px;
+  }
+
+  th,
+  td {
+    padding: 9px 8px;
+  }
+}

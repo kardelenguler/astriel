@@ -14,8 +14,15 @@ const R = {
   planet: 170,     // gezegen sembolleri
   house: 124,      // ev numaraları
   aspect: 108,     // açı çizgilerinin uçları
+  outerRing: 300,  // dış halka (ilerletilmiş gezegenler) sınırı
+  outerPlanet: 278, // dış halkadaki gezegen sembolleri
 };
 const MIN_GAP = 8; // iki gezegen sembolü arasındaki en az açı (derece)
+const OUTER_MIN_GAP = 7; // dış halkada yarıçap büyük olduğu için biraz daha sıkı olabilir
+
+// Dış halka yokken ve varken SVG'nin görünen alanı
+const VIEW_BOX = '-30 -30 560 560';
+const VIEW_BOX_WITH_OUTER = '-70 -70 640 640';
 
 // \uFE0E: sembollerin renkli emoji yerine düz yazı olarak çizilmesini sağlar
 const VS = '\uFE0E';
@@ -81,12 +88,24 @@ function spread(longitudes: number[], minGap: number): number[] {
 export class ChartWheel {
   readonly chart = input.required<ChartResponse>();
 
+  /**
+   * İsteğe bağlı dış halka: bu haritanın gezegenleri burç bandının dışına çizilir
+   * (ör. ilerletilmiş gezegenler). Çark, `chart`ın yükseleniyle döndürülmeye devam eder.
+   */
+  readonly outer = input<ChartResponse | null>(null);
+
+  /** Dış halkadaki gezegenlerin ipucu yazısında kullanılan ad ("İlerletilmiş Güneş...") */
+  readonly outerLabel = input('İlerletilmiş');
+
   /** Bir gezegen sembolüne tıklanınca gezegenin anahtarı ("sun", "moon"...) gönderilir */
   readonly planetSelected = output<string>();
 
   protected select(key: string): void {
     this.planetSelected.emit(key);
   }
+
+  /** Dış halka varsa çizim alanı genişler */
+  protected readonly viewBox = computed(() => (this.outer() ? VIEW_BOX_WITH_OUTER : VIEW_BOX));
 
   /** Yükselen solda dursun diye çarkın döndürülme açısı (saat bilinmiyorsa 0° Koç solda) */
   private readonly rotation = computed(() => this.chart().ascendant?.longitude ?? 0);
@@ -189,6 +208,38 @@ export class ChartWheel {
     });
   });
 
+  // ---------- Dış halka gezegenleri (ör. ilerletilmiş) ----------
+  protected readonly outerPlanets = computed(() => {
+    const outer = this.outer();
+    if (!outer) {
+      return [];
+    }
+    const label = this.outerLabel();
+    const sorted = [...outer.planets].sort((a, b) => a.longitude - b.longitude);
+    const display = spread(
+      sorted.map((p) => p.longitude),
+      OUTER_MIN_GAP,
+    );
+
+    return sorted.map((planet: Planet, i) => {
+      const tickFrom = this.point(planet.longitude, R.outer);
+      const tickTo = this.point(planet.longitude, R.outer + 9);
+      const glyph = this.point(display[i], R.outerPlanet);
+      const moved = Math.abs(display[i] - planet.longitude) > 0.5;
+      const lineEnd = this.point(display[i], R.outerPlanet - 11);
+      return {
+        key: planet.key,
+        glyph: (PLANET_GLYPHS[planet.key] ?? planet.name.slice(0, 2)) + VS,
+        title: `${label} ${planet.name} · ${planet.formatted}${planet.retrograde ? ' · Retro' : ''}`,
+        retrograde: planet.retrograde,
+        x: glyph.x,
+        y: glyph.y,
+        tick: { x1: tickFrom.x, y1: tickFrom.y, x2: tickTo.x, y2: tickTo.y },
+        connector: moved ? { x1: tickTo.x, y1: tickTo.y, x2: lineEnd.x, y2: lineEnd.y } : null,
+      };
+    });
+  });
+
   // ---------- Açılar ----------
   protected readonly aspects = computed(() => {
     const longitudes = new Map(this.chart().planets.map((p) => [p.key, p.longitude]));
@@ -233,6 +284,9 @@ export class ChartWheel {
     }
     if (chart.ascendant) {
       parts.push(`Yükselen ${chart.ascendant.sign.name}`);
+    }
+    if (this.outer()) {
+      parts.push(`Dış halkada ${this.outerLabel().toLocaleLowerCase('tr-TR')} gezegenler`);
     }
     return parts.join(', ');
   });

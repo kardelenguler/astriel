@@ -23,6 +23,7 @@ import { InterpretationService } from '../../core/services/interpretation.servic
 import { SavedChartsService } from '../../core/services/saved-charts.service';
 import { ChartWheel } from '../../shared/chart-wheel/chart-wheel';
 import { InterpretationPanel } from '../../shared/interpretation-panel/interpretation-panel';
+import { Progressed } from '../../shared/progressed/progressed';
 import { SolarReturn } from '../../shared/solar-return/solar-return';
 import { SpecialPoints } from '../../shared/special-points/special-points';
 
@@ -33,8 +34,8 @@ const NAME_MAX_LENGTH = 100; // backend'deki sınırın aynısı
 // Kaydetme kutusunun durumları
 type SaveState = 'idle' | 'editing' | 'saving' | 'saved';
 
-// Sayfadaki sekmeler (ileride 'progressed' eklenecek)
-type Tab = 'natal' | 'solar';
+// Sayfadaki sekmeler
+type Tab = 'natal' | 'solar' | 'progressed';
 
 /**
  * Harita sonuç sayfası. İki şekilde açılır:
@@ -43,7 +44,14 @@ type Tab = 'natal' | 'solar';
  */
 @Component({
   selector: 'app-chart',
-  imports: [RouterLink, ChartWheel, InterpretationPanel, SpecialPoints, SolarReturn],
+  imports: [
+    RouterLink,
+    ChartWheel,
+    InterpretationPanel,
+    SpecialPoints,
+    SolarReturn,
+    Progressed,
+  ],
   templateUrl: './chart.html',
   styleUrl: './chart.scss',
 })
@@ -70,7 +78,7 @@ export class Chart {
 
   // ---------- Sekmeler ----------
   readonly tab = signal<Tab>('natal');
-  /** Solar Return gibi sekmelerin kullandığı doğum bilgileri (hem adresten hem kayıtlıdan gelir) */
+  /** Solar Return ve İlerletilmiş sekmelerin kullandığı doğum bilgileri (hem adresten hem kayıtlıdan gelir) */
   readonly birthRequest = signal<ChartCalculateRequest | null>(null);
 
   // ---------- Kaydetme durumu ----------

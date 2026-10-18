@@ -2,6 +2,7 @@
 
 calculate(): astro motorunun parçalarını doğru sırayla çağırıp tek bir harita üretir.
 solar_return(): Güneş dönüşü anını bulur ve o an için aynı hesabı yapar.
+progressed(): "bir gün = bir yıl" yöntemiyle ilerletilmiş haritayı hesaplar.
 Kayıtlı haritalarla ilgili işlemler (kaydet, listele, sil) SavedChartService'tedir.
 """
 
@@ -12,6 +13,7 @@ from app.astro import ephemeris
 from app.astro.aspects import find_aspects
 from app.astro.houses import calculate_houses
 from app.astro.planets import calculate_planets
+from app.astro.progression import TROPICAL_YEAR_DAYS, next_moon_sign_change
 from app.astro.solar_return import find_solar_return
 from app.astro.special_points import calculate_special_points
 from app.astro.time_conversion import get_zone, local_to_utc, timezone_at
@@ -21,8 +23,12 @@ from app.schemas.chart import (
     ChartCalculateRequest,
     ChartResponse,
     HouseSystemOut,
+    MoonSignChangeOut,
     PlanetOut,
     PointOut,
+    ProgressedRequest,
+    ProgressedResponse,
+    SignOut,
     SolarReturnRequest,
     SolarReturnResponse,
     SpecialPointOut,
@@ -108,6 +114,58 @@ class ChartService:
             year=request.year, used_birth_place=used_birth_place, chart=chart
         )
 
+    def progressed(self, request: ProgressedRequest) -> ProgressedResponse:
+        """İkincil ilerletme: hedef tarihteki yaş kadar GÜN, doğum anına eklenir.
+
+        Yükselen ve evler, doğum yeri için ilerletilmiş ana göre çıkarılır
+        (yaygın basit yöntem; bazı yazılımlar MC'yi farklı ilerletir).
+        """
+        time_known = request.birth_time is not None
+        local_time = request.birth_time or UNKNOWN_TIME_DEFAULT
+
+        tz_name = timezone_at(request.latitude, request.longitude)
+        birth = local_to_utc(request.birth_date, local_time, tz_name)
+        natal_jd = ephemeris.julian_day(birth.utc)
+
+        # Yaş, takvim günleriyle hesaplanır (yaz saati geçişleri sonucu etkilemesin)
+        age_years = (request.target_date - request.birth_date).days / TROPICAL_YEAR_DAYS
+        progressed_jd = natal_jd + age_years  # 1 yıl = 1 gün
+        moment = ephemeris.utc_from_julian_day(progressed_jd)
+
+        warnings = list(birth.warnings)
+        if not time_known:
+            warnings.append(
+                "Doğum saati bilinmediği için ilerletilmiş konumlar yaklaşık hesaplandı; "
+                "özellikle Ay birkaç derece kayabilir."
+            )
+
+        chart = self._chart_at(
+            utc=moment,
+            utc_offset_hours=birth.utc_offset_hours,
+            tz_name=tz_name,
+            latitude=request.latitude,
+            longitude=request.longitude,
+            house_system=request.house_system,
+            time_known=time_known,
+            warnings=warnings,
+        )
+
+        # İlerletilmiş Ay'ın bir sonraki burç değişimi (gerçek takvim tarihine çevrilir)
+        cross_jd = next_moon_sign_change(progressed_jd)
+        change_utc = birth.utc + timedelta(days=(cross_jd - natal_jd) * TROPICAL_YEAR_DAYS)
+        change_date = change_utc.astimezone(get_zone(tz_name)).date()
+        # Geçişin hemen sonrasındaki burç = Ay'ın geçeceği burç
+        new_sign = sign_of(ephemeris.calc_body(cross_jd + 0.01, "moon").longitude)
+
+        return ProgressedResponse(
+            target_date=request.target_date,
+            age_years=age_years,
+            chart=chart,
+            next_moon_sign_change=MoonSignChangeOut(
+                change_date=change_date, sign=SignOut.model_validate(new_sign)
+            ),
+        )
+
     def _chart_at(
         self,
         *,
@@ -120,7 +178,7 @@ class ChartService:
         time_known: bool,
         warnings: list[str],
     ) -> ChartResponse:
-        """Belirli bir an ve yer için haritayı üretir (doğum haritası ve Solar Return ortak kullanır)."""
+        """Belirli bir an ve yer için haritayı üretir (doğum, Solar Return ve ilerletilmiş harita ortak kullanır)."""
         jd = ephemeris.julian_day(utc)
 
         # ---------- Evler (sadece saat biliniyorsa) ----------

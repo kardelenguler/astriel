@@ -1,0 +1,117 @@
+<section class="pr">
+  <!-- ================= Kontroller: tarih ================= -->
+  <div class="box controls">
+    <p class="intro">
+      İlerletilmiş haritada doğumundan sonraki her gün bir yıl sayılır: 30 yaşındaki birinin
+      ilerletilmiş haritası, doğumundan 30 gün sonraki gökyüzüdür. Geleneksel olarak içsel
+      değişimleri ve yaşam dönemlerini anlatmak için kullanılır.
+    </p>
+
+    <div class="date-stepper">
+      <button type="button" class="step" aria-label="Bir yıl geri" (click)="shiftYear(-1)">◀</button>
+      <input
+        type="date"
+        aria-label="İlerletilmiş haritanın tarihi"
+        [min]="minDate()"
+        [max]="maxDate"
+        [value]="targetDate()"
+        (change)="onDateInput($event)"
+      />
+      <button type="button" class="step" aria-label="Bir yıl ileri" (click)="shiftYear(1)">▶</button>
+    </div>
+    <p class="today-row">
+      <button type="button" class="today-btn" (click)="setToday()">Bugün</button>
+    </p>
+
+    @if (dateError(); as message) {
+      <p class="error" role="alert">{{ message }}</p>
+    }
+  </div>
+
+  <!-- ================= Yükleniyor / hata ================= -->
+  @if (loading()) {
+    <div class="state" role="status">
+      <div class="spinner" aria-hidden="true"></div>
+      <p>İlerletilmiş harita hesaplanıyor…</p>
+    </div>
+  }
+
+  @if (error(); as message) {
+    <p class="error state" role="alert">{{ message }}</p>
+  }
+
+  <!-- ================= Sonuç ================= -->
+  @if (chart(); as c) {
+    <div class="box age">
+      <p class="age-label">Seçtiğin tarihte</p>
+      <p class="age-text">{{ ageText() }}</p>
+    </div>
+
+    <!-- İlerletilmiş Ay -->
+    @if (moonInfo(); as moon) {
+      <div class="box moon">
+        <h2>İlerletilmiş Ay</h2>
+        <p>
+          İlerletilmiş Ay'ın şu an <strong>{{ moon.current }}</strong> burcunda.
+          <strong>{{ moon.date }}</strong> tarihinde <strong>{{ moon.next }}</strong> burcuna
+          geçecek.
+        </p>
+        <p class="moon-note">
+          İlerletilmiş Ay yaklaşık 2,5 yılda bir burç değiştirir. Geleneksel olarak bu geçişler,
+          duygusal ihtiyaçlarda yeni bir dönemin başlangıcı olarak yorumlanır.
+        </p>
+      </div>
+    }
+
+    <!-- Çark: iç halka doğum, dış halka ilerletilmiş -->
+    <section class="box wheel-box">
+      <h2>İlerletilmiş Harita</h2>
+      <app-chart-wheel [chart]="natal()" [outer]="c" outerLabel="İlerletilmiş" />
+      <ul class="legend">
+        <li><span class="swatch natal"></span>İç halka: doğum haritan</li>
+        <li><span class="swatch progressed"></span>Dış halka: ilerletilmiş gezegenler</li>
+      </ul>
+    </section>
+
+    <!-- Doğum ve ilerletilmiş konumlar -->
+    <section class="box">
+      <h2>Doğum ve İlerletilmiş Konumlar</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Gök Cismi</th>
+              <th scope="col">Doğumda</th>
+              <th scope="col">İlerletilmiş</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.name) {
+              <tr>
+                <th scope="row">{{ row.name }}</th>
+                <td>{{ row.natal }}</td>
+                <td [class.changed]="row.changed">
+                  {{ row.progressed }}
+                  @if (row.retrograde) {
+                    <span class="retro" title="Geri hareket (retro)">℞</span>
+                  }
+                  @if (row.changed) {
+                    <span class="changed-note">yeni burç</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    @if (c.warnings.length > 0) {
+      <div class="warnings">
+        @for (warning of c.warnings; track $index) {
+          <p>{{ warning }}</p>
+        }
+      </div>
+    }
+  }
+</section>

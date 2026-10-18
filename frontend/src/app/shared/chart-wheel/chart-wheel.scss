@@ -52,6 +52,7 @@
 // Sembol yazıları ortak ayarlar
 .sign-glyph,
 .planet-glyph,
+.outer-glyph,
 .retro,
 .house-no,
 .axis-label {
@@ -61,6 +62,7 @@
 
 .sign-glyph,
 .planet-glyph,
+.outer-glyph,
 .retro {
   font-family: 'Segoe UI Symbol', 'Noto Sans Symbols 2', 'Apple Symbols', serif;
 }
@@ -157,6 +159,24 @@
 
 .retro {
   font-size: 9px;
+  fill: var(--color-mauve);
+}
+
+// ---------- Dış halka (ilerletilmiş gezegenler) ----------
+.outer-ring {
+  stroke: var(--color-mauve);
+  stroke-width: 0.8;
+  stroke-dasharray: 2 4;
+  opacity: 0.4;
+}
+
+.outer-tick {
+  stroke: var(--color-mauve);
+  stroke-width: 1.2;
+}
+
+.outer-glyph {
+  font-size: 19px;
   fill: var(--color-mauve);
 }
 

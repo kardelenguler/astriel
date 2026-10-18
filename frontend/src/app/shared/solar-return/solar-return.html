@@ -23,10 +23,19 @@
       </button>
     </div>
 
-    <p class="intro">
-      Güneş her yıl doğum gününün civarında, doğduğun andaki konumuna geri döner. O anın haritası,
-      yeni yaşında öne çıkan temaları gösterir.
-    </p>
+    <header class="intro">
+      <p class="eyebrow">Solar Return · Güneş Dönüşü</p>
+      <h2>Yeni yaşın, yeni bir gökyüzü.</h2>
+      <p>
+        Her doğum gününde Güneş, gökyüzünde doğduğun andaki yerine geri döner. Bu özel an, önündeki
+        bir yılın sembolik hikâyesine açılan bir kapıdır.
+      </p>
+      <p>
+        Solar Return haritanı keşfet; bu yıl hangi temaların öne çıktığını, enerjinin hangi yaşam
+        alanlarında yoğunlaştığını ve seni nelerin beklediğini astrolojik bir bakışla yorumla.
+      </p>
+      <p>Gökyüzünün bu yıla dair anlattıklarını keşfet.</p>
+    </header>
 
     <div class="mode" role="group" aria-label="Haritanın hesaplanacağı yer">
       <button
@@ -48,7 +57,12 @@
     </div>
 
     @if (mode() === 'other') {
-      <p class="hint">O yıl doğum günümde nerede olacağımı seçiyorum.</p>
+      <div class="intro" style="margin: 16px auto 14px">
+        <p>
+          O yıl doğum günün için bulunacağın şehri seç. Harita, Güneş dönüşü anında o şehirde
+          gökyüzünün nasıl göründüğüne göre hesaplanır.
+        </p>
+      </div>
       <div class="place-search">
         <input
           type="text"
@@ -81,10 +95,6 @@
           </ul>
         }
       }
-
-      @if (!otherPlace()) {
-        <p class="hint">Haritayı görmek için bir yer ara ve listeden seç.</p>
-      }
     }
   </div>
 
@@ -102,13 +112,7 @@
 
   <!-- ================= Sonuç ================= -->
   @if (chart(); as c) {
-    <div class="box moment">
-      <p class="moment-label">{{ year() }} Güneş dönüşün</p>
-      <p class="moment-time">{{ momentText() }}</p>
-      <p class="moment-place">{{ placeLabel() }} · {{ c.timezone }}</p>
-    </div>
-
-    <!-- Yükselen, Güneş'in evi, Ay (tıklanınca açıklama açılır) -->
+    <!-- Yükselen, Güneş, Ay (tıklanınca açıklama açılır) ve Dönüş Anı -->
     <div class="key-cards">
       @if (c.ascendant; as asc) {
         <button
@@ -118,9 +122,18 @@
           [attr.aria-expanded]="selected()?.id === 'solar-ascendant'"
           (click)="select('ascendant')"
         >
-          <span class="key-label">Yükselen</span>
-          <span class="key-sign">{{ asc.sign.name }}</span>
-          <span class="key-detail">{{ asc.formatted }}</span>
+          <span class="key-icon" aria-hidden="true">{{ signGlyph(asc.sign.key) }}</span>
+          <span class="key-body">
+            <span class="key-label">Yükselen</span>
+            <span class="key-sign">{{ asc.sign.name }}</span>
+            <span class="key-detail">{{ asc.formatted }}</span>
+          </span>
+          <span class="key-teaser">
+            {{ ascendantTeaser() }}
+            <span class="more" style="color: var(--color-mauve); white-space: nowrap">
+              {{ selected()?.id === 'solar-ascendant' ? 'Aşağıda açık ▾' : 'Devamını oku ›' }}
+            </span>
+          </span>
         </button>
       }
       @if (sun(); as s) {
@@ -131,9 +144,21 @@
           [attr.aria-expanded]="selected()?.id === 'solar-sun'"
           (click)="select('sun')"
         >
-          <span class="key-label">Güneş'in Evi</span>
-          <span class="key-sign">{{ s.house ? s.house + '. Ev' : '—' }}</span>
-          <span class="key-detail">{{ s.formatted }}</span>
+          <span class="key-icon" aria-hidden="true">☉&#xFE0E;</span>
+          <span class="key-body">
+            <span class="key-label">Güneş</span>
+            <span class="key-sign">{{ s.sign.name }}</span>
+            <span class="key-detail">{{ s.formatted }}</span>
+          </span>
+          @if (s.house) {
+            <span class="key-badge">{{ s.house }}. ev</span>
+          }
+          <span class="key-teaser">
+            {{ sunTeaser() }}
+            <span class="more" style="color: var(--color-mauve); white-space: nowrap">
+              {{ selected()?.id === 'solar-sun' ? 'Aşağıda açık ▾' : 'Devamını oku ›' }}
+            </span>
+          </span>
         </button>
       }
       @if (moon(); as m) {
@@ -144,11 +169,45 @@
           [attr.aria-expanded]="selected()?.id === 'solar-moon'"
           (click)="select('moon')"
         >
-          <span class="key-label">Ay</span>
-          <span class="key-sign">{{ m.sign.name }}</span>
-          <span class="key-detail">{{ m.house ? m.house + '. Ev' : m.formatted }}</span>
+          <span class="key-icon" aria-hidden="true">☽&#xFE0E;</span>
+          <span class="key-body">
+            <span class="key-label">Ay</span>
+            <span class="key-sign">{{ m.sign.name }}</span>
+            <span class="key-detail">{{ m.formatted }}</span>
+          </span>
+          @if (m.house) {
+            <span class="key-badge">{{ m.house }}. ev</span>
+          }
+          <span class="key-teaser">
+            {{ moonTeaser() }}
+            <span class="more" style="color: var(--color-mauve); white-space: nowrap">
+              {{ selected()?.id === 'solar-moon' ? 'Aşağıda açık ▾' : 'Devamını oku ›' }}
+            </span>
+          </span>
         </button>
       }
+      <article class="key-card moment-card">
+        <svg
+          class="key-icon"
+          viewBox="-8 -8 40 40"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <rect x="3.5" y="5" width="17" height="15" rx="2" />
+          <path d="M3.5 10h17M8 3v4M16 3v4" />
+        </svg>
+        <span class="key-body">
+          <span class="key-label plain">Dönüş Anı</span>
+          <span class="key-sign">{{ momentDate() }}</span>
+          <span class="key-detail">{{ momentClock() }} ({{ offsetText() }})</span>
+        </span>
+        <span class="key-teaser">
+          <span class="moment-place">{{ placeLabel() }}</span>
+        </span>
+      </article>
     </div>
 
     @if (selected(); as detail) {
@@ -157,10 +216,161 @@
       <p class="card-hint">Kartlara dokunarak yılının açıklamasını görebilirsin.</p>
     }
 
-    <section class="box wheel-box">
-      <h2>{{ year() }} Solar Return Haritası</h2>
-      <app-chart-wheel [chart]="c" />
-    </section>
+    <!-- Alt sekmeler -->
+    <nav class="subtabs" role="tablist" aria-label="Solar Return bölümleri">
+      <button
+        type="button"
+        role="tab"
+        [class.active]="subTab() === 'overview'"
+        [attr.aria-selected]="subTab() === 'overview'"
+        (click)="setSubTab('overview')"
+      >
+        Genel Bakış
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [class.active]="subTab() === 'planets'"
+        [attr.aria-selected]="subTab() === 'planets'"
+        (click)="setSubTab('planets')"
+      >
+        Gezegenler
+      </button>
+      @if (hasHouses()) {
+        <button
+          type="button"
+          role="tab"
+          [class.active]="subTab() === 'houses'"
+          [attr.aria-selected]="subTab() === 'houses'"
+          (click)="setSubTab('houses')"
+        >
+          Evler
+        </button>
+      }
+      <button
+        type="button"
+        role="tab"
+        [class.active]="subTab() === 'aspects'"
+        [attr.aria-selected]="subTab() === 'aspects'"
+        (click)="setSubTab('aspects')"
+      >
+        Açılar
+      </button>
+    </nav>
+
+    @switch (subTab()) {
+      @case ('overview') {
+        <div class="overview">
+          <!-- Yılın ana teması ve hemen altında yaşam alanlarına göre yorumlar -->
+          <app-solar-return-year [chart]="c" only="theme" />
+          <app-solar-return-year [chart]="c" only="areas" />
+
+          <!-- Çark ve seçili gezegen: geniş alanda yan yana, dar alanda alt alta -->
+          <section class="box wheel-row">
+            <div class="wheel-col">
+              <h2>{{ year() }} Solar Return Haritası</h2>
+              <app-chart-wheel [chart]="c" (planetSelected)="selectPlanet($event)" />
+              <p class="wheel-hint">Bir gezegene dokunarak ayrıntısını görebilirsin.</p>
+            </div>
+
+            @if (selectedPlanet(); as p) {
+              <aside class="planet-panel">
+                <span class="chip">Seçili Gezegen</span>
+                <h2>
+                  {{ p.name }}
+                  @if (p.retrograde) {
+                    <span class="retro" title="Geri hareket (retro)">℞</span>
+                  }
+                </h2>
+                <p class="pp-sign">{{ p.sign.name }} <span>{{ p.formatted }}</span></p>
+                @if (p.house) {
+                  <p class="pp-house">{{ p.house }}. ev</p>
+                }
+
+                <h3>Öne Çıkan Açılar</h3>
+                @if (planetAspects().length === 0) {
+                  <p class="muted">Bu gezegenin belirgin bir açısı yok.</p>
+                } @else {
+                  <ul class="pp-aspects">
+                    @for (a of planetAspects(); track $index) {
+                      <li>
+                        <span class="dot" [class]="'dot ' + a.kind" aria-hidden="true"></span>
+                        <span class="pp-aspect-name">{{ a.type }} · {{ a.other }}</span>
+                        <span class="pp-orb">{{ a.orb }}°</span>
+                      </li>
+                    }
+                  </ul>
+                }
+              </aside>
+            }
+          </section>
+
+          <!-- Göstergeler ve hesaplama bilgileri: yan yana, aynı boyda -->
+          <div class="below">
+            <section class="box">
+              <h2>Öne Çıkan Göstergeler</h2>
+              @if (highlights().length === 0) {
+                <p class="muted">Bu haritada belirgin bir açı yok.</p>
+              } @else {
+                <ul class="highlights">
+                  @for (h of highlights(); track $index) {
+                    <li>
+                      <button type="button" (click)="selectPlanet(h.first)">
+                        <span [class]="'dot ' + h.kind" aria-hidden="true"></span>
+                        <span class="hl-text">
+                          <span class="hl-title">{{ h.title }}</span>
+                          <span class="hl-sub">{{ h.subtitle }}</span>
+                        </span>
+                        <span class="hl-arrow" aria-hidden="true">›</span>
+                      </button>
+                    </li>
+                  }
+                </ul>
+              }
+            </section>
+
+            <section class="box info">
+              <h2>Hesaplama Bilgileri</h2>
+              <dl>
+                @for (row of infoRows(); track row.label) {
+                  <div class="info-row">
+                    <dt>{{ row.label }}</dt>
+                    <dd>{{ row.value }}</dd>
+                  </div>
+                }
+              </dl>
+            </section>
+          </div>
+
+          <!-- Hızlı erişim: tam genişlikte şerit -->
+          <section class="box quick">
+            <h2>Hızlı Erişim</h2>
+            <div class="quick-buttons">
+              <button type="button" (click)="setSubTab('planets')">
+                Gezegenleri İncele <span aria-hidden="true">›</span>
+              </button>
+              @if (hasHouses()) {
+                <button type="button" (click)="setSubTab('houses')">
+                  Evleri Gör <span aria-hidden="true">›</span>
+                </button>
+              }
+              <button type="button" (click)="setSubTab('aspects')">
+                Açıları Keşfet <span aria-hidden="true">›</span>
+              </button>
+            </div>
+          </section>
+        </div>
+      }
+      @case ('planets') {
+        <app-chart-tables [chart]="c" only="planets" />
+      }
+      @case ('houses') {
+        <app-chart-tables [chart]="c" only="houses" />
+      }
+      @case ('aspects') {
+        <app-chart-tables [chart]="c" only="aspects" />
+      }
+    }
 
     @if (c.warnings.length > 0) {
       <div class="warnings">

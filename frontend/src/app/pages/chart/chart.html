@@ -95,12 +95,27 @@
       >
         Solar Return
       </button>
+      <button
+        type="button"
+        role="tab"
+        class="tab"
+        [class.active]="tab() === 'progressed'"
+        [attr.aria-selected]="tab() === 'progressed'"
+        (click)="setTab('progressed')"
+      >
+        İlerletilmiş
+      </button>
     </nav>
 
     @if (tab() === 'solar') {
       <!-- ================= SOLAR RETURN ================= -->
       @if (birthRequest(); as request) {
         <app-solar-return [request]="request" [birthPlaceName]="placeName()" />
+      }
+    } @else if (tab() === 'progressed') {
+      <!-- ================= İLERLETİLMİŞ HARİTA ================= -->
+      @if (birthRequest(); as request) {
+        <app-progressed [request]="request" [natal]="c" />
       }
     } @else {
       <!-- ================= DOĞUM HARİTASI ================= -->

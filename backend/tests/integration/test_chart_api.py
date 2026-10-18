@@ -4,6 +4,7 @@ import pytest
 
 URL = "/api/v1/charts/calculate"
 SOLAR_RETURN_URL = "/api/v1/charts/solar-return"
+PROGRESSED_URL = "/api/v1/charts/progressed"
 
 VALID = {
     "birth_date": "1995-06-15",
@@ -131,3 +132,24 @@ def test_solar_return_requires_both_coordinates(client):
     assert response.status_code == 422
     field_error = response.json()["error"]["fields"][0]
     assert field_error["field"] == "return_longitude"
+
+
+# =============================== İLERLETİLMİŞ HARİTA ===============================
+def test_progressed_success(client):
+    response = client.post(PROGRESSED_URL, json={**VALID, "target_date": "2025-06-15"})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["target_date"] == "2025-06-15"
+    assert data["age_years"] == pytest.approx(30.0, abs=0.01)
+    assert data["chart"]["utc_datetime"].startswith("1995-07-1")  # doğumdan ~30 gün sonra
+    assert len(data["chart"]["houses"]) == 12
+    assert data["next_moon_sign_change"]["change_date"] > "2025-06-15"
+    assert data["next_moon_sign_change"]["sign"]["key"]
+
+
+def test_progressed_target_must_be_after_birth(client):
+    response = client.post(PROGRESSED_URL, json={**VALID, "target_date": "1995-06-15"})
+    assert response.status_code == 422
+    field_error = response.json()["error"]["fields"][0]
+    assert field_error["field"] == "target_date"
+    assert "doğum tarihinden sonra" in field_error["message"]

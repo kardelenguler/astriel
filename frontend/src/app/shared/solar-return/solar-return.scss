@@ -2,10 +2,14 @@
   display: block;
 }
 
+// Düzen ekranın değil, sayfanın kendi genişliğine göre değişir (container query)
+.sr {
+  container-type: inline-size;
+}
+
 // Başlık fontunda (Cormorant) sayılar varsayılan olarak "eski stil" çizilir:
 // bazıları yukarı, bazıları aşağı kayar. Bu satırlar hepsini aynı boya ve hizaya getirir.
 .year,
-.moment-time,
 .key-sign {
   font-variant-numeric: lining-nums tabular-nums;
   font-feature-settings: 'lnum' 1, 'tnum' 1;
@@ -32,7 +36,7 @@
   align-items: center;
   justify-content: center;
   gap: 20px;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
 }
 
 .year {
@@ -64,17 +68,47 @@
   }
 }
 
+// ---------- Tanıtım bloğu ----------
 .intro {
-  margin: 0 0 14px;
+  max-width: 640px;
+  margin: 0 auto 22px;
   text-align: center;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--color-text-muted);
+
+  .eyebrow {
+    margin: 0 0 8px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-mauve);
+  }
+
+  h2 {
+    margin: 0 0 14px;
+    font-size: 32px;
+    line-height: 1.15;
+    color: var(--color-gold);
+  }
+
+  p {
+    margin: 0 0 12px;
+    font-size: 14.5px;
+    line-height: 1.75;
+    color: var(--color-text-muted);
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .hint {
   margin: 10px 0 0;
   font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.muted {
   color: var(--color-text-muted);
 }
 
@@ -200,49 +234,26 @@
   }
 }
 
-// ---------- Güneş dönüşü anı ----------
-.moment {
-  text-align: center;
-}
-
-.moment-label {
-  margin: 0;
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-mauve);
-}
-
-.moment-time {
-  margin: 6px 0;
-  font-family: var(--font-display);
-  font-size: 28px;
-  color: var(--color-gold);
-}
-
-.moment-place {
-  margin: 0;
-  font-size: 13px;
-  color: var(--color-text-muted);
-}
-
-// ---------- Yükselen, Güneş'in evi, Ay ----------
+// ---------- Üst kartlar: Yükselen, Güneş, Ay, Dönüş anı ----------
 .key-cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
   margin-bottom: 16px;
 }
 
 .key-card {
-  display: flex;
-  flex-direction: column;
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-content: start;
   align-items: center;
+  gap: 10px 14px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg, 16px);
-  padding: 16px 10px;
-  text-align: center;
+  padding: 16px;
+  text-align: left;
   font: inherit;
   color: inherit;
 }
@@ -264,6 +275,29 @@ button.clickable {
   }
 }
 
+.key-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--color-gold);
+}
+
+svg.key-icon {
+  padding: 7px;
+}
+
+.key-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
 .key-label {
   font-size: 11px;
   letter-spacing: 0.1em;
@@ -273,6 +307,7 @@ button.clickable {
 
 // Tıklanabilir olduğu belli olsun: kesik çizgili etiket (doğum haritasındaki kartlar gibi)
 .key-card.clickable .key-label {
+  align-self: flex-start;
   padding-bottom: 2px;
   border-bottom: 1px dashed rgba(197, 138, 168, 0.8);
 }
@@ -282,15 +317,52 @@ button.clickable {
 }
 
 .key-sign {
-  margin: 6px 0 2px;
+  margin: 4px 0 2px;
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 24px;
+  line-height: 1.1;
   color: var(--color-gold);
 }
 
 .key-detail {
   font-size: 12px;
   color: var(--color-text-muted);
+}
+
+// "4. ev" rozeti: kartın sağ üst köşesi
+.key-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 1px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: 11px;
+  color: var(--color-mauve);
+}
+
+// Kısa açıklama: ikonun ve metnin altında, kartın tam genişliğinde
+.key-teaser {
+  grid-column: 1 / -1;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+// Dönüş anı kartı tıklanmaz; tarih uzun olduğu için yazı biraz küçük
+.moment-card .key-sign {
+  font-size: 20px;
+}
+
+// Dönüş anı kartının altındaki şehir adı ortalanır
+.moment-card .key-teaser {
+  text-align: center;
+}
+
+.moment-place {
+  display: block;
+  font-size: 15px;
+  color: var(--color-text);
 }
 
 .card-hint {
@@ -310,17 +382,293 @@ app-interpretation-panel {
   margin-bottom: 16px;
 }
 
-// ---------- Çark ----------
-.wheel-box {
+// ---------- Alt sekmeler ----------
+.subtabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  button {
+    flex-shrink: 0;
+    padding: 10px 18px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--color-text-muted);
+    font-family: var(--font-body);
+    font-size: 15px;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--color-text);
+    }
+
+    &.active {
+      color: var(--color-gold);
+      border-bottom-color: var(--color-gold);
+    }
+  }
+}
+
+// ---------- Genel Bakış: çark + seçili gezegen ----------
+.wheel-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+
+.wheel-col {
+  min-width: 0;
+
   app-chart-wheel {
     display: block;
-    max-width: 520px;
+    max-width: 480px;
     margin: 0 auto;
   }
 }
 
-.warnings {
+.wheel-hint {
+  margin: 8px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+// ---------- Seçili gezegen ----------
+.planet-panel {
+  min-width: 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+
+  h2 {
+    margin-bottom: 6px;
+  }
+
+  h3 {
+    margin: 18px 0 8px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+  }
+
+  .retro {
+    margin-left: 6px;
+    font-size: 18px;
+    color: var(--color-mauve);
+  }
+}
+
+.chip {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 3px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--color-mauve);
+}
+
+.pp-sign {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--color-gold);
+
+  span {
+    margin-left: 8px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--color-text-muted);
+  }
+}
+
+.pp-house {
+  display: inline-block;
+  margin: 0;
+  padding: 2px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.pp-aspects {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 14px;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+.pp-aspect-name {
+  flex: 1;
+}
+
+.pp-orb {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: 50%;
+
+  &.harmonious {
+    background: var(--color-gold);
+  }
+
+  &.hard {
+    background: var(--color-error);
+  }
+
+  &.neutral {
+    background: var(--color-mauve);
+  }
+}
+
+// ---------- Göstergeler ve hesaplama bilgileri (yan yana, aynı boy) ----------
+.below {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
   margin-bottom: 16px;
+
+  .box {
+    margin-bottom: 0;
+  }
+}
+
+.highlights {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    border-bottom: 1px solid var(--color-border);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 0;
+    background: none;
+    border: none;
+    color: var(--color-text);
+    font-family: var(--font-body);
+    text-align: left;
+    cursor: pointer;
+
+    &:hover .hl-title {
+      color: var(--color-gold);
+    }
+  }
+}
+
+.hl-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.hl-title {
+  font-size: 14px;
+}
+
+.hl-sub {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.hl-arrow {
+  color: var(--color-text-muted);
+  font-size: 18px;
+}
+
+.info {
+  dl {
+    margin: 0;
+  }
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 14px;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  dt {
+    color: var(--color-text-muted);
+  }
+
+  dd {
+    margin: 0;
+    text-align: right;
+  }
+}
+
+// ---------- Hızlı erişim: tam genişlikte şerit ----------
+.quick-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--color-input);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--color-gold);
+      color: var(--color-gold);
+    }
+  }
+}
+
+.warnings {
+  margin: 16px 0;
 
   p {
     margin: 0 0 8px;
@@ -340,17 +688,45 @@ app-interpretation-panel {
   }
 }
 
+// ---------- Sayfa genişliğine göre düzen ----------
+// Dar: kartlar 2x2
+@container (max-width: 819px) {
+  .key-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+// Orta ve geniş: çark ile seçili gezegen yan yana, alttaki iki kutu aynı boyda
+@container (min-width: 640px) {
+  .wheel-row {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .planet-panel {
+    padding-top: 0;
+    padding-left: 24px;
+    border-top: none;
+    border-left: 1px solid var(--color-border);
+  }
+
+  .below {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+}
+
 @media (max-width: 600px) {
   .box {
     padding: 16px;
   }
 
-  .year {
-    font-size: 34px;
+  .intro h2 {
+    font-size: 26px;
   }
 
-  .moment-time {
-    font-size: 22px;
+  .year {
+    font-size: 34px;
   }
 
   .key-cards {
@@ -358,7 +734,14 @@ app-interpretation-panel {
   }
 
   .key-card {
-    padding: 12px 6px;
+    padding: 12px;
+    gap: 8px 10px;
+  }
+
+  .key-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
   }
 
   .key-label {
@@ -367,6 +750,25 @@ app-interpretation-panel {
   }
 
   .key-sign {
-    font-size: 17px;
+    font-size: 19px;
+  }
+
+  .moment-card .key-sign {
+    font-size: 16px;
+  }
+
+  .key-badge {
+    top: 8px;
+    right: 8px;
+    font-size: 10px;
+  }
+
+  .key-teaser {
+    font-size: 12px;
+  }
+
+  .subtabs button {
+    padding: 10px 14px;
+    font-size: 14px;
   }
 }
