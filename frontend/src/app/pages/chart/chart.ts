@@ -1,5 +1,14 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  Injector,
+  afterNextRender,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, ParamMap, Params, Router, RouterLink } from '@angular/router';
 import { combineLatest } from 'rxjs';
@@ -14,6 +23,7 @@ import { InterpretationService } from '../../core/services/interpretation.servic
 import { SavedChartsService } from '../../core/services/saved-charts.service';
 import { ChartWheel } from '../../shared/chart-wheel/chart-wheel';
 import { InterpretationPanel } from '../../shared/interpretation-panel/interpretation-panel';
+import { SpecialPoints } from '../../shared/special-points/special-points';
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/; // 1995-06-15
 const TIME_PATTERN = /^\d{2}:\d{2}$/; // 14:30
@@ -29,7 +39,7 @@ type SaveState = 'idle' | 'editing' | 'saving' | 'saved';
  */
 @Component({
   selector: 'app-chart',
-  imports: [RouterLink, ChartWheel, InterpretationPanel],
+  imports: [RouterLink, ChartWheel, InterpretationPanel, SpecialPoints],
   templateUrl: './chart.html',
   styleUrl: './chart.scss',
 })
@@ -40,6 +50,8 @@ export class Chart {
   private readonly savedCharts = inject(SavedChartsService);
   private readonly interpretations = inject(InterpretationService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly injector = inject(Injector);
   protected readonly auth = inject(AuthService);
 
   // ---------- Sayfanın durumu ----------
@@ -132,6 +144,26 @@ export class Chart {
       return;
     }
     this.toggle(`planet-${key}`, () => this.interpretations.forPlanet(planet));
+  }
+
+  /**
+   * Çarktaki gezegen sembolüne tıklanınca: yorumu açar ve ekranı oraya kaydırır
+   * (yorum, sayfada çarkın epey altındaki Gezegenler bölümünde açılır).
+   */
+  showPlanet(key: string): void {
+    this.selectPlanet(key);
+    if (!this.planetDetail()) {
+      return; // yorum kapandı veya bulunamadı: kaydırmaya gerek yok
+    }
+    // Yorum paneli çizildikten sonra kaydır (aynı anda tek panel açık olabilir)
+    afterNextRender(
+      () => {
+        this.host.nativeElement
+          .querySelector('app-interpretation-panel')
+          ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      },
+      { injector: this.injector },
+    );
   }
 
   closeDetail(): void {

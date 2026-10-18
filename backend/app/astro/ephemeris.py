@@ -55,6 +55,10 @@ BODY_IDS: dict[str, int] = {
     "pluto": swe.PLUTO,
     "north_node": swe.TRUE_NODE,
     "chiron": swe.CHIRON,
+    # Ortalama Lilit (Ay'ın ortalama apojesi): astrolojide en yaygın kullanılan Lilit
+    "lilith": swe.MEAN_APOG,
+    # Juno asteroidi: seas_18.se1 dosyasındadır (Chiron ile aynı dosya)
+    "juno": swe.JUNO,
 }
 
 
@@ -117,4 +121,4 @@ def calc_houses(jd: float, latitude: float, longitude: float, system: str) -> Ra
     # pysweph 13 eleman döndürür ve 0. eleman boştur; farklı sürümlere karşı iki durumu da ele al
     twelve = cusps[1:13] if len(cusps) == 13 else cusps[:12]
 
-    return RawHouses(cusps=tuple(twelve), ascendant=points[0], midheaven=points[1])
+    return RawHouses(cusps=tuple(twelve), ascendant=points[0], midheaven=points[1]) 

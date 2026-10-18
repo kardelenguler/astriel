@@ -1,0 +1,40 @@
+@if (cards().length > 0) {
+  <section class="panel" aria-labelledby="special-points-title">
+    <h2 id="special-points-title">Özel Noktalar</h2>
+    <p class="panel-hint">
+      Gezegenlerin yanı sıra haritanda yol gösterici bazı özel noktalar da bulunur.
+    </p>
+
+    <div class="cards">
+      @for (card of cards(); track card.info.key) {
+        <article class="card" [class.locked]="card.locked">
+          <header class="card-head">
+            <span class="glyph" aria-hidden="true">{{ card.info.glyph }}</span>
+            <div>
+              <h3>{{ card.info.title }}</h3>
+              @if (card.locked) {
+                <p class="where">Doğum saati gerekli</p>
+              } @else if (card.sign) {
+                <p class="where">
+                  {{ card.sign.name }}@if (card.house !== null) { · {{ card.house }}. Ev }
+                </p>
+              }
+            </div>
+          </header>
+
+          <p class="intro">{{ card.info.intro }}</p>
+
+          @if (card.locked) {
+            <div class="lock-note">
+              <span class="lock-ornament" aria-hidden="true">✦</span>
+              <p>Doğum saatini girersen bu noktanın yorumu burada açılır.</p>
+              <span class="lock-ornament" aria-hidden="true">✦</span>
+            </div>
+          } @else if (card.text) {
+            <p class="text">{{ card.text }}</p>
+          }
+        </article>
+      }
+    </div>
+  </section>
+}

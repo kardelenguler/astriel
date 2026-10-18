@@ -115,22 +115,60 @@ h4 {
   color: #6f6880;
 }
 
+// Telefon: kutu daha derli toplu, bir ekrana sığsın
 @media (max-width: 600px) {
   .detail {
-    padding: 24px 20px 20px;
+    margin-top: 10px;
+    padding: 16px 16px 14px;
+  }
+
+  .close {
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+
+  .keywords {
+    margin-bottom: 4px;
+    padding-right: 34px;
+    font-size: 10px;
+    letter-spacing: 0.12em;
   }
 
   h3 {
-    font-size: 24px;
+    font-size: 22px;
+  }
+
+  .position {
+    margin-top: 2px;
+    font-size: 13px;
   }
 
   h4 {
-    font-size: 19px;
+    margin-bottom: 4px;
+    font-size: 18px;
   }
 
   .description,
   .text {
-    font-size: 14px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .description {
+    margin-top: 10px;
+  }
+
+  .divider {
+    margin: 12px 0 10px;
+    font-size: 11px;
+  }
+
+  .note {
+    margin-top: 12px;
+    font-size: 11px;
   }
 }
 
@@ -143,4 +181,8 @@ h4 {
 // Ev yerleşimi ve retro notu gibi ek paragraflar
 .extra {
   margin-top: 12px;
+
+  @media (max-width: 600px) {
+    margin-top: 8px;
+  }
 }

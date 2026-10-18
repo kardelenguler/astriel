@@ -40,6 +40,20 @@ export interface Planet {
   house: number | null; // doğum saati bilinmiyorsa null
 }
 
+/**
+ * Özel nokta: Güney Ay Düğümü, Lilit, Juno, Şans Noktası.
+ * (Kuzey Ay Düğümü ve Chiron `planets` içinde gelir.)
+ */
+export interface SpecialPoint {
+  key: string; // "south_node", "lilith", "juno", "part_of_fortune"
+  name: string; // "Güney Ay Düğümü"
+  longitude: number;
+  sign: Sign;
+  degree: number; // burç içindeki derece (0–30)
+  formatted: string; // "3°30' Aslan"
+  house: number | null; // doğum saati bilinmiyorsa null
+}
+
 export interface AspectType {
   key: string; // "trine"
   name: string; // "Üçgen"
@@ -72,6 +86,7 @@ export interface ChartResponse {
   midheaven: ChartPoint | null;
   houses: ChartPoint[]; // 1.–12. ev; saat bilinmiyorsa boş
   planets: Planet[];
+  special_points: SpecialPoint[]; // Güney Düğüm, Lilit, Juno, Şans Noktası
   aspects: Aspect[];
   warnings: string[]; // kullanıcıya gösterilecek Türkçe uyarılar
   engine_version: string;

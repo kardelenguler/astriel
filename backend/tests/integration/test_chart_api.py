@@ -77,3 +77,12 @@ def test_timezone_aware_birth_time_rejected(client):
     assert field_error["field"] == "birth_time"
     assert "yerel saat" in field_error["message"]
     assert "hiç yaşanmadı" not in field_error["message"]
+
+
+
+
+def test_calculate_returns_special_points(client):
+    data = client.post(URL, json=VALID).json()
+    keys = [p["key"] for p in data["special_points"]]
+    assert keys == ["south_node", "lilith", "juno", "part_of_fortune"]
+    assert all(p["sign"]["key"] and 1 <= p["house"] <= 12 for p in data["special_points"])

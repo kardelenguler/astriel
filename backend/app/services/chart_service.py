@@ -11,6 +11,7 @@ from app.astro import ephemeris
 from app.astro.aspects import find_aspects
 from app.astro.houses import calculate_houses
 from app.astro.planets import calculate_planets
+from app.astro.special_points import calculate_special_points
 from app.astro.time_conversion import local_to_utc, timezone_at
 from app.astro.zodiac import sign_of
 from app.schemas.chart import (
@@ -20,13 +21,15 @@ from app.schemas.chart import (
     HouseSystemOut,
     PlanetOut,
     PointOut,
+    SpecialPointOut,
 )
 
 logger = logging.getLogger(__name__)
 
 # Hesaplama kuralları değişirse ilk kısmı artır; kayıtlı haritaların hangi sürümle
 # hesaplandığı birth_charts.engine_version sütununda tutulur.
-ENGINE_VERSION = f"astriel-1/swe-{ephemeris.EPHEMERIS_VERSION}"
+# astriel-2: özel noktalar (Güney Düğüm, Lilit, Juno, Şans Noktası) eklendi.
+ENGINE_VERSION = f"astriel-2/swe-{ephemeris.EPHEMERIS_VERSION}"
 
 # Doğum saati bilinmiyorsa gezegenler öğle vaktine göre hesaplanır:
 # gün içindeki en büyük olası hata böylece en küçük olur (±12 saat).
@@ -65,6 +68,10 @@ class ChartService:
         warnings.extend(planets.warnings)
         aspects = find_aspects(planets.planets)
 
+        # ---------- Özel noktalar (Güney Düğüm, Lilit, Juno, Şans Noktası) ----------
+        special = calculate_special_points(jd, planets.planets, houses)
+        warnings.extend(special.warnings)
+
         # Doğum tarihi kişisel veridir; log'a yazılmaz.
         logger.info(
             "Harita hesaplandı: saat_biliniyor=%s, uyarı=%d",
@@ -84,6 +91,7 @@ class ChartService:
             midheaven=PointOut.model_validate(houses.midheaven) if houses else None,
             houses=[PointOut.model_validate(c) for c in houses.cusps] if houses else [],
             planets=[PlanetOut.model_validate(p) for p in planets.planets],
+            special_points=[SpecialPointOut.model_validate(p) for p in special.points],
             aspects=[AspectOut.model_validate(a) for a in aspects],
             warnings=warnings,
             engine_version=ENGINE_VERSION,

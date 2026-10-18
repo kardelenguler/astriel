@@ -115,13 +115,27 @@
   }
 }
 
-// ---------- Gezegenler ----------
+// ---------- Gezegenler (tıklanabilir) ----------
 .planet {
-  cursor: default;
+  cursor: pointer;
+  outline: none;
 
-  &:hover .planet-glyph {
+  &:hover .planet-glyph,
+  &:focus-visible .planet-glyph {
     fill: var(--color-mauve);
   }
+
+  // Klavyeyle gezerken seçili gezegenin etrafında altın halka
+  &:focus-visible .hit-area {
+    stroke: var(--color-gold);
+    stroke-width: 1;
+  }
+}
+
+// Görünmez geniş tıklama alanı
+.hit-area {
+  fill: transparent;
+  stroke: transparent;
 }
 
 .planet-tick {

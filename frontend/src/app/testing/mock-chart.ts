@@ -63,6 +63,7 @@ export function mockChart(options: { timeKnown?: boolean } = {}): ChartResponse 
       planet('mars', 'Mars', 248.37),
       planet('saturn', 'Satürn', 111.5, true),
     ],
+    special_points: [], // özel noktalar gereken testlerde ayrıca eklenir
     aspects: [
       // Uyumlu
       { first: 'moon', second: 'mars', type: { key: 'trine', name: 'Üçgen', angle: 120, orb: 8 }, angle: 120, orb: 0, applying: true },

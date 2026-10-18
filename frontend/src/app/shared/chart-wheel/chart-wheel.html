@@ -42,14 +42,24 @@
     />
   }
 
-  <!-- Gezegenler -->
+  <!-- Gezegenler (üstüne gelince adı görünür, tıklanınca yorumuna gidilir) -->
   @for (p of planets(); track p.key) {
-    <g class="planet">
+    <g
+      class="planet"
+      role="button"
+      tabindex="0"
+      [attr.aria-label]="p.title"
+      (click)="select(p.key)"
+      (keydown.enter)="select(p.key)"
+      (keydown.space)="$event.preventDefault(); select(p.key)"
+    >
       <title>{{ p.title }}</title>
       <line [attr.x1]="p.tick.x1" [attr.y1]="p.tick.y1" [attr.x2]="p.tick.x2" [attr.y2]="p.tick.y2" class="planet-tick" />
       @if (p.connector; as c) {
         <line [attr.x1]="c.x1" [attr.y1]="c.y1" [attr.x2]="c.x2" [attr.y2]="c.y2" class="connector" />
       }
+      <!-- Görünmez geniş tıklama alanı: küçük sembole isabet etmek kolaylaşır -->
+      <circle [attr.cx]="p.x" [attr.cy]="p.y" r="14" class="hit-area" />
       <text [attr.x]="p.x" [attr.y]="p.y" class="planet-glyph">{{ p.glyph }}</text>
       @if (p.retrograde) {
         <text [attr.x]="p.x + 10" [attr.y]="p.y + 9" class="retro">℞</text>

@@ -97,6 +97,18 @@ class PlanetOut(FromAttributesModel):
     house: int | None
 
 
+class SpecialPointOut(FromAttributesModel):
+    """Güney Ay Düğümü, Lilit, Juno, Şans Noktası (Kuzey Düğüm ve Chiron planets içinde)."""
+
+    key: str
+    name: str
+    longitude: float
+    sign: SignOut
+    degree: float
+    formatted: str
+    house: int | None  # doğum saati bilinmiyorsa None
+
+
 class AspectTypeOut(FromAttributesModel):
     key: str
     name: str
@@ -128,6 +140,8 @@ class ChartResponse(BaseModel):
     midheaven: PointOut | None
     houses: list[PointOut]  # sırayla 1.–12. ev; saat bilinmiyorsa boş
     planets: list[PlanetOut]
+    # Varsayılan boş liste: özel noktalardan önce kaydedilmiş eski haritalar da okunabilsin
+    special_points: list[SpecialPointOut] = Field(default_factory=list)
     aspects: list[AspectOut]
     warnings: list[str]
     engine_version: str

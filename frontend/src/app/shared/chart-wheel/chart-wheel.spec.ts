@@ -11,12 +11,16 @@ describe('ChartWheel', () => {
     return fixture;
   }
 
+  /** Bir gezegenin SVG grubu */
+  function planetGroup(element: HTMLElement, planetName: string): Element {
+    return Array.from(element.querySelectorAll('g.planet')).find((g) =>
+      g.querySelector('title')?.textContent?.startsWith(planetName),
+    )!;
+  }
+
   /** Bir gezegen sembolünün SVG içindeki konumu */
   function glyphPosition(element: HTMLElement, planetName: string): { x: number; y: number } {
-    const group = Array.from(element.querySelectorAll('g.planet')).find((g) =>
-      g.querySelector('title')?.textContent?.startsWith(planetName),
-    );
-    const text = group!.querySelector('text.planet-glyph')!;
+    const text = planetGroup(element, planetName).querySelector('text.planet-glyph')!;
     return { x: Number(text.getAttribute('x')), y: Number(text.getAttribute('y')) };
   }
 
@@ -69,5 +73,23 @@ describe('ChartWheel', () => {
 
     expect(distance).toBeGreaterThan(20); // semboller yaklaşık 19px boyutunda
     expect(element.querySelectorAll('line.connector').length).toBeGreaterThan(0);
+  });
+
+  it('gezegen sembolüne tıklanınca gezegenin anahtarı gönderilmeli', async () => {
+    const fixture = await render();
+    const element: HTMLElement = fixture.nativeElement;
+    const selected: string[] = [];
+    fixture.componentInstance.planetSelected.subscribe((key) => selected.push(key));
+
+    planetGroup(element, 'Merkür').dispatchEvent(new Event('click'));
+
+    expect(selected).toEqual(['mercury']);
+  });
+
+  it('ipucu metni gezegenin adını ve tıklama davetini içermeli', async () => {
+    const element: HTMLElement = (await render()).nativeElement;
+    const title = planetGroup(element, 'Merkür').querySelector('title')!.textContent;
+
+    expect(title).toContain('yorumu için tıkla');
   });
 });

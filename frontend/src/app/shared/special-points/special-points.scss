@@ -1,0 +1,214 @@
+:host {
+  display: block;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+
+  h2 {
+    font-size: 28px;
+  }
+}
+
+.panel-hint {
+  margin: -6px 0 8px;
+  font-size: 13px;
+  color: rgba(197, 138, 168, 0.85);
+
+  &::before {
+    content: '✦ ';
+    color: var(--color-gold);
+  }
+}
+
+// Yorumlar uzun olduğu için masaüstünde 2 sütun (3 sütunda metin sıkışırdı)
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+// ---------- Kart ----------
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px;
+  background: var(--color-input);
+  border: 1px solid rgba(201, 164, 108, 0.35); // ince altın çerçeve
+  border-radius: var(--radius-md);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+
+  // Üzerine gelince mor parıltı
+  &:hover {
+    border-color: var(--color-mauve);
+    box-shadow: 0 0 22px rgba(197, 138, 168, 0.18);
+  }
+
+  // Kilitli kart (doğum saati yok): soluk ve kesik çizgili çerçeve
+  &.locked {
+    border-style: dashed;
+
+    .glyph,
+    h3,
+    .intro {
+      opacity: 0.6;
+    }
+
+    &:hover {
+      border-color: rgba(201, 164, 108, 0.35);
+      box-shadow: none;
+    }
+  }
+}
+
+// Üst satır: sembol çemberi + başlık + "burç · ev"
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  h3 {
+    font-size: 26px;
+    color: var(--color-text);
+  }
+}
+
+// Sembolün durduğu altın çember
+.glyph {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border: 1px solid var(--color-gold);
+  border-radius: 50%;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--color-gold);
+}
+
+.where {
+  font-size: 13px;
+  color: var(--color-gold);
+}
+
+// "Bu nedir" tanıtımı
+.intro {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.35;
+  color: rgba(197, 138, 168, 0.95);
+}
+
+// Kişiye özel yorum
+.text {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--color-text);
+}
+
+// Kilit notu: kartın boş alanında ortalı, iki yıldız arasında italik yazı
+.lock-note {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 16px 12px;
+  text-align: center;
+
+  p {
+    max-width: 26ch;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 19px;
+    line-height: 1.4;
+    color: rgba(197, 138, 168, 0.85);
+    text-wrap: balance; // satırları dengeli böler, son satırda tek kelime kalmaz
+  }
+}
+
+.lock-ornament {
+  font-size: 18px;
+  line-height: 1;
+  color: var(--color-gold);
+  opacity: 0.8;
+}
+
+// ================= MOBİL =================
+// Telefonda her şey biraz küçülür: kenar boşlukları azalır, metin daha geniş alana yayılır.
+@media (max-width: 760px) {
+  .panel {
+    gap: 12px;
+    padding: 14px;
+
+    h2 {
+      font-size: 24px;
+    }
+  }
+
+  .panel-hint {
+    margin: -4px 0 4px;
+    font-size: 12px;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .card {
+    gap: 8px;
+    padding: 14px;
+  }
+
+  .card-head {
+    gap: 12px;
+
+    h3 {
+      font-size: 21px;
+    }
+  }
+
+  .glyph {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .where {
+    font-size: 12px;
+  }
+
+  .intro {
+    font-size: 15px;
+    line-height: 1.3;
+  }
+
+  .text {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .lock-note {
+    padding: 2px 6px;
+    gap: 6px;
+
+    p {
+      font-size: 16px;
+    }
+  }
+
+  .lock-ornament {
+    font-size: 14px;
+  }
+}

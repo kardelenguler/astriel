@@ -67,8 +67,42 @@ h1 {
   font-size: clamp(38px, 5vw, 56px);
 }
 
+// Tarih, saat ve saat dilimi: küçük etiketler (satır sonunda tek kelime kalmaz)
 .meta {
-  color: var(--color-text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 4px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    font-size: 13px;
+    color: var(--color-text-muted);
+  }
+
+  // Saat dilimi: ikincil bilgi, soluk
+  .tz {
+    opacity: 0.7;
+  }
+}
+
+// Saat girilmediyse: eklenebilecek bir şey gibi görünür
+.add-time {
+  color: var(--color-mauve);
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--color-gold);
+  }
+}
+
+.meta li:has(.add-time) {
+  border-style: dashed;
+  border-color: rgba(197, 138, 168, 0.55);
 }
 
 .change-link {
@@ -242,12 +276,69 @@ tbody tr:hover {
 
 // ================= MOBİL =================
 @media (max-width: 800px) {
+  // Büyük üçlü telefonda da yan yana kalır (alt alta dizilince bir ekran tutuyordu)
   .big-three {
-    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .big-card {
+    gap: 2px;
+    padding: 12px 10px;
+    border-radius: var(--radius-sm);
+  }
+
+  .big-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+  }
+
+  .big-sign {
+    font-size: 22px;
+  }
+
+  .big-detail {
+    font-size: 11px;
+    line-height: 1.3;
   }
 
   .houses {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+// Telefon: sayfa boşlukları ve başlık biraz daha sıkı
+@media (max-width: 600px) {
+  .chart-page {
+    gap: 18px;
+    padding-top: 20px;
+    padding-bottom: 56px;
+  }
+
+  .chart-header {
+    gap: 6px;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.24em;
+  }
+
+  h1 {
+    font-size: 34px;
+  }
+
+  // Saat dilimi telefonda gizli: tarih ve saat tek satıra sığar
+  .meta .tz {
+    display: none;
+  }
+
+  .panel {
+    gap: 12px;
+    padding: 16px;
+
+    h2 {
+      font-size: 24px;
+    }
   }
 }
 

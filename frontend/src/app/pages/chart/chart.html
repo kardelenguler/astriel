@@ -21,11 +21,18 @@
     <header class="chart-header">
       <p class="eyebrow">{{ savedName() ?? 'Doğum Haritan' }}</p>
       <h1>{{ placeName() }}</h1>
-      <p class="meta">
-        {{ birthDateText() }}
-        · {{ birthTimeText() ?? 'saat bilinmiyor' }}
-        · {{ c.timezone }}
-      </p>
+      <ul class="meta">
+        <li>{{ birthDateText() }}</li>
+        @if (birthTimeText(); as time) {
+          <li>{{ time }}</li>
+        } @else {
+          <!-- Saat girilmediyse: ekleyebileceğin bir şey olarak göster -->
+          <li>
+            <a routerLink="/" [queryParams]="editParams()" class="add-time">+ Doğum saati ekle</a>
+          </li>
+        }
+        <li class="tz">{{ c.timezone }}</li>
+      </ul>
       <div class="header-actions">
         <a routerLink="/" [queryParams]="editParams()" class="change-link">Bilgileri Değiştir</a>
         @switch (saveState()) {
@@ -123,10 +130,10 @@
       <p class="detail-error" role="alert">{{ message }}</p>
     }
 
-    <!-- Doğum haritası çarkı -->
+    <!-- Doğum haritası çarkı (bir gezegene tıklanınca yorumuna gidilir) -->
     <section class="panel wheel-panel">
       <h2>Doğum Haritası</h2>
-      <app-chart-wheel [chart]="c" />
+      <app-chart-wheel [chart]="c" (planetSelected)="showPlanet($event)" />
       <ul class="wheel-legend">
         <li><span class="swatch harmonious"></span>Uyumlu Açılar (üçgen, altmışlık)</li>
         <li><span class="swatch hard"></span>Zorlayıcı Açılar (kare, karşıt)</li>
@@ -141,6 +148,9 @@
         }
       </div>
     }
+
+    <!-- Özel noktalar (Kuzey Düğüm, Lilit, Şans Noktası, Kiron, Juno...) -->
+    <app-special-points [chart]="c" />
 
     <!-- Gezegenler (adlarına tıklanınca açıklama açılır) -->
     <section class="panel">

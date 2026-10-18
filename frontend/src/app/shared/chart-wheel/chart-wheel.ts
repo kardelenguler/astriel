@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 
 import { ChartResponse } from '../../core/models/chart';
 
@@ -80,6 +80,13 @@ function spread(longitudes: number[], minGap: number): number[] {
 })
 export class ChartWheel {
   readonly chart = input.required<ChartResponse>();
+
+  /** Bir gezegen sembolüne tıklanınca gezegenin anahtarı ("sun", "moon"...) gönderilir */
+  readonly planetSelected = output<string>();
+
+  protected select(key: string): void {
+    this.planetSelected.emit(key);
+  }
 
   /** Yükselen solda dursun diye çarkın döndürülme açısı (saat bilinmiyorsa 0° Koç solda) */
   private readonly rotation = computed(() => this.chart().ascendant?.longitude ?? 0);
@@ -170,7 +177,8 @@ export class ChartWheel {
       return {
         key: planet.key,
         glyph: (PLANET_GLYPHS[planet.key] ?? planet.name.slice(0, 2)) + VS,
-        title: `${planet.name} · ${planet.formatted}${planet.retrograde ? ' · Retro' : ''}`,
+        // Üstüne gelince görünen ipucu: ad, konum, (retro) ve tıklama daveti
+        title: `${planet.name} · ${planet.formatted}${planet.retrograde ? ' · Retro' : ''} · yorumu için tıkla`,
         retrograde: planet.retrograde,
         x: label.x,
         y: label.y,

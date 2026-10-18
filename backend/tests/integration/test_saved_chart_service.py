@@ -142,3 +142,16 @@ def test_purge_removes_only_charts_deleted_long_ago(service, owner, db_session):
     # Yeni silinen hâlâ geri alınabilir, silinmemiş olana dokunulmadı
     assert service.restore(owner, recent.id).name == "Yeni silinen"
     assert service.get(owner, kept.id).name == "Silinmemiş"
+
+
+
+def test_old_chart_without_special_points_gets_them(service, owner, db_session):
+    saved = service.save(owner, _request())
+    chart = service.charts.get_for_user(saved.id, owner.id)
+    # Özel noktalardan önce kaydedilmiş eski bir harita gibi davran
+    chart.engine_version = "astriel-1/eski"
+    chart.chart_data = {k: v for k, v in chart.chart_data.items() if k != "special_points"}
+    db_session.flush()
+
+    result = service.get(owner, saved.id)
+    assert len(result.chart.special_points) >= 3
