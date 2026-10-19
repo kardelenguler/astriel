@@ -13,6 +13,7 @@ import { ProgressedRequest, ProgressedResponse } from '../../core/models/progres
 import { ChartService } from '../../core/services/chart.service';
 import { ChartTables } from '../chart-tables/chart-tables';
 import { ChartWheel } from '../chart-wheel/chart-wheel';
+import { ProgressReading } from '../progress-reading/progress-reading';
 
 /** Backend'in desteklediği son tarih (backend: ephemeris.py MAX_YEAR) */
 const MAX_DATE = '2398-12-31';
@@ -169,7 +170,7 @@ interface ListedPlanet {
  */
 @Component({
   selector: 'app-progressed',
-  imports: [ChartWheel, ChartTables],
+  imports: [ChartWheel, ChartTables, ProgressReading],
   templateUrl: './progressed.html',
   styleUrl: './progressed.scss',
 })

@@ -1,0 +1,35 @@
+@if (theme(); as t) {
+  <section class="reading">
+    <div class="theme">
+      <p class="eyebrow">Yaş Yorumları · Bu Yaşın Ana Teması</p>
+      <h2>{{ title() }}</h2>
+      <p class="theme-text">{{ t.text }}</p>
+      @if (tags().length > 0) {
+        <ul class="tags">
+          @for (tag of tags(); track tag) {
+            <li>{{ tag }}</li>
+          }
+        </ul>
+      }
+    </div>
+
+    @if (cards().length > 0) {
+      <div class="grid">
+        @for (a of cards(); track a.key) {
+          <article class="area">
+            <header class="area-head">
+              <span class="area-icon" aria-hidden="true">{{ a.icon }}</span>
+              <div class="area-heading">
+                <h3 class="area-title">{{ a.title }}</h3>
+                <p class="area-sub">{{ a.subtitle }}</p>
+              </div>
+            </header>
+            <p class="area-text">{{ a.text }}</p>
+          </article>
+        }
+      </div>
+    }
+
+    <p class="note">Astrolojik geleneğe dayanan genel açıklamalardır; kesin bir öngörü değildir.</p>
+  </section>
+}

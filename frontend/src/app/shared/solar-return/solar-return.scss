@@ -767,8 +767,18 @@ app-interpretation-panel {
     font-size: 12px;
   }
 
-  .subtabs button {
-    padding: 10px 14px;
-    font-size: 14px;
+  // Dört alt sekme kaydırmadan sığar
+  .subtabs {
+    gap: 0;
+    overflow: visible;
+
+    button {
+      flex: 1 1 auto;
+      flex-shrink: 1;
+      padding: 10px 4px;
+      font-size: 13px;
+      text-align: center;
+      white-space: nowrap;
+    }
   }
 }
