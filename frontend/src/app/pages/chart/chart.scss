@@ -122,7 +122,7 @@ h1 {
   display: flex;
   gap: 4px;
   border-bottom: 1px solid var(--color-border);
-  overflow-x: auto; // dar ekranda sekmeler taşarsa yana kaysın
+  overflow-x: auto; // çok dar ekranda sekmeler taşarsa yana kaysın
   overflow-y: hidden; // dikey kaydırma çubuğu çıkmasın
   scrollbar-width: none; // yatay kaydırma çubuğunu gizle (parmakla kayar)
 
@@ -368,9 +368,17 @@ tbody tr:hover {
     display: none;
   }
 
+  // Üç sekme kaydırmadan sığar: genişliği eşit paylaşırlar
+  .tabs {
+    gap: 0;
+  }
+
   .tab {
-    padding: 10px 14px;
-    font-size: 14px;
+    flex: 1 1 auto;
+    padding: 10px 6px;
+    font-size: 13.5px;
+    text-align: center;
+    white-space: nowrap;
   }
 
   .panel {

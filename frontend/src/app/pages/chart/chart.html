@@ -103,7 +103,7 @@
         [attr.aria-selected]="tab() === 'progressed'"
         (click)="setTab('progressed')"
       >
-        İlerletilmiş
+        Progress
       </button>
     </nav>
 
@@ -113,7 +113,7 @@
         <app-solar-return [request]="request" [birthPlaceName]="placeName()" />
       }
     } @else if (tab() === 'progressed') {
-      <!-- ================= İLERLETİLMİŞ HARİTA ================= -->
+      <!-- ================= PROGRESS HARİTASI ================= -->
       @if (birthRequest(); as request) {
         <app-progressed [request]="request" [natal]="c" />
       }

@@ -1,27 +1,92 @@
 <section class="pr">
-  <!-- ================= Kontroller: tarih ================= -->
-  <div class="box controls">
-    <p class="intro">
-      İlerletilmiş haritada doğumundan sonraki her gün bir yıl sayılır: 30 yaşındaki birinin
-      ilerletilmiş haritası, doğumundan 30 gün sonraki gökyüzüdür. Geleneksel olarak içsel
+  <!-- ================= Başlık ================= -->
+  <header class="pr-head">
+    <p class="eyebrow">Progress Haritası</p>
+    <h2>Zamanla birlikte ilerleyen gökyüzün</h2>
+    <p>
+      Progress haritasında doğumundan sonraki her gün bir yıl sayılır: 30 yaşındaki birinin
+      progress haritası, doğumundan 30 gün sonraki gökyüzüdür. Geleneksel olarak içsel
       değişimleri ve yaşam dönemlerini anlatmak için kullanılır.
     </p>
+  </header>
 
-    <div class="date-stepper">
-      <button type="button" class="step" aria-label="Bir yıl geri" (click)="shiftYear(-1)">◀</button>
-      <input
-        type="date"
-        aria-label="İlerletilmiş haritanın tarihi"
-        [min]="minDate()"
-        [max]="maxDate"
-        [value]="targetDate()"
-        (change)="onDateInput($event)"
-      />
-      <button type="button" class="step" aria-label="Bir yıl ileri" (click)="shiftYear(1)">▶</button>
+  <!-- ================= Zaman seçici ================= -->
+  <div class="box controls">
+    <div class="picker-top">
+      <div>
+        <h2 class="picker-title">Zaman Seçici</h2>
+        <p class="picker-sub">Hangi yaşın progress haritasını görmek istiyorsun?</p>
+      </div>
+      <div class="mode" role="group" aria-label="Seçim türü">
+        <button
+          type="button"
+          [class.active]="pickMode() === 'age'"
+          [attr.aria-pressed]="pickMode() === 'age'"
+          (click)="setPickMode('age')"
+        >
+          Yaş Seç
+        </button>
+        <button
+          type="button"
+          [class.active]="pickMode() === 'date'"
+          [attr.aria-pressed]="pickMode() === 'date'"
+          (click)="setPickMode('date')"
+        >
+          Tarih Seç
+        </button>
+      </div>
     </div>
-    <p class="today-row">
-      <button type="button" class="today-btn" (click)="setToday()">Bugün</button>
-    </p>
+
+    <div class="picker-body">
+      <div class="picker-input">
+        @if (pickMode() === 'age') {
+          <div class="age-slider">
+            <button type="button" class="step" aria-label="Bir yaş geri" (click)="shiftAge(-1)">
+              ◀
+            </button>
+            <input
+              type="range"
+              min="1"
+              step="1"
+              aria-label="Yaş"
+              [max]="maxAge()"
+              [value]="sliderAge()"
+              (input)="onAgeInput($event)"
+            />
+            <button type="button" class="step" aria-label="Bir yaş ileri" (click)="shiftAge(1)">
+              ▶
+            </button>
+          </div>
+        } @else {
+          <div class="date-stepper">
+            <button type="button" class="step" aria-label="Bir yıl geri" (click)="shiftYear(-1)">
+              ◀
+            </button>
+            <input
+              type="date"
+              aria-label="Progress haritasının tarihi"
+              [min]="minDate()"
+              [max]="maxDate"
+              [value]="targetDate()"
+              (change)="onDateInput($event)"
+            />
+            <button type="button" class="step" aria-label="Bir yıl ileri" (click)="shiftYear(1)">
+              ▶
+            </button>
+          </div>
+          <p class="today-row">
+            <button type="button" class="today-btn" (click)="setToday()">Bugün</button>
+          </p>
+        }
+      </div>
+
+      <div class="picker-result">
+        <p class="pr-label">Seçilen Yaş</p>
+        <p class="age-big">{{ age() ?? '—' }}</p>
+        <p class="pr-label">Karşılık Gelen Tarih</p>
+        <p class="date-text">{{ dateText() || '—' }}</p>
+      </div>
+    </div>
 
     @if (dateError(); as message) {
       <p class="error" role="alert">{{ message }}</p>
@@ -32,7 +97,7 @@
   @if (loading()) {
     <div class="state" role="status">
       <div class="spinner" aria-hidden="true"></div>
-      <p>İlerletilmiş harita hesaplanıyor…</p>
+      <p>Progress haritası hesaplanıyor…</p>
     </div>
   }
 
@@ -42,69 +107,210 @@
 
   <!-- ================= Sonuç ================= -->
   @if (chart(); as c) {
-    <div class="box age">
-      <p class="age-label">Seçtiğin tarihte</p>
-      <p class="age-text">{{ ageText() }}</p>
+    <!-- Üst kartlar: Progress Ay, Güneş, Yükselen -->
+    <div class="cards">
+      @for (card of cards(); track card.key) {
+        <article class="card">
+          <span class="card-icon" aria-hidden="true">{{ card.icon }}</span>
+          <span class="card-body">
+            <span class="card-label">{{ card.label }}</span>
+            <span class="card-sign">{{ card.sign }}</span>
+            <span class="card-detail">{{ card.detail }}</span>
+          </span>
+          @if (card.house) {
+            <span class="badge">{{ card.house }}. ev</span>
+          }
+          <span class="card-teaser">{{ card.teaser }}</span>
+        </article>
+      }
     </div>
 
-    <!-- İlerletilmiş Ay -->
-    @if (moonInfo(); as moon) {
-      <div class="box moon">
-        <h2>İlerletilmiş Ay</h2>
-        <p>
-          İlerletilmiş Ay'ın şu an <strong>{{ moon.current }}</strong> burcunda.
-          <strong>{{ moon.date }}</strong> tarihinde <strong>{{ moon.next }}</strong> burcuna
-          geçecek.
-        </p>
-        <p class="moon-note">
-          İlerletilmiş Ay yaklaşık 2,5 yılda bir burç değiştirir. Geleneksel olarak bu geçişler,
-          duygusal ihtiyaçlarda yeni bir dönemin başlangıcı olarak yorumlanır.
-        </p>
-      </div>
-    }
+    <!-- Alt sekmeler -->
+    <nav class="subtabs" role="tablist" aria-label="Progress bölümleri">
+      <button
+        type="button"
+        role="tab"
+        [class.active]="subTab() === 'overview'"
+        [attr.aria-selected]="subTab() === 'overview'"
+        (click)="setSubTab('overview')"
+      >
+        Genel Bakış
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [class.active]="subTab() === 'planets'"
+        [attr.aria-selected]="subTab() === 'planets'"
+        (click)="setSubTab('planets')"
+      >
+        Gezegenler
+      </button>
+      @if (hasHouses()) {
+        <button
+          type="button"
+          role="tab"
+          [class.active]="subTab() === 'houses'"
+          [attr.aria-selected]="subTab() === 'houses'"
+          (click)="setSubTab('houses')"
+        >
+          Evler
+        </button>
+      }
+      <button
+        type="button"
+        role="tab"
+        [class.active]="subTab() === 'aspects'"
+        [attr.aria-selected]="subTab() === 'aspects'"
+        (click)="setSubTab('aspects')"
+      >
+        Açılar
+      </button>
+    </nav>
 
-    <!-- Çark: iç halka doğum, dış halka ilerletilmiş -->
-    <section class="box wheel-box">
-      <h2>İlerletilmiş Harita</h2>
-      <app-chart-wheel [chart]="natal()" [outer]="c" outerLabel="İlerletilmiş" />
-      <ul class="legend">
-        <li><span class="swatch natal"></span>İç halka: doğum haritan</li>
-        <li><span class="swatch progressed"></span>Dış halka: ilerletilmiş gezegenler</li>
-      </ul>
-    </section>
+    @switch (subTab()) {
+      @case ('overview') {
+        <div class="overview">
+          <!-- Çark ve seçili gezegen: geniş alanda yan yana, dar alanda alt alta -->
+          <section class="box wheel-row">
+            <div class="wheel-col">
+              <h2>Progress Haritası</h2>
+              <app-chart-wheel
+                [chart]="natal()"
+                [outer]="c"
+                outerLabel="Progress"
+                (planetSelected)="selectPlanet($event)"
+              />
+              <ul class="legend">
+                <li><span class="swatch natal"></span>İç halka: doğum haritan</li>
+                <li><span class="swatch progressed"></span>Dış halka: progress gezegenleri</li>
+              </ul>
+            </div>
 
-    <!-- Doğum ve ilerletilmiş konumlar -->
-    <section class="box">
-      <h2>Doğum ve İlerletilmiş Konumlar</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Gök Cismi</th>
-              <th scope="col">Doğumda</th>
-              <th scope="col">İlerletilmiş</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (row of rows(); track row.name) {
-              <tr>
-                <th scope="row">{{ row.name }}</th>
-                <td>{{ row.natal }}</td>
-                <td [class.changed]="row.changed">
-                  {{ row.progressed }}
-                  @if (row.retrograde) {
+            @if (selectedPlanet(); as p) {
+              <aside class="planet-panel">
+                <span class="chip">Seçili Gezegen</span>
+                <h2>
+                  Progress {{ p.name }}
+                  @if (p.retrograde) {
                     <span class="retro" title="Geri hareket (retro)">℞</span>
                   }
-                  @if (row.changed) {
-                    <span class="changed-note">yeni burç</span>
-                  }
-                </td>
-              </tr>
+                </h2>
+                <p class="pp-sign">{{ p.sign.name }} <span>{{ p.formatted }}</span></p>
+                @if (p.house) {
+                  <p class="pp-house">{{ p.house }}. ev</p>
+                }
+
+                <h3>Öne Çıkan Açılar</h3>
+                @if (planetAspects().length === 0) {
+                  <p class="muted">Bu gezegenin belirgin bir açısı yok.</p>
+                } @else {
+                  <ul class="pp-aspects">
+                    @for (a of planetAspects(); track $index) {
+                      <li>
+                        <span [class]="'dot ' + a.kind" aria-hidden="true"></span>
+                        <span class="pp-aspect-name">{{ a.type }} · {{ a.other }}</span>
+                        <span class="pp-orb">{{ a.orb }}°</span>
+                      </li>
+                    }
+                  </ul>
+                }
+              </aside>
             }
-          </tbody>
-        </table>
-      </div>
-    </section>
+          </section>
+
+          <!-- Bilgiler ve gezegen listesi: yan yana, aynı boyda -->
+          <div class="below">
+            <section class="box info">
+              <h2>Progress Bilgileri</h2>
+              <dl>
+                @for (row of infoRows(); track row.label) {
+                  <div class="info-row">
+                    <dt>{{ row.label }}</dt>
+                    <dd>{{ row.value }}</dd>
+                  </div>
+                }
+              </dl>
+            </section>
+
+            <section class="box">
+              <h2>Progress Gezegenleri</h2>
+              <ul class="plist">
+                @for (p of planetList(); track p.key) {
+                  <li>
+                    <button
+                      type="button"
+                      [class.selected]="selectedPlanet()?.key === p.key"
+                      (click)="selectPlanet(p.key)"
+                    >
+                      <span class="glyph" aria-hidden="true">{{ p.glyph }}</span>
+                      <span class="pl-text">{{ p.name }} <span>{{ p.label }}</span></span>
+                      @if (p.house) {
+                        <span class="pl-house">{{ p.house }}. ev</span>
+                      }
+                    </button>
+                  </li>
+                }
+              </ul>
+            </section>
+          </div>
+
+          <!-- Progress Ay -->
+          @if (moonInfo(); as moon) {
+            <div class="box moon">
+              <h2>Progress Ay</h2>
+              <p>
+                Progress Ay'ın şu an <strong>{{ moon.current }}</strong> burcunda.
+                <strong>{{ moon.date }}</strong> tarihinde <strong>{{ moon.next }}</strong>
+                burcuna geçecek.
+              </p>
+              <p class="moon-note">
+                Progress Ay yaklaşık 2,5 yılda bir burç değiştirir. Geleneksel olarak bu geçişler,
+                duygusal ihtiyaçlarda yeni bir dönemin başlangıcı olarak yorumlanır.
+              </p>
+            </div>
+          }
+        </div>
+      }
+      @case ('planets') {
+        <!-- Doğum ve progress konumlar -->
+        <section class="box">
+          <h2>Doğum ve Progress Konumlar</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Gök Cismi</th>
+                  <th scope="col">Doğumda</th>
+                  <th scope="col">Progress</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of rows(); track row.name) {
+                  <tr>
+                    <th scope="row">{{ row.name }}</th>
+                    <td>{{ row.natal }}</td>
+                    <td [class.changed]="row.changed">
+                      {{ row.progressed }}
+                      @if (row.retrograde) {
+                        <span class="retro" title="Geri hareket (retro)">℞</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <app-chart-tables [chart]="c" only="planets" />
+      }
+      @case ('houses') {
+        <app-chart-tables [chart]="c" only="houses" />
+      }
+      @case ('aspects') {
+        <app-chart-tables [chart]="c" only="aspects" />
+      }
+    }
 
     @if (c.warnings.length > 0) {
       <div class="warnings">

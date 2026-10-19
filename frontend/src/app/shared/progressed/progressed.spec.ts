@@ -1,108 +1,236 @@
-import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { NEVER, Observable } from 'rxjs';
+import { NEVER } from 'rxjs';
 
+import { PROGRESS_MOON_TEXTS } from '../../core/content/progress-texts/cards';
 import { ChartResponse } from '../../core/models/chart';
-import { ProgressedRequest, ProgressedResponse } from '../../core/models/progressed';
+import { ProgressedResponse } from '../../core/models/progressed';
 import { ChartService } from '../../core/services/chart.service';
 import { Progressed } from './progressed';
 
-// Sahte servis: backend'e istek atmaz, sadece hangi bilgiyle çağrıldığını kaydeder.
-class FakeChartService {
-  readonly requests: ProgressedRequest[] = [];
-  progressed(request: ProgressedRequest): Observable<ProgressedResponse> {
-    this.requests.push(request);
-    return NEVER;
-  }
+function sign(key: string, name: string) {
+  return { key, name };
 }
 
-/** Bugünün yerel tarihi, "2026-10-18" biçiminde (bileşendekiyle aynı mantık) */
-function todayIso(): string {
-  const now = new Date();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  return `${now.getFullYear()}-${month}-${day}`;
+function planet(key: string, name: string, signKey: string, signName: string, house: number) {
+  return {
+    key,
+    name,
+    sign: sign(signKey, signName),
+    formatted: `10°00' ${signName}`,
+    house,
+    retrograde: false,
+  };
+}
+
+function progressedResponse(houses: unknown[] = [{}, {}]): ProgressedResponse {
+  const chart = {
+    planets: [
+      {
+        key: 'moon',
+        name: 'Ay',
+        sign: sign('libra', 'Terazi'),
+        formatted: "14°32' Terazi",
+        house: 3,
+        retrograde: false,
+      },
+      {
+        key: 'sun',
+        name: 'Güneş',
+        sign: sign('aquarius', 'Kova'),
+        formatted: "6°48' Kova",
+        house: 4,
+        retrograde: false,
+      },
+      planet('venus', 'Venüs', 'sagittarius', 'Yay', 3),
+      planet('chiron', 'Kiron', 'aries', 'Koç', 9),
+    ],
+    ascendant: { sign: sign('sagittarius', 'Yay'), formatted: "18°21' Yay" },
+    houses,
+    house_system: { code: 'P', name: 'Placidus' },
+    aspects: [
+      { first: 'sun', second: 'moon', type: { key: 'trine', name: 'Üçgen' }, orb: 3 },
+      { first: 'venus', second: 'sun', type: { key: 'square', name: 'Kare' }, orb: 1 },
+      { first: 'moon', second: 'venus', type: { key: 'sextile', name: 'Altmışlık' }, orb: 2 },
+    ],
+    warnings: [],
+  } as unknown as ChartResponse;
+
+  return {
+    target_date: '2027-01-26',
+    age_years: 22,
+    chart,
+    next_moon_sign_change: { change_date: '2029-10-12', sign: sign('scorpio', 'Akrep') },
+  } as unknown as ProgressedResponse;
 }
 
 describe('Progressed', () => {
-  let chartService: FakeChartService;
-
-  beforeEach(() => {
-    chartService = new FakeChartService();
+  function create() {
     TestBed.configureTestingModule({
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        { provide: ChartService, useValue: chartService },
-      ],
+      providers: [{ provide: ChartService, useValue: { progressed: () => NEVER } }],
     });
-  });
-
-  /** Doğum bilgileriyle bileşeni açar (çark sonuç gelince çizilir; burada sonuç hiç gelmez) */
-  async function create() {
     const fixture = TestBed.createComponent(Progressed);
     fixture.componentRef.setInput('request', {
-      birth_date: '1995-06-15',
-      birth_time: '14:30',
-      latitude: 36.8969,
-      longitude: 30.7133,
+      birth_date: '2005-01-26',
+      birth_time: '14:15',
+      latitude: 37.7,
+      longitude: 30.5,
     });
-    fixture.componentRef.setInput('natal', { planets: [] } as unknown as ChartResponse);
+    fixture.componentRef.setInput('natal', { planets: [], ascendant: null } as unknown as ChartResponse);
     fixture.detectChanges();
-    await fixture.whenStable();
-    return fixture;
+    return fixture.componentInstance;
   }
 
-  async function change(fixture: Awaited<ReturnType<typeof create>>, date: string) {
-    fixture.componentInstance.setDate(date);
-    fixture.detectChanges();
-    await fixture.whenStable();
-  }
+  describe('zaman seçici', () => {
+    it('yaş seçilince doğum günü tarihine çevrilir', () => {
+      const c = create();
+      c.setAge(22);
+      expect(c.targetDate()).toBe('2027-01-26');
+      expect(c.age()).toBe(22);
+      expect(c.dateText()).toBe('26 Ocak 2027');
+    });
 
-  it('açılınca bugünün tarihiyle ilerletilmiş harita istemeli', async () => {
-    await create();
+    it('yaş 1 ile en büyük yaş arasında kalır', () => {
+      const c = create();
+      c.setAge(0);
+      expect(c.sliderAge()).toBe(1);
+      c.setAge(500);
+      expect(c.sliderAge()).toBe(c.maxAge());
+    });
 
-    expect(chartService.requests).toHaveLength(1);
-    expect(chartService.requests[0]).toMatchObject({
-      birth_date: '1995-06-15',
-      target_date: todayIso(),
+    it('−/+ düğmeleri yaşı bir değiştirir', () => {
+      const c = create();
+      c.setAge(22);
+      c.shiftAge(1);
+      expect(c.age()).toBe(23);
+      c.shiftAge(-2);
+      expect(c.age()).toBe(21);
+    });
+
+    it('tarih seçilince yaş tamamlanmış yıl olarak hesaplanır', () => {
+      const c = create();
+      c.setDate('2027-01-25');
+      expect(c.age()).toBe(21);
+      c.setDate('2027-01-26');
+      expect(c.age()).toBe(22);
+    });
+
+    it('doğumdan önceki tarih hata verir', () => {
+      const c = create();
+      c.setDate('2005-01-26');
+      expect(c.dateError()).toBe('Tarih doğum tarihinden sonra olmalı.');
+      expect(c.dateText()).toBe('');
+    });
+
+    it('geçersiz tarihte yaş null olur', () => {
+      const c = create();
+      c.setDate('');
+      expect(c.age()).toBeNull();
+      expect(c.dateError()).toBe('Bir tarih seç.');
+    });
+
+    it('yaş seç / tarih seç arasında geçilir', () => {
+      const c = create();
+      expect(c.pickMode()).toBe('age');
+      c.setPickMode('date');
+      expect(c.pickMode()).toBe('date');
     });
   });
 
-  it('tarih değişince yeni istek atmalı', async () => {
-    const fixture = await create();
+  describe('üst kartlar', () => {
+    it('Ay, Güneş ve Yükselen için üretilir', () => {
+      const c = create();
+      c.result.set(progressedResponse());
+      const cards = c.cards();
+      expect(cards.map((x) => x.key)).toEqual(['moon', 'sun', 'asc']);
+      expect(cards[0].label).toBe('Progress Ay');
+      expect(cards[0].sign).toBe('Terazi');
+      expect(cards[0].house).toBe(3);
+      expect(cards[0].teaser).toBe(PROGRESS_MOON_TEXTS['libra']);
+      expect(cards[2].house).toBe(1);
+    });
 
-    await change(fixture, '2030-01-01');
-
-    expect(chartService.requests.at(-1)?.target_date).toBe('2030-01-01');
+    it('doğum saati yoksa Yükselen kartı çıkmaz', () => {
+      const c = create();
+      const response = progressedResponse();
+      (response.chart as unknown as { ascendant: null }).ascendant = null;
+      c.result.set(response);
+      expect(c.cards().map((x) => x.key)).toEqual(['moon', 'sun']);
+    });
   });
 
-  it('en erken tarih doğumdan bir gün sonrası olmalı', async () => {
-    const fixture = await create();
+  describe('alt sekmeler', () => {
+    it('başlangıçta Genel Bakış açıktır', () => {
+      expect(create().subTab()).toBe('overview');
+    });
 
-    expect(fixture.componentInstance.minDate()).toBe('1995-06-16');
+    it('evler varsa Evler sekmesi seçilebilir', () => {
+      const c = create();
+      c.result.set(progressedResponse());
+      c.setSubTab('houses');
+      expect(c.hasHouses()).toBe(true);
+      expect(c.subTab()).toBe('houses');
+    });
+
+    it('ev yoksa Evler seçili olsa da Genel Bakış gösterilir', () => {
+      const c = create();
+      c.result.set(progressedResponse([]));
+      c.setSubTab('houses');
+      expect(c.hasHouses()).toBe(false);
+      expect(c.subTab()).toBe('overview');
+    });
   });
 
-  it('doğumdan önceki ya da boş tarih için istek atmamalı', async () => {
-    const fixture = await create();
-    expect(chartService.requests).toHaveLength(1);
+  describe('seçili gezegen', () => {
+    it('varsayılan olarak Güneş seçilidir', () => {
+      const c = create();
+      c.result.set(progressedResponse());
+      expect(c.selectedPlanet()?.key).toBe('sun');
+    });
 
-    await change(fixture, '1990-01-01');
-    await change(fixture, '');
+    it('selectPlanet seçimi değiştirir', () => {
+      const c = create();
+      c.result.set(progressedResponse());
+      c.selectPlanet('moon');
+      expect(c.selectedPlanet()?.key).toBe('moon');
+    });
 
-    expect(chartService.requests).toHaveLength(1);
-    expect(fixture.componentInstance.dateError()).toBe('Bir tarih seç.');
+    it('açılar orb değerine göre küçükten büyüğe sıralanır', () => {
+      const c = create();
+      c.result.set(progressedResponse());
+      const aspects = c.planetAspects();
+      expect(aspects.map((a) => a.other)).toEqual(['Venüs', 'Ay']);
+      expect(aspects[0].kind).toBe('hard');
+      expect(aspects[1].kind).toBe('harmonious');
+      expect(aspects[0].orb).toBe('1.0');
+    });
   });
 
-  it('yıl oku tarihi bir yıl kaydırmalı', async () => {
-    const fixture = await create();
-    await change(fixture, '2030-03-10');
+  describe('gezegen listesi ve bilgiler', () => {
+    it('listede sadece ana gezegenler yer alır', () => {
+      const c = create();
+      c.result.set(progressedResponse());
+      const keys = c.planetList().map((p) => p.key);
+      expect(keys).toEqual(['sun', 'moon', 'venus']);
+      expect(c.planetList()[0].glyph).toContain('☉');
+    });
 
-    fixture.componentInstance.shiftYear(1);
-    fixture.detectChanges();
-    await fixture.whenStable();
+    it('bilgi satırları yaş, tarih ve progress zamanını içerir', () => {
+      const c = create();
+      c.setDate('2027-01-26');
+      c.result.set(progressedResponse());
+      const rows = Object.fromEntries(c.infoRows().map((r) => [r.label, r.value]));
+      expect(rows['Doğum tarihi']).toBe('26 Ocak 2005');
+      expect(rows['Doğum saati']).toBe('14:15');
+      expect(rows['Seçilen yaş']).toBe('22');
+      expect(rows['Karşılık gelen tarih']).toBe('26 Ocak 2027');
+      expect(rows['Progress zamanı']).toBe('17 Şubat 2005');
+      expect(rows['Ev sistemi']).toBe('Placidus');
+    });
 
-    expect(fixture.componentInstance.targetDate()).toBe('2031-03-10');
+    it('Progress Ay bir sonraki burç değişimini gösterir', () => {
+      const c = create();
+      c.result.set(progressedResponse());
+      expect(c.moonInfo()).toEqual({ current: 'Terazi', next: 'Akrep', date: '12 Ekim 2029' });
+    });
   });
 });
