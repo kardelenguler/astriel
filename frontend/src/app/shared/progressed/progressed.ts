@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, ElementRef, computed, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { EMPTY, catchError, switchMap } from 'rxjs';
 
@@ -176,6 +176,7 @@ interface ListedPlanet {
 })
 export class Progressed {
   private readonly chartService = inject(ChartService);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   /** Doğum bilgileri (doğum haritasını hesaplayan istekle aynı) */
   readonly request = input.required<ChartCalculateRequest>();
@@ -504,9 +505,19 @@ export class Progressed {
     this.chosenSubTab.set(tab);
   }
 
-  /** Çarkta (ya da listede) bir gezegene tıklanınca yandaki panel o gezegeni gösterir */
+  /**
+   * Çarkta (ya da listede) bir gezegene tıklanınca "Seçili Gezegen" kutusu o gezegeni
+   * gösterir ve ekran o kutuya kayar.
+   */
   selectPlanet(key: string): void {
     this.selectedPlanetKey.set(key);
+    this.scrollToPanel();
+  }
+
+  /** "Seçili Gezegen" kutusunu görünür yere getirir (kutu yoksa bir şey yapmaz) */
+  private scrollToPanel(): void {
+    const panel = this.host.nativeElement.querySelector('.planet-panel');
+    panel?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
   }
 
   // ================= Zaman seçici =================

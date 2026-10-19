@@ -173,9 +173,9 @@
     @switch (subTab()) {
       @case ('overview') {
         <div class="overview">
-          <!-- Çark ve seçili gezegen: geniş alanda yan yana, dar alanda alt alta -->
-          <section class="box wheel-row">
-            <div class="wheel-col">
+          <!-- Üst satır: çark + gezegen listesi (seçim burada yapılır) -->
+          <div class="wheel-row">
+            <section class="box wheel-col">
               <h2>Progress Haritası</h2>
               <app-chart-wheel
                 [chart]="natal()"
@@ -187,10 +187,35 @@
                 <li><span class="swatch natal"></span>İç halka: doğum haritan</li>
                 <li><span class="swatch progressed"></span>Dış halka: progress gezegenleri</li>
               </ul>
-            </div>
+            </section>
 
+            <section class="box">
+              <h2>Progress Gezegenleri</h2>
+              <p class="list-hint">Bir gezegene dokun, ayrıntısı altta açılsın.</p>
+              <ul class="plist">
+                @for (p of planetList(); track p.key) {
+                  <li>
+                    <button
+                      type="button"
+                      [class.selected]="selectedPlanet()?.key === p.key"
+                      (click)="selectPlanet(p.key)"
+                    >
+                      <span class="glyph" aria-hidden="true">{{ p.glyph }}</span>
+                      <span class="pl-text">{{ p.name }} <span>{{ p.label }}</span></span>
+                      @if (p.house) {
+                        <span class="pl-house">{{ p.house }}. ev</span>
+                      }
+                    </button>
+                  </li>
+                }
+              </ul>
+            </section>
+          </div>
+
+          <!-- Alt satır: seçili gezegen + progress bilgileri -->
+          <div class="below">
             @if (selectedPlanet(); as p) {
-              <aside class="planet-panel">
+              <section class="box planet-panel">
                 <span class="chip">Seçili Gezegen</span>
                 <h2>
                   Progress {{ p.name }}
@@ -232,12 +257,9 @@
                     }
                   </ul>
                 }
-              </aside>
+              </section>
             }
-          </section>
 
-          <!-- Bilgiler ve gezegen listesi: yan yana, aynı boyda -->
-          <div class="below">
             <section class="box info">
               <h2>Progress Bilgileri</h2>
               <dl>
@@ -248,27 +270,6 @@
                   </div>
                 }
               </dl>
-            </section>
-
-            <section class="box">
-              <h2>Progress Gezegenleri</h2>
-              <ul class="plist">
-                @for (p of planetList(); track p.key) {
-                  <li>
-                    <button
-                      type="button"
-                      [class.selected]="selectedPlanet()?.key === p.key"
-                      (click)="selectPlanet(p.key)"
-                    >
-                      <span class="glyph" aria-hidden="true">{{ p.glyph }}</span>
-                      <span class="pl-text">{{ p.name }} <span>{{ p.label }}</span></span>
-                      @if (p.house) {
-                        <span class="pl-house">{{ p.house }}. ev</span>
-                      }
-                    </button>
-                  </li>
-                }
-              </ul>
             </section>
           </div>
 
