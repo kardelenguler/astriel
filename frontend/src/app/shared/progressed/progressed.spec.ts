@@ -11,15 +11,33 @@ function sign(key: string, name: string) {
   return { key, name };
 }
 
-function planet(key: string, name: string, signKey: string, signName: string, house: number) {
+function planet(
+  key: string,
+  name: string,
+  signKey: string,
+  signName: string,
+  house: number,
+  longitude: number,
+) {
   return {
     key,
     name,
+    longitude,
     sign: sign(signKey, signName),
     formatted: `10°00' ${signName}`,
     house,
     retrograde: false,
   };
+}
+
+/** Doğum haritası: progress gezegenleriyle açı yapacak konumlar */
+function natalPlanets() {
+  return [
+    planet('sun', 'Güneş', 'aquarius', 'Kova', 4, 306.4),
+    planet('moon', 'Ay', 'sagittarius', 'Yay', 1, 200),
+    planet('venus', 'Venüs', 'aries', 'Koç', 7, 14),
+    planet('mars', 'Mars', 'taurus', 'Boğa', 8, 30),
+  ];
 }
 
 function progressedResponse(houses: unknown[] = [{}, {}]): ProgressedResponse {
@@ -28,6 +46,7 @@ function progressedResponse(houses: unknown[] = [{}, {}]): ProgressedResponse {
       {
         key: 'moon',
         name: 'Ay',
+        longitude: 194.5,
         sign: sign('libra', 'Terazi'),
         formatted: "14°32' Terazi",
         house: 3,
@@ -36,13 +55,14 @@ function progressedResponse(houses: unknown[] = [{}, {}]): ProgressedResponse {
       {
         key: 'sun',
         name: 'Güneş',
+        longitude: 306.8,
         sign: sign('aquarius', 'Kova'),
         formatted: "6°48' Kova",
         house: 4,
         retrograde: false,
       },
-      planet('venus', 'Venüs', 'sagittarius', 'Yay', 3),
-      planet('chiron', 'Kiron', 'aries', 'Koç', 9),
+      planet('venus', 'Venüs', 'sagittarius', 'Yay', 3, 268.7),
+      planet('chiron', 'Kiron', 'aries', 'Koç', 9, 10),
     ],
     ascendant: { sign: sign('sagittarius', 'Yay'), formatted: "18°21' Yay" },
     houses,
@@ -64,7 +84,7 @@ function progressedResponse(houses: unknown[] = [{}, {}]): ProgressedResponse {
 }
 
 describe('Progressed', () => {
-  function create() {
+  function create(natal: unknown[] = []) {
     TestBed.configureTestingModule({
       providers: [{ provide: ChartService, useValue: { progressed: () => NEVER } }],
     });
@@ -75,7 +95,10 @@ describe('Progressed', () => {
       latitude: 37.7,
       longitude: 30.5,
     });
-    fixture.componentRef.setInput('natal', { planets: [], ascendant: null } as unknown as ChartResponse);
+    fixture.componentRef.setInput('natal', {
+      planets: natal,
+      ascendant: null,
+    } as unknown as ChartResponse);
     fixture.detectChanges();
     return fixture.componentInstance;
   }
@@ -202,6 +225,49 @@ describe('Progressed', () => {
       expect(aspects[0].kind).toBe('hard');
       expect(aspects[1].kind).toBe('harmonious');
       expect(aspects[0].orb).toBe('1.0');
+    });
+  });
+
+  describe('progress – doğum açıları', () => {
+    it('1° içindeki açılar bulunur ve dar sapma önde sıralanır', () => {
+      const c = create(natalPlanets());
+      c.result.set(progressedResponse());
+      const found = c.crossAspects();
+      expect(found.map((a) => `${a.progressedName}-${a.type}-${a.natalName}`)).toEqual([
+        'Güneş-Kavuşum-Güneş',
+        'Ay-Karşıt-Venüs',
+      ]);
+      expect(found[0].orb).toBe('0.4');
+      expect(found[1].orb).toBe('0.5');
+      expect(found[0].kind).toBe('neutral');
+      expect(found[1].kind).toBe('hard');
+    });
+
+    it('1°den geniş sapma sayılmaz', () => {
+      // Progress Venüs (268.7) ile doğum Mars (30): üçgenden 1.3° uzak
+      const c = create(natalPlanets());
+      c.result.set(progressedResponse());
+      expect(c.crossAspects().some((a) => a.progressedName === 'Venüs')).toBe(false);
+    });
+
+    it('seçili gezegenin açıları ayrıca süzülür', () => {
+      const c = create(natalPlanets());
+      c.result.set(progressedResponse());
+      expect(c.selectedCrossAspects().map((a) => a.natalName)).toEqual(['Güneş']);
+      c.selectPlanet('moon');
+      expect(c.selectedCrossAspects().map((a) => a.natalName)).toEqual(['Venüs']);
+    });
+
+    it('doğum gezegeni yoksa açı çıkmaz', () => {
+      const c = create([]);
+      c.result.set(progressedResponse());
+      expect(c.crossAspects()).toEqual([]);
+    });
+
+    it('Kiron gibi listede olmayan cisimler hesaba katılmaz', () => {
+      const c = create(natalPlanets());
+      c.result.set(progressedResponse());
+      expect(c.crossAspects().some((a) => a.progressedName === 'Kiron')).toBe(false);
     });
   });
 

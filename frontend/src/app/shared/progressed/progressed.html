@@ -200,7 +200,22 @@
                   <p class="pp-house">{{ p.house }}. ev</p>
                 }
 
-                <h3>Öne Çıkan Açılar</h3>
+                <h3>Doğum Haritasıyla Açılar</h3>
+                @if (selectedCrossAspects().length === 0) {
+                  <p class="muted">Bu tarihte doğum haritanla 1° içinde bir açısı yok.</p>
+                } @else {
+                  <ul class="pp-aspects">
+                    @for (a of selectedCrossAspects(); track $index) {
+                      <li>
+                        <span [class]="'dot ' + a.kind" aria-hidden="true"></span>
+                        <span class="pp-aspect-name">{{ a.type }} · Doğum {{ a.natalName }}</span>
+                        <span class="pp-orb">{{ a.orb }}°</span>
+                      </li>
+                    }
+                  </ul>
+                }
+
+                <h3>Progress Haritasındaki Açılar</h3>
                 @if (planetAspects().length === 0) {
                   <p class="muted">Bu gezegenin belirgin bir açısı yok.</p>
                 } @else {
@@ -308,6 +323,41 @@
         <app-chart-tables [chart]="c" only="houses" />
       }
       @case ('aspects') {
+        <!-- Progress gezegenlerinin doğum gezegenleriyle açıları -->
+        <section class="box">
+          <h2>Progress – Doğum Açıları</h2>
+          <p class="muted">
+            Progress gezegenlerinin doğum haritandaki gezegenlerle yaptığı açılar (en fazla 1°
+            sapma).
+          </p>
+          @if (crossAspects().length === 0) {
+            <p class="muted" style="margin-top: 12px">Bu tarihte 1° içinde bir açı yok.</p>
+          } @else {
+            <div class="table-wrap" style="margin-top: 12px">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Progress</th>
+                    <th scope="col">Açı</th>
+                    <th scope="col">Doğum</th>
+                    <th scope="col">Sapma</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (a of crossAspects(); track $index) {
+                    <tr>
+                      <th scope="row">{{ a.progressedName }}</th>
+                      <td>{{ a.type }}</td>
+                      <td>{{ a.natalName }}</td>
+                      <td>{{ a.orb }}°</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </section>
+
         <app-chart-tables [chart]="c" only="aspects" />
       }
     }

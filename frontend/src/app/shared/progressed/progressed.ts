@@ -23,7 +23,7 @@ const DAY_MS = 86_400_000;
 
 /** Tabloda doğum ve progress konumları karşılaştırılan gök cisimleri (hızlı ilerleyenler) */
 const TABLE_PLANETS = ['sun', 'moon', 'mercury', 'venus', 'mars'];
-/** "Progress Gezegenleri" listesinde gösterilen gezegenler */
+/** "Progress Gezegenleri" listesinde ve açı hesabında kullanılan gezegenler */
 const LIST_PLANETS = [
   'sun',
   'moon',
@@ -38,9 +38,20 @@ const LIST_PLANETS = [
 ];
 /** Seçili gezegen panelinde en fazla kaç açı gösterilir */
 const MAX_PANEL_ASPECTS = 5;
+/** Progress – doğum açılarında izin verilen en büyük sapma (derece); gelenekte dar tutulur */
+const MAX_CROSS_ORB = 1;
 
 const HARMONIOUS = new Set(['trine', 'sextile']);
 const HARD = new Set(['square', 'opposition']);
+
+/** Progress – doğum açılarında bakılan açı türleri */
+const CROSS_ASPECT_TYPES = [
+  { key: 'conjunction', name: 'Kavuşum', angle: 0 },
+  { key: 'sextile', name: 'Altmışlık', angle: 60 },
+  { key: 'square', name: 'Kare', angle: 90 },
+  { key: 'trine', name: 'Üçgen', angle: 120 },
+  { key: 'opposition', name: 'Karşıt', angle: 180 },
+];
 
 // \uFE0E: sembolün renkli emoji yerine düz yazı olarak çizilmesini sağlar
 const VS = '\uFE0E';
@@ -98,6 +109,12 @@ function aspectKind(typeKey: string): AspectKind {
   return HARMONIOUS.has(typeKey) ? 'harmonious' : HARD.has(typeKey) ? 'hard' : 'neutral';
 }
 
+/** İki boylam arasındaki en kısa açı farkı (0–180 derece) */
+function angularDistance(a: number, b: number): number {
+  const diff = Math.abs(a - b) % 360;
+  return diff > 180 ? 360 - diff : diff;
+}
+
 /** Tabloda bir satır: gök cisminin doğumdaki ve progress konumu */
 interface Row {
   name: string;
@@ -124,6 +141,17 @@ interface PanelAspect {
   type: string; // "Üçgen"
   orb: string; // "1.4"
   kind: AspectKind;
+}
+
+/** Progress gezegeninin doğum gezegeniyle yaptığı açı */
+interface CrossAspect {
+  progressedKey: string;
+  progressedName: string; // "Ay"
+  natalName: string; // "Venüs"
+  type: string; // "Karşıt"
+  kind: AspectKind;
+  orb: string; // "0.5"
+  orbValue: number;
 }
 
 /** "Progress Gezegenleri" listesindeki bir satır */
@@ -238,6 +266,54 @@ export class Progressed {
         orb: a.orb.toFixed(1),
         kind: aspectKind(a.type.key),
       }));
+  });
+
+  /**
+   * Progress gezegenlerinin doğum gezegenleriyle yaptığı açılar (en dar sapma önde).
+   * Gelenekte bu açılarda sadece 1° içindeki sapmalar sayılır.
+   */
+  readonly crossAspects = computed<CrossAspect[]>(() => {
+    const progressed = this.chart();
+    if (!progressed) {
+      return [];
+    }
+    const natal = this.natal();
+    const found: CrossAspect[] = [];
+
+    for (const progressedKey of LIST_PLANETS) {
+      const from = progressed.planets.find((p) => p.key === progressedKey);
+      if (!from) {
+        continue;
+      }
+      for (const natalKey of LIST_PLANETS) {
+        const to = natal.planets.find((p) => p.key === natalKey);
+        if (!to) {
+          continue;
+        }
+        const distance = angularDistance(from.longitude, to.longitude);
+        for (const type of CROSS_ASPECT_TYPES) {
+          const orb = Math.abs(distance - type.angle);
+          if (orb <= MAX_CROSS_ORB) {
+            found.push({
+              progressedKey,
+              progressedName: from.name,
+              natalName: to.name,
+              type: type.name,
+              kind: aspectKind(type.key),
+              orb: orb.toFixed(1),
+              orbValue: orb,
+            });
+          }
+        }
+      }
+    }
+    return found.sort((a, b) => a.orbValue - b.orbValue);
+  });
+
+  /** Seçili progress gezegeninin doğum gezegenleriyle açıları */
+  readonly selectedCrossAspects = computed(() => {
+    const key = this.selectedPlanet()?.key;
+    return this.crossAspects().filter((a) => a.progressedKey === key);
   });
 
   /** "Progress Gezegenleri" listesi */
