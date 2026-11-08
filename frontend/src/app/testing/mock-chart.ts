@@ -76,3 +76,38 @@ export function mockChart(options: { timeKnown?: boolean } = {}): ChartResponse 
     engine_version: 'test',
   } as ChartResponse;
 }
+
+/**
+ * mockChart + tüm özel noktalar (Kuzey Düğüm ve Kiron gezegen listesinde, diğerleri
+ * special_points'te). Hepsi ilk gezegenin burcunda; doğum saati biliniyorsa 5. evde.
+ * Doğum saati yoksa Şans Noktası hesaplanamadığı için listede yer almaz.
+ */
+export function mockChartWithSpecialPoints(options: { timeKnown?: boolean } = {}): ChartResponse {
+  const timeKnown = options.timeKnown ?? true;
+  const chart = mockChart({ timeKnown });
+  const sign = chart.planets[0].sign;
+  const point = (key: string, name: string) => ({
+    key,
+    name,
+    longitude: 10,
+    sign,
+    degree: 10,
+    formatted: `10° ${sign.name}`,
+    house: timeKnown ? 5 : null,
+  });
+
+  return {
+    ...chart,
+    planets: [
+      ...chart.planets,
+      { ...point('north_node', 'Kuzey Düğüm'), speed: -0.05, retrograde: false },
+      { ...point('chiron', 'Kiron'), speed: 0.01, retrograde: false },
+    ],
+    special_points: [
+      point('south_node', 'Güney Düğüm'),
+      point('lilith', 'Lilit'),
+      point('juno', 'Juno'),
+      ...(timeKnown ? [point('part_of_fortune', 'Şans Noktası')] : []),
+    ],
+  };
+}
