@@ -5,11 +5,11 @@
 """
 
 import logging
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from sqlalchemy.exc import SQLAlchemyError
@@ -23,6 +23,22 @@ from app.db.session import SessionLocal
 from app.services.saved_chart_service import purge_old_deleted_charts
 
 logger = logging.getLogger(__name__)
+
+# Her yanıta eklenen güvenlik başlıkları (tarayıcıya "şunlara izin verme" der)
+SECURITY_HEADERS = {
+    # Tarayıcı dosya türünü tahmin etmesin (ör. bir .txt'yi script gibi çalıştırmasın)
+    "X-Content-Type-Options": "nosniff",
+    # Site başka sitelerin içine (iframe) gömülemesin: tıklama tuzaklarına karşı
+    "X-Frame-Options": "DENY",
+    # Başka siteye giden bağlantılarda sadece alan adı gönderilsin, sayfa adresi değil
+    # (ör. /harita/<id> gibi adresler dışarı sızmasın)
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    # Site kamera, mikrofon ve konum gibi izinleri hiç kullanmaz; isteyemesin de
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+    # Tarayıcı siteye 1 yıl boyunca sadece HTTPS ile bağlansın
+    # (HTTP üzerinden, ör. localhost'ta, tarayıcılar bu başlığı yok sayar)
+    "Strict-Transport-Security": "max-age=31536000",
+}
 
 
 def run_startup_maintenance() -> None:
@@ -59,11 +75,27 @@ def mount_frontend(app: FastAPI, dist: Path) -> None:
         if path == "api" or path.startswith("api/"):
             raise StarletteHTTPException(status_code=404)
 
-        requested = (dist / path).resolve()
-        # Güvenlik: "../.env" gibi istekler site klasörünün dışına çıkamaz
-        if path and requested.is_relative_to(dist) and requested.is_file():
-            return FileResponse(requested)
+        try:
+            requested = (dist / path).resolve()
+            # Güvenlik: "../.env" gibi istekler site klasörünün dışına çıkamaz
+            if path and requested.is_relative_to(dist) and requested.is_file():
+                return FileResponse(requested)
+        except (ValueError, OSError):
+            # Adreste null byte (%00) veya işletim sisteminin kabul etmediği bir yol varsa
+            # resolve()/is_file() hata fırlatır. 500 yerine site açılır; Angular kendi
+            # "Sayfa bulunamadı" ekranını gösterir.
+            logger.warning("Geçersiz dosya yolu istendi: %r", path)
         return FileResponse(index)
+
+
+async def add_security_headers(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
+    response = await call_next(request)
+    for name, value in SECURITY_HEADERS.items():
+        # Bir endpoint aynı başlığı kendisi koyduysa ona dokunma
+        response.headers.setdefault(name, value)
+    return response
 
 
 def create_app() -> FastAPI:
@@ -90,6 +122,10 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    # Güvenlik başlıkları: en son eklendiği için en dışta çalışır ve
+    # site dosyaları dahil (index.html, main.js...) her yanıta eklenir
+    app.middleware("http")(add_security_headers)
 
     app.include_router(api_router)
 

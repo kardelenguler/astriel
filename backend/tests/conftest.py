@@ -83,14 +83,15 @@ def db_client(db_session: Session) -> Generator[TestClient, None, None]:
     finally:
         app.dependency_overrides.clear()
 
+
 @pytest.fixture(autouse=True)
 def _reset_limiters():
     """Her test temiz sayaçlarla başlasın (testler birbirini kilitlemesin)."""
-    from app.core.rate_limit import login_limiter, search_limiter
+    from app.core.rate_limit import login_limiter, register_limiter, search_limiter
 
-    login_limiter.clear()
-    search_limiter.clear()
+    limiters = (login_limiter, search_limiter, register_limiter)
+    for limiter in limiters:
+        limiter.clear()
     yield
-    login_limiter.clear()
-    search_limiter.clear()
-
+    for limiter in limiters:
+        limiter.clear()

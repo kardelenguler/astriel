@@ -6,6 +6,8 @@
    kilitlemesini önler.
 2) Yer arama: Aynı IP dakikada en fazla SEARCH_LIMIT arama yapabilir. Nominatim'i
    tek bir kişinin tüketmesini ve sıranın onunla dolmasını önler.
+3) Kayıt: Aynı IP saatte en fazla REGISTER_LIMIT hesap açma denemesi yapabilir.
+   Bir botun saniyede yüzlerce sahte hesap açmasını önler.
 
 Not: Sayaçlar bellekte tutulur. Uygulama tek bir süreçte çalıştığı sürece
 yeterlidir; birden fazla sunucuya ölçeklenirse Redis gibi ortak bir depoya
@@ -30,9 +32,22 @@ SEARCH_LIMIT = 20
 SEARCH_WINDOW_SECONDS = 60
 SEARCH_LIMIT_MESSAGE = "Çok fazla arama yaptın. Lütfen bir dakika sonra tekrar dene."
 
+REGISTER_LIMIT = 5
+REGISTER_WINDOW_SECONDS = 60 * 60  # 1 saat
+REGISTER_LIMIT_MESSAGE = "Kısa sürede çok fazla hesap oluşturuldu. Lütfen daha sonra tekrar dene."
+
 # Render'da istek şu sırayla gelir: Cloudflare -> Render. Her biri X-Forwarded-For
 # başlığının SONUNA bir IP ekler. Kullanıcının gerçek IP'si bu yüzden sondan 3.'dür.
 # Baştaki değerleri kullanıcı kendisi yazabilir; onlara asla güvenilmez.
+#
+# DİKKAT (varsayım): Bu sayı Render'ın bugünkü altyapısına göredir. Render araya
+# bir proxy daha ekler veya çıkarırsa yanlış IP seçilir:
+#   - Sayı gerçekten KÜÇÜKSE: kullanıcının kendi yazdığı sahte IP'ye güvenilir
+#     ve istek sınırları her istekte farklı IP yazılarak atlatılabilir.
+#   - Sayı gerçekten BÜYÜKSE: tüm kullanıcılar aynı proxy IP'sinden geliyormuş
+#     gibi görünür ve sınırlar herkesi birlikte kilitler.
+# Platform değişirse (başka bir sunucuya taşınma, Cloudflare ekleme/çıkarma)
+# Render loglarındaki X-Forwarded-For başlığına bakılıp bu sayı yeniden ayarlanmalıdır.
 TRUSTED_PROXY_HOPS = 2
 
 
@@ -121,6 +136,9 @@ class LoginAttemptLimiter:
 # Uygulama boyunca her iş için tek bir sayaç kullanılır
 login_limiter = LoginAttemptLimiter()
 search_limiter = LoginAttemptLimiter(max_attempts=SEARCH_LIMIT, window_seconds=SEARCH_WINDOW_SECONDS)
+register_limiter = LoginAttemptLimiter(
+    max_attempts=REGISTER_LIMIT, window_seconds=REGISTER_WINDOW_SECONDS
+)
 
 
 def get_login_limiter() -> LoginAttemptLimiter:
@@ -131,5 +149,10 @@ def get_search_limiter() -> LoginAttemptLimiter:
     return search_limiter
 
 
+def get_register_limiter() -> LoginAttemptLimiter:
+    return register_limiter
+
+
 LoginLimiterDep = Annotated[LoginAttemptLimiter, Depends(get_login_limiter)]
 SearchLimiterDep = Annotated[LoginAttemptLimiter, Depends(get_search_limiter)]
+RegisterLimiterDep = Annotated[LoginAttemptLimiter, Depends(get_register_limiter)]

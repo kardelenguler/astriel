@@ -4,7 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.core.config import Settings, settings
-from app.main import create_app
+from app.main import SECURITY_HEADERS, create_app
 
 _REQUIRED = {"secret_key": "x" * 32, "geocoder_user_agent": "Astriel/test (test@example.com)"}
 
@@ -64,3 +64,23 @@ def test_unknown_api_path_returns_json_404(site_client):
     response = site_client.get("/api/v1/olmayan-adres")
     assert response.status_code == 404
     assert "error" in response.json()
+
+
+def test_null_byte_in_path_does_not_crash(site_client):
+    # Adreste %00 (null byte) varsa resolve() hata fırlatır; 500 yerine site açılmalı
+    response = site_client.get("/main.js%00.png")
+    assert response.status_code == 200
+    assert "ANGULAR" in response.text
+
+
+# ------------------------- Güvenlik başlıkları -------------------------
+@pytest.mark.parametrize(
+    "path",
+    ["/", "/main.js", "/api/v1/olmayan-adres"],
+    ids=["site-sayfasi", "site-dosyasi", "api-hata-yaniti"],
+)
+def test_security_headers_are_on_every_response(site_client, path):
+    # Site sayfaları, dosyaları ve API'nin hata yanıtları dahil her yanıtta olmalı
+    response = site_client.get(path)
+    for name, value in SECURITY_HEADERS.items():
+        assert response.headers[name] == value

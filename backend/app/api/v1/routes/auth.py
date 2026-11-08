@@ -7,7 +7,13 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from app.api.deps import AuthServiceDep, CurrentUser
 from app.core.exceptions import AuthenticationError
-from app.core.rate_limit import LoginLimiterDep, attempt_key, client_ip
+from app.core.rate_limit import (
+    REGISTER_LIMIT_MESSAGE,
+    LoginLimiterDep,
+    RegisterLimiterDep,
+    attempt_key,
+    client_ip,
+)
 from app.schemas.error import ErrorResponse
 from app.schemas.user import TokenResponse, UserCreate, UserOut
 
@@ -21,9 +27,20 @@ _UNAUTHORIZED = {401: {"model": ErrorResponse, "description": "Giriş gerekli ve
     response_model=UserOut,
     status_code=status.HTTP_201_CREATED,
     summary="Yeni hesap oluştur",
-    responses={409: {"model": ErrorResponse, "description": "Kullanıcı adı veya e-posta zaten kayıtlı"}},
+    responses={
+        409: {"model": ErrorResponse, "description": "Kullanıcı adı veya e-posta zaten kayıtlı"},
+        429: {"model": ErrorResponse, "description": "Kısa sürede çok fazla hesap açma denemesi"},
+    },
 )
-def register(data: UserCreate, auth: AuthServiceDep) -> UserOut:
+def register(
+    request: Request,
+    data: UserCreate,
+    auth: AuthServiceDep,
+    limiter: RegisterLimiterDep,
+) -> UserOut:
+    # Aynı IP saatte en fazla REGISTER_LIMIT deneme yapabilir (sahte hesap botlarına karşı).
+    # Geçersiz form (422) buraya hiç ulaşmaz, yani sayılmaz; "zaten kayıtlı" (409) sayılır.
+    limiter.hit(client_ip(request) or "unknown", REGISTER_LIMIT_MESSAGE)
     return UserOut.model_validate(auth.register(data))
 
 
