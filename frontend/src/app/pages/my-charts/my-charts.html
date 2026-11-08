@@ -119,11 +119,13 @@
     }
   }
 
-  <!-- Silindikten sonra 8 saniye görünen "Geri al" çubuğu -->
-  @if (lastDeleted(); as deleted) {
+  <!-- Son silmeden sonra 8 saniye görünen "Geri al" çubuğu (üst üste silinenler birikir) -->
+  @if (recentlyDeleted().length > 0) {
     <div class="undo-bar" role="status">
-      <span>“{{ deleted.name }}” silindi.</span>
-      <button type="button" (click)="undoDelete()">Geri Al</button>
+      <span>{{ undoMessage() }}</span>
+      <button type="button" (click)="undoDelete()">
+        {{ recentlyDeleted().length > 1 ? 'Hepsini Geri Al' : 'Geri Al' }}
+      </button>
     </div>
   }
 </section>

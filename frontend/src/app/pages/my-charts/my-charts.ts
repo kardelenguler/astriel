@@ -39,7 +39,16 @@ export class MyCharts {
   readonly loadError = signal<string | null>(null);    // liste hiç yüklenemediyse
   readonly actionError = signal<string | null>(null);  // aç/sil/geri al başarısızsa
   readonly busyId = signal<string | null>(null);       // işlem süren kartın id'si
-  readonly lastDeleted = signal<ChartSummary | null>(null);
+  /**
+   * Geri alınabilecek silinmiş haritalar (en eskisi başta). Üst üste silinenler
+   * birikir; her yeni silme süreyi baştan başlatır. Süre dolunca liste boşalır.
+   */
+  readonly recentlyDeleted = signal<ChartSummary[]>([]);
+  /** Geri al çubuğundaki yazı: tek harita için adı, birden fazlası için sayısı */
+  readonly undoMessage = computed(() => {
+    const deleted = this.recentlyDeleted();
+    return deleted.length === 1 ? `“${deleted[0].name}” silindi.` : `${deleted.length} harita silindi.`;
+  });
 
   // ---------- Adlandırma ----------
   readonly editingId = signal<string | null>(null);    // adı düzenlenen kartın id'si
@@ -135,34 +144,26 @@ export class MyCharts {
       });
   }
 
+  /** Süresi dolmamış TÜM silinmiş haritaları geri getirir */
   undoDelete(): void {
-    const item = this.lastDeleted();
-    if (!item) {
+    const items = this.recentlyDeleted();
+    if (items.length === 0) {
       return;
     }
     clearTimeout(this.undoTimer);
-    this.lastDeleted.set(null);
+    this.recentlyDeleted.set([]);
+    this.actionError.set(null);
 
-    this.savedCharts
-      .restore(item.id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        // Listeyi baştan yüklemek yerine haritayı eski yerine geri koy:
-        // "Daha fazla yükle" ile açılmış haritalar kaybolmasın
-        next: () => {
-          this.charts.update((list) => {
-            const last = list.at(-1);
-            // Haritanın yeri henüz yüklenmemiş kısımdaysa eklenmez; "Daha Fazla Yükle"
-            // ile zaten gelecek (eklenseydi listede iki kez görünürdü)
-            if (last && this.hasMore() && newestFirst(item, last) > 0) {
-              return list;
-            }
-            return [...list, item].sort(newestFirst);
-          });
-          this.total.update((t) => t + 1);
-        },
-        error: (error) => this.actionError.set(getErrorMessage(error)),
-      });
+    // Her harita ayrı istekle geri alınır: biri başarısız olursa diğerleri yine gelir
+    for (const item of items) {
+      this.savedCharts
+        .restore(item.id)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: () => this.putBack(item),
+          error: (error) => this.actionError.set(getErrorMessage(error)),
+        });
+    }
   }
 
   // ================= Adlandırma =================
@@ -241,9 +242,27 @@ export class MyCharts {
     return time ? time.slice(0, 5) : 'saat bilinmiyor';
   }
 
+  /** Silinen haritayı geri alınabilecekler listesine ekler ve süreyi baştan başlatır */
   private showUndo(item: ChartSummary): void {
     clearTimeout(this.undoTimer);
-    this.lastDeleted.set(item);
-    this.undoTimer = setTimeout(() => this.lastDeleted.set(null), UNDO_SECONDS * 1000);
+    this.recentlyDeleted.update((list) => [...list, item]);
+    this.undoTimer = setTimeout(() => this.recentlyDeleted.set([]), UNDO_SECONDS * 1000);
+  }
+
+  /**
+   * Geri alınan haritayı listedeki eski yerine koyar. Listeyi baştan yüklemek
+   * yerine böyle yapılır: "Daha fazla yükle" ile açılmış haritalar kaybolmasın.
+   */
+  private putBack(item: ChartSummary): void {
+    this.charts.update((list) => {
+      const last = list.at(-1);
+      // Haritanın yeri henüz yüklenmemiş kısımdaysa eklenmez; "Daha Fazla Yükle"
+      // ile zaten gelecek (eklenseydi listede iki kez görünürdü)
+      if (last && this.hasMore() && newestFirst(item, last) > 0) {
+        return list;
+      }
+      return [...list, item].sort(newestFirst);
+    });
+    this.total.update((t) => t + 1);
   }
 }
