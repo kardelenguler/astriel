@@ -1,6 +1,6 @@
 """geocoder.py birim testleri.
 
-İnternete ÇIKMAZ: Nominatim yanıtları sahtedir (httpx2.MockTransport).
+İnternete ÇIKMAZ: Nominatim ve Open-Meteo yanıtları sahtedir (httpx2.MockTransport).
 """
 
 import httpx2
@@ -17,6 +17,15 @@ ANTALYA = {
     "lat": "36.8865728",
     "lon": "30.7030242",
     "address": {"city": "Antalya", "country": "Türkiye"},
+}
+
+# Open-Meteo'nun aynı şehir için döndürdüğü biçim (yedek servis)
+ANTALYA_OPEN_METEO = {
+    "name": "Antalya",
+    "latitude": 36.90812,
+    "longitude": 30.69556,
+    "country": "Türkiye",
+    "admin1": "Antalya",
 }
 
 
@@ -155,3 +164,74 @@ def test_rate_limit_waits_between_requests(monkeypatch):
 
     assert len(waits) == 1
     assert 0 < waits[0] <= 1.0
+
+
+# =============================== YEDEK SERVİS (Open-Meteo) ===============================
+def _nominatim_refuses(status: int, fallback_response: httpx2.Response):
+    """Nominatim 'status' ile reddeder, Open-Meteo 'fallback_response' döner."""
+
+    def handler(request: httpx2.Request) -> httpx2.Response:
+        if request.url.host == "geocoding-api.open-meteo.com":
+            return fallback_response
+        return httpx2.Response(status)
+
+    return handler
+
+
+@pytest.mark.parametrize("status", [429, 403], ids=["cok-fazla-istek", "engellendi"])
+def test_refused_nominatim_falls_back_to_open_meteo(status):
+    ok = httpx2.Response(200, json={"results": [ANTALYA_OPEN_METEO]})
+    geocoder, requests = _geocoder(_nominatim_refuses(status, ok))
+
+    [place] = geocoder.search("Antalya")
+
+    assert place.name == "Antalya"
+    assert place.latitude == pytest.approx(36.90812)
+    assert place.country == "Türkiye"
+    assert len(requests) == 2  # önce Nominatim, sonra Open-Meteo
+    assert requests[1].url.host == "geocoding-api.open-meteo.com"
+
+
+def test_fallback_sends_expected_parameters():
+    ok = httpx2.Response(200, json={"results": []})
+    geocoder, requests = _geocoder(_nominatim_refuses(429, ok))
+    geocoder.search("  İzmir ")
+    params = requests[1].url.params
+    assert params["name"] == "İzmir"  # boşluklar temizlendi, "İ" aynen kaldı
+    assert params["language"] == "tr"
+
+
+def test_fallback_display_name_has_no_repeats():
+    # Open-Meteo'da şehir ve il adı aynı olabilir: "Antalya, Antalya, Türkiye" OLMAMALI
+    ok = httpx2.Response(200, json={"results": [ANTALYA_OPEN_METEO]})
+    geocoder, _ = _geocoder(_nominatim_refuses(429, ok))
+    assert geocoder.search("Antalya")[0].display_name == "Antalya, Türkiye"
+
+
+def test_fallback_no_results_is_not_an_error():
+    # Open-Meteo sonuç bulamayınca "results" anahtarını hiç göndermez
+    ok = httpx2.Response(200, json={"generationtime_ms": 0.5})
+    geocoder, _ = _geocoder(_nominatim_refuses(429, ok))
+    assert geocoder.search("olmayan-bir-yer") == ()
+
+
+def test_fallback_results_are_cached():
+    ok = httpx2.Response(200, json={"results": [ANTALYA_OPEN_METEO]})
+    geocoder, requests = _geocoder(_nominatim_refuses(429, ok))
+    geocoder.search("Antalya")
+    geocoder.search("antalya")
+    assert len(requests) == 2  # ikinci arama önbellekten geldi, yeni istek yok
+
+
+def test_fallback_failure_raises_external_service_error():
+    geocoder, _ = _geocoder(_nominatim_refuses(429, httpx2.Response(500)))
+    with pytest.raises(ExternalServiceError):
+        geocoder.search("Antalya")
+
+
+def test_other_nominatim_errors_do_not_use_fallback():
+    # 500 gibi hatalar ortak IP sorunu değildir: yedeğe geçilmez, hata iletilir
+    geocoder, requests = _geocoder(_respond_json({"error": "x"}, status=500))
+    with pytest.raises(ExternalServiceError):
+        geocoder.search("Antalya")
+    assert len(requests) == 1  # Open-Meteo'ya istek gitmedi

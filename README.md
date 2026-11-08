@@ -12,7 +12,8 @@ yaz saati kuralları dahil doğru şekilde UTC'ye çevrilir.
 
 ## Özellikler
 
-- **Doğum haritası hesaplama:** 10 gezegen, Kuzey Ay Düğümü, Chiron, yükselen, MC ve 12 ev
+- **Doğum haritası hesaplama:** 10 gezegen, Kuzey Düğüm, Kiron, yükselen, MC ve 12 ev
+- **Özel noktalar:** Güney Düğüm, Lilit, Juno ve Şans Noktası; her biri için burç ve eve göre yorum
 - **6 ev sistemi:** Placidus, Koch, Whole Sign, Equal, Porphyry, Regiomontanus (API'den seçilebilir; site Placidus kullanır)
 - **Açılar:** kavuşum, karşıt, üçgen, kare, altmışlık; yaklaşan/ayrılan bilgisiyle
 - **Doğum saati bilinmiyorsa:** gezegenler öğle saatine göre hesaplanır, Ay o gün burç
@@ -20,12 +21,15 @@ yaz saati kuralları dahil doğru şekilde UTC'ye çevrilir.
 - **Zor durumlar:** yaz saati geçişinde hiç yaşanmamış veya iki kez yaşanmış saatler ile
   kutup enlemlerinde Placidus/Koch'un tanımsız olması ayrıca ele alınır
 - **Doğum yeri arama:** OpenStreetMap (Nominatim), kullanım kurallarına uygun hız sınırı
-  ve önbellekle
+  ve önbellekle; Nominatim isteği reddederse (403/429) yedek olarak Open-Meteo kullanılır
 - **Misafir kullanım:** kayıt olmadan harita hesaplanıp görüntülenebilir
 - **Hesap sistemi:** kayıt olan kullanıcı haritalarını kaydedebilir, adlandırabilir,
   silebilir ve silmeyi geri alabilir
 - **Harita çarkı:** SVG ile çizilen, birbirine yakın gezegenleri otomatik ayıran burç çarkı
 - **Yorumlar:** Güneş, Ay, Yükselen, gezegenler ve 12 ev için açıklamalar
+- **Solar Return:** seçilen yılın güneş dönüşü haritası ve yıllık yorumlar
+- **İlerletilmiş harita (progresyon):** ilerletilmiş Güneş, Ay ve gezegenlerle yaş dönemi yorumları
+- **Rehber:** 12 burç ve 12 ev için ayrı açıklama sayfaları
 - **Güvenlik:** şifre değişince diğer oturumlar kapanır; giriş ve yer aramada istek sınırı vardır
 - **Gizlilik:** doğum bilgileri loglara ve ziyaretçi sayacına gitmez; silinen haritalar 30 gün sonra kalıcı olarak silinir
 
@@ -49,6 +53,7 @@ yaz saati kuralları dahil doğru şekilde UTC'ye çevrilir.
 
 **Dış servis**
 - OpenStreetMap Nominatim: doğum yeri arama
+- Open-Meteo Geocoding (GeoNames verisi): Nominatim'e ulaşılamazsa yedek yer arama
 
 **Yayın**
 - Docker, Render (uygulama), Neon (PostgreSQL)
@@ -86,7 +91,7 @@ pip install -r requirements-dev.txt
 (veritabanı şifresi, `SECRET_KEY`, `GEOCODER_USER_AGENT`).
 
 **Efemeris dosyaları:** 1800–2400 yıllarını kapsayan Swiss Ephemeris dosyaları
-(`sepl_18.se1` gezegenler, `semo_18.se1` Ay, `seas_18.se1` Chiron) depoda
+(`sepl_18.se1` gezegenler, `semo_18.se1` Ay, `seas_18.se1` Kiron) depoda
 `backend/ephemeris/` klasöründe hazır gelir; ayrıca indirmen gerekmez.
 
 Veritabanı tablolarını oluştur ve sunucuyu başlat:
@@ -135,6 +140,9 @@ Bu değer tanımlı değilse o testler atlanır.
 - [x] Kayıt, giriş ve harita kaydetme
 - [x] Burç çarkı ve temel yorumlar (Güneş, Ay, Yükselen, gezegenler, 12 ev)
 - [x] Kayıtlı haritalarda sayfalama ve kalıcı harita adresleri
+- [x] Özel noktalar (Düğümler, Lilit, Juno, Şans Noktası, Kiron)
+- [x] Solar Return ve ilerletilmiş harita
+- [ ] Sinastri (uyum haritası)
 - [ ] Gezegen + burç + ev kombinasyonlarından kural tabanlı yorum motoru
 - [ ] Yapay zekâ ile kişiye özel harita yorumları
 - [ ] Günlük ve haftalık burç yorumları
